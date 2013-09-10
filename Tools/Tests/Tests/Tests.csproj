@@ -47,6 +47,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Framework\AnnonTable.cs" />
+    <Compile Include="Framework\FileHandle.cs" />
+    <Compile Include="Framework\FileSystem.cs" />
+    <Compile Include="Framework\LuaEnvironment.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestAttribute.cs" />

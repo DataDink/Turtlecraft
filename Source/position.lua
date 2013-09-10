@@ -1,5 +1,5 @@
 turtlecraft.position = {};
-	
+
 (function() 
 
 	local directions = {
@@ -18,7 +18,7 @@ turtlecraft.position = {};
 	turtlecraft.position.facings = facings;
 
 	local cache = {};
-	cache.path = turtlecraft.directory + "position.data";
+	cache.path = turtlecraft.directory .. "position.data";
 	cache.read = function() 
 		if (not fs.exists(cache.path)) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
 		local handle = fs.open(cache.path, "r");
@@ -155,5 +155,19 @@ turtlecraft.position = {};
 		end
 	end
 	
+	turtlecraft.position.getPosition = function() 
+		return {x = location.x, y = location.y, z = location.z, d = location.d};
+	end
 	
+	turtlecraft.position.inSync = function()
+		return location.positionConfirmed and location.position.directionConfirmed;
+	end
+	
+	turtlecraft.position.canSync = function()
+		return (location.positionConfirmed or location.hasCustom or location.hasGps) and (location.directionConfirmed or location.hasCustom or location.hasCompass);
+	end
+	
+	turtlecraft.position.face = function(direction)
+		cache.write({x = location.x, y = location.y, z = location.z, d = direction}, location);
+	end
 end)();

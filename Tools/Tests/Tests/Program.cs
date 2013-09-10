@@ -6,12 +6,15 @@ using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 using LuaInterface;
+using Tests.Framework;
 
 namespace Tests
 {
     class Program
     {
-        public readonly static List<string> Results = new List<string>(); 
+        public readonly static List<string> Results = new List<string>();
+        public static readonly List<string> ProjectFiles = new List<string>();
+
 
         [STAThread]
         static void Main(string[] args)
@@ -29,9 +32,9 @@ namespace Tests
                 .ToArray();
 
             // Test compile first
-            using (var environment = new Lua()) {
+            using (var environment = new LuaEnvironment()) {
                 try {
-                    foreach (var file in files) environment.LoadFile(file);
+                    ConfigureEnvironment(environment, files);
                 } catch (Exception ex) {
                     Console.WriteLine("Could not load project: {0}", ex.Message);
                     Console.WriteLine("Press any key to quit");
@@ -40,12 +43,12 @@ namespace Tests
                 }
             }
 
-            // Run each test (these should all be static methods accepting a lua environment)
+            // Run each test (these should all be static methods accepting a lua environment (LuaEnvironment))
             foreach (var test in tests) {
-                using (var environment = new Lua()) {
+                using (var environment = new LuaEnvironment()) {
                     try {
-                        foreach (var file in files) environment.LoadFile(file);
-                        test.Invoke(null, new object[] {environment});
+                        ConfigureEnvironment(environment, files);
+                        test.Invoke(null, new object[] { environment, files });
                         Write("Test Completed: {0}.{1}", test.DeclaringType.Name, test.Name);
                     } catch (Exception ex) {
                         Write("Test Exception: {0}.{1} : {2}", test.DeclaringType.Name, test.Name, ex.Message);
@@ -53,15 +56,26 @@ namespace Tests
                 }
             }
 
-            using (var dlg = new SaveFileDialog {AddExtension = true, DefaultExt = ".txt", Title = "Save Results"}) {
+            using (var dlg = new SaveFileDialog {AddExtension = true, DefaultExt = ".txt", Title = "Save Results", FileName = "test-results.txt", Filter = "Text Files|*.txt"}) {
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 File.WriteAllLines(dlg.FileName, Results.ToArray());
             }
         }
 
+        static void ConfigureEnvironment(LuaEnvironment environment, string[] files)
+        {
+            environment.RegisterFunction("print", null, () => Print(""));
+            foreach (var file in files) environment.Api.DoFile(file);
+        }
+
+        public static void Print(string text)
+        {
+            Write(text);
+        }
+
         public static void Write(string format, params object[] args)
         {
-            Console.Write(format, args);
+            Console.WriteLine(format, args);
             Results.Add(string.Format(format, args));
         }
     }

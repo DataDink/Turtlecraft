@@ -10,7 +10,7 @@ turtlecraft.position = {};
 	};
 	turtlecraft.position.directions = directions;
 
-	local facings = {};
+	local facings = {}; -- TODO: These need to be matched up with the turtlecraft directions
 	facings[0] = directions.forward;
 	facings[1] = directions.right;
 	facings[2] = directions.backward;
@@ -20,12 +20,17 @@ turtlecraft.position = {};
 	local cache = {};
 	cache.path = turtlecraft.directory .. "position.data";
 	cache.read = function() 
-		if (not fs.exists(cache.path)) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
+		local default = {
+			x = 0, y = 0, z = 0, d = 0,
+			positionConfirmed = false,
+			directionConfirmed = false
+		};
+		if (not fs.exists(cache.path)) then return default; end
 		local handle = fs.open(cache.path, "r");
-		if (handle == nil) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
+		if (handle == nil) then return default; end
 		
 		local line = fs.readLine();
-		if (line == nil) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
+		if (line == nil) then return default; end
 		local reader = string.gmatch(line, "[^,]+");
 		local intended = {
 			x = tonumber(reader()),
@@ -46,15 +51,18 @@ turtlecraft.position = {};
 			return intended; 
 		end
 		
-		if (info.fuel > turtle.getFuelLevel()) then
-			info.positionConfirmed = true;
+		if (fuel > turtle.getFuelLevel()) then
+			intended.positionConfirmed = true;
 		end
 		
 		reader = string.gmatch(line, "[^,]+");
-		info.x = tonumber(reader());
-		info.y = tonumber(reader());
-		info.z = tonumber(reader());
-		info.d = tonumber(reader());
+		if (not intended.positionConfirmed)
+			intended.x = tonumber(reader());
+			intended.y = tonumber(reader());
+			intended.z = tonumber(reader());
+			intended.d = tonumber(reader());
+		end
+		return intended;
 	end
 	cache.write = function(intended, previous) 
 		local handle = fs.open(cache.path, "w");
@@ -85,12 +93,12 @@ turtlecraft.position = {};
 		return nil;
 	end
 	
-	-- Second most reliable - requires wonky GPS setup.
+	-- Second most reliable - requires wonky GPS setup. - no facing support
 	location.tryGetGps = function() 
 		if (rednet == nil or gps == nil) then return nil; end
 		rednet.open("right");
 		if (not rednet.isOpen("right")) then return nil; end
-		local x, y, z = gps.locate(10);
+		local x, z, y = gps.locate(10); -- I orientate my coordinates differently
 		if (x == nil) then return nil; end
 		return {
 			x = x,
@@ -99,7 +107,7 @@ turtlecraft.position = {};
 		};
 	end
 	
-	-- Gives us a reliable facing
+	-- Gives us a reliable facing. - no position support
 	location.tryGetCompass = function() 
 		if (getFacing == nil) then return nil; end
 		return facings[getFacing()];

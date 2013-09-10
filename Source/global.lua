@@ -1,4 +1,4 @@
-if (turtlecraft != nil) then 
+if (turtlecraft ~= nil) then 
 	error("A conflicting version of turtle craft exists or another script has registered 'turtlecraft'"); 
 end
 

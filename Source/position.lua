@@ -18,8 +18,8 @@ turtlecraft.position = {};
 	turtlecraft.position.facings = facings;
 
 	local cache = {};
-	cache.path = turtlecraft.directory + "position.data"
-	cache.read = function() {
+	cache.path = turtlecraft.directory + "position.data";
+	cache.read = function() 
 		if (not fs.exists(cache.path)) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
 		local handle = fs.open(cache.path, "r");
 		if (handle == nil) then return {x = 0, y = 0, z = 0, d = directions.forward}; end
@@ -55,17 +55,17 @@ turtlecraft.position = {};
 		info.y = tonumber(reader());
 		info.z = tonumber(reader());
 		info.d = tonumber(reader());
-	}
-	cache.write = function(intended, previous) {
+	end
+	cache.write = function(intended, previous) 
 		local handle = fs.open(cache.path, "w");
 		if (handle == nil) then return false; end
 		handle.writeLine(intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel());
-		if (previous ~= nil) {
+		if (previous ~= nil) then
 			handle.writeLine(previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d);
-		}
+		end
 		handle.close();
 		return true;
-	}
+	end
 
 	local location = {
 		x = 0, 
@@ -80,13 +80,13 @@ turtlecraft.position = {};
 	};
 	
 	-- Most reliable - but, sadly,  you may not be playing on RenEvo's custom server.
-	location.tryGetCustom = function() {
+	location.tryGetCustom = function() 
 		-- TODO: add code here for RenEvo's custom location mod
 		return nil;
-	};
+	end
 	
 	-- Second most reliable - requires wonky GPS setup.
-	location.tryGetGps = function() {
+	location.tryGetGps = function() 
 		if (rednet == nil or gps == nil) then return nil; end
 		rednet.open("right");
 		if (not rednet.isOpen("right")) then return nil; end
@@ -97,15 +97,15 @@ turtlecraft.position = {};
 			y = y,
 			z = z
 		};
-	};
+	end
 	
 	-- Gives us a reliable facing
-	location.tryGetCompass = function() {
+	location.tryGetCompass = function() 
 		if (getFacing == nil) then return nil; end
 		return facings[getFacing()];
-	};
+	end
 	
-	location.init = function() {
+	location.init = function() 
 		local customReading = location.tryGetCustom();
 		if (customReading ~= nil) then location.hasCustom = true; end
 		local gpsReading = location.tryGetGps();
@@ -128,14 +128,32 @@ turtlecraft.position = {};
 			location.d = customReading.d;
 			location.positionConfirmed = true;
 			location.directionConfirmed = true;
-		else if (location.hasGps) then
+		elseif (location.hasGps) then
 			location.x = gpsReading.x;
 			location.y = gpsReading.y;
 			location.z = gpsReading.z;
 			location.positionConfirmed = true;
 		end
-		
-	};
+		if (location.hasCompass) then
+			location.d = compassReading;
+			location.directionConfirmed = true;
+		end
+	end
+	location.init();
+	
+	location.face = function(direction)
+		if (direction == location.d) then return; end
+		if (direction % 90 ~= 0) then error("Position.lua location.face: direction was not % 90 degrees"); end
+		if (direction == (location.d + 270) % 360) then
+			turtle.turnLeft();
+			location.d = direction;
+			return;
+		end
+		while (direction ~= location.d) do
+			turtle.turnRight();
+			location.d = location.d + 90;
+		end
+	end
 	
 	
 end)();

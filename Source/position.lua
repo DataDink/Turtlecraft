@@ -179,12 +179,12 @@ turtlecraft.position = {};
 		end
 	end
 	
-	turtlecraft.position.get = function() {
+	turtlecraft.position.get = function() 
 		return location.x, location.y, location.z, location.d;
-	}
+	end
 	
 	-- Will fail if a syncronization change happened.
-	turtlecraft.position.set = function(x, y, z, d, moveAction) {
+	turtlecraft.position.set = function(x, y, z, d, moveAction) 
 		local previous = {x = location.x, y = location.y, z = location.z, d = location.d};
 		local intended = {x = x, y = y, z = z, d = d};
 		if (moveAction ~= nil) then
@@ -198,7 +198,7 @@ turtlecraft.position = {};
 		location.z = z;
 		location.d = d;
 		return true;
-	}
+	end
 	
 
 end)();

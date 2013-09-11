@@ -19,8 +19,23 @@ turtlecraft.position = {};
 	facings[3] = directions.left;
 	turtlecraft.position.facings = facings;
 
-	local cache = {};
-	cache.path = turtlecraft.directory .. "position.data";
+	local location = {
+		x = 0, 
+		y = 0, 
+		z = 0, 
+		d = directions.forward
+	};
+	
+	local addons = {
+		positionConfirmed = false,
+		directionConfirmed = false,
+		canSync = false
+	};
+
+	local cache = {
+		path = turtlecraft.directory .. "position.data"
+	};
+
 	cache.read = function() 
 		local default = {
 			x = 0, y = 0, z = 0, d = 0,
@@ -63,6 +78,7 @@ turtlecraft.position = {};
 		
 		if (fuel > turtle.getFuelLevel()) then
 			intended.positionConfirmed = true;
+			intended.directionConfirmed = true;
 		elseif (fuel == turtle.getFuelLevel()) then
 			intended.x = previous.x;
 			intended.y = previous.y;
@@ -82,24 +98,14 @@ turtlecraft.position = {};
 		handle.close();
 		return true;
 	end
-
-	local location = {
-		x = 0, 
-		y = 0, 
-		z = 0, 
-		d = directions.forward,
-		positionConfirmed = false,
-		directionConfirmed = false,
-		canSync = false,
-	};
 	
 	-- Most reliable - but, sadly,  you may not be playing on RenEvo's custom server.
-	location.tryUpdateCustom = function()
+	addons.tryUpdateCustom = function()
 		-- Unknown yet
+		return false;
 	end
-	location.tryUpdateCustom();
 	
-	location.tryReadGps()
+	addons.tryReadGps()
 		if (rednet == nil or gps == nil) then return nil; end
 		rednet.open("right");
 		if (not rednet.isOpen("right")) then return nil; end
@@ -108,30 +114,30 @@ turtlecraft.position = {};
 	end
 	
 	-- Second most reliable - requires wonky GPS setup. - no facing support
-	location.tryUpdateGps = function()
-		local x, y, z = location.tryReadGps();
-		if (x == nil) then return; end
+	addons.tryUpdateGps = function()
+		local x, y, z = addons.tryReadGps();
+		if (x == nil) then return false; end
 		location.x = x;
 		location.y = y;
 		location.z = z;
-		location.positionConfirmed = true;
-		location.canSync = true;
+		addons.positionConfirmed = true;
+		addons.canSync = true;
+		return true;
 	end
-	location.tryUpdateGps();
 	
-	location.tryUpdateCompass = function()
-		if (getFacing == nil) then return; end
+	addons.tryUpdateCompass = function()
+		if (getFacing == nil) then return false; end
 		location.d = facings[getFacing()];
-		location.directionConfirmed = true;
+		addons.directionConfirmed = true;
+		return true;
 	end
-	location.tryUpdateCompass();
 	
 	-- if true than an adjustment was made and should be compensated by the caller
-	location.trySync = function()
-		if (location.directionConfirmed) then return false; end
-		if (not location.canSync) then return false; end
+	addons.trySync = function()
+		if (addons.directionConfirmed) then return false; end
+		if (not addons.canSync) then return false; end
 		
-		local x, y, z = location.tryReadGps();
+		local x, y, z = addons.tryReadGps();
 		local actual = location.d;
 		if (location.d == directions.forward and x < location.x) then actual = directions.left; end
 		if (location.d == directions.backward and x < location.x) then actual = directions.left; end
@@ -156,6 +162,23 @@ turtlecraft.position = {};
 		return adjustRequired;
 	end
 	
+	location.init = function() 
+		local recovery = cache.read();
+		location.x = recovery.x;
+		location.y = recovery.y;
+		location.z = recovery.z;
+		location.d = recovery.d;
+		
+		addons.positionConfirmed = recovery.positionConfirmed;
+		addons.directionConfirmed = recovery.directionConfirmed;
+		
+		if (not addons.tryUpdateCustom()) then
+			if (not addons.tryUpdateGps()) then
+				addons.tryUpdateCompass();
+			end
+		end
+	end
+	
 	turtlecraft.position.get = function() {
 		return location.x, location.y, location.z, location.d;
 	}
@@ -176,4 +199,6 @@ turtlecraft.position = {};
 		location.d = d;
 		return true;
 	}
+	
+
 end)();

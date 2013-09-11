@@ -6,7 +6,9 @@ turtlecraft.position = {};
 		forward = 270,
 		backward = 90,
 		left = 180,
-		right = 0
+		right = 0,
+		up = 'up',
+		down = 'down'
 	};
 	turtlecraft.position.directions = directions;
 
@@ -149,8 +151,27 @@ turtlecraft.position = {};
 	end
 	location.init();
 	
+	location.confirm = function(beforeMove) -- assumes a forward movement only
+		if (location.hasGps and (not location.directionConfirmed)) then
+			local actualDirection = beforeMove.d
+			if (beforeMove.x > location.x) then actualDirection = directions.right; end
+			if (beforeMove.x < location.x) then actualDirection = directions.left; end
+			if (beforeMove.y > location.y) then actualDirection = directions.forward; end
+			if (beforeMove.y < location.y) then actualDirection = directions.backward; end
+			if (actualDirection ~= beforeMove.d) then
+				if (not turtle.back()) then return false; end
+				location.d = actualDirection;
+				location.directionConfirmed = true;
+				location.face(beforeMove.d);
+				if (not turtle.forward()) then return false; end
+			end
+		end
+		return true;
+	end
+	
 	location.face = function(direction)
 		if (direction == location.d) then return; end
+		if (direction == directions.up or direction == directions.down) then return; end
 		if (direction % 90 ~= 0) then error("Position.lua location.face: direction was not % 90 degrees"); end
 		if (direction == (location.d + 270) % 360) then
 			turtle.turnLeft();
@@ -161,6 +182,73 @@ turtlecraft.position = {};
 			turtle.turnRight();
 			location.d = location.d + 90;
 		end
+	end
+	
+	location.move = function(direction, before, after, fail)
+		local priorPosition = {x = location.x, y = location.y, z = location.z, d = location.d};
+		location.face(direction);
+		local expectedPosition = {x = location.x, y = location.y, z = location.z, d = location.d};
+		
+		local move = turtle.forward;
+		if (direction == directions.up) then 
+			move = turtle.up; 
+			expectedPosition.z = expectedPosition.z + 1;
+		end
+		if (direction == directions.down) then 
+			move = turtle.down; 
+			expectedPosition.z = expectedPosition.z - 1;
+		end
+		if (direction == directions.forward) then expectedPosition.x = expectedPosition.x + 1; end
+		if (direction == directions.backward) then expectedPosition.x = expectedPosition.x - 1; end
+		if (direction == directions.left) then expectedPosition.y = expectedPosition.y - 1; end
+		if (direction == directions.right) then expectedPosition.y = expectedPosition.y + 1; end
+		
+		if (before ~= nil) then before(); end
+		
+		cache.write(expectedPosition, priorPosition);
+		local moveTries = 0;
+		while (not move()) do
+			moveTries = moveTries + 1;
+			if (moveTries > 10) then 
+				cache.write(location);
+				return false; 
+			end
+			sleep(1);
+			if (fail ~= nil) then fail(); end
+		end
+		cache.write(location);
+		if (not location.confirm(priorPosition)) then return false; end
+		location.x = expectedPosition.x;
+		location.y = expectedPosition.y;
+		location.z = expectedPosition.z;
+		if (after ~= nil) then after(); end
+		return true;
+	end
+	
+	location.moveTo = function(targetPosition, before, after, fail)
+		local x = turtlecraft.math.round(targetPosition.x);
+		local y = turtlecraft.math.round(targetPosition.y);
+		local z = turtlecraft.math.round(targetPosition.z);
+		local xmove = nil;
+		if (location.x > x) then xmove = directions.left; end
+		if (location.x < x) then xmove = directions.right; end
+		local ymove = nil;
+		if (location.y > y) then ymove = directions.backward; end
+		if (location.y < y) then ymove = directions.forward; end
+		local zmove = nil;
+		if (location.z > z) then zmove = directions.down; end
+		if (location.z < z) then zmove = directions.up; end
+		
+		while (location.z ~= z) do
+			if (not location.move(zmove, before, after, fail)) then return false; end
+		end
+		while (location.x ~= x) do
+			if (not location.move(xmove, before, after, fail)) then return false; end
+		end
+		while (location.y ~= y) do
+			if (not location.move(ymove, before, after, fail)) then return false; end
+		end
+		return true;
 	end
 	
 	turtlecraft.position.getPosition = function() 
@@ -177,5 +265,9 @@ turtlecraft.position = {};
 	
 	turtlecraft.position.face = function(direction)
 		cache.write({x = location.x, y = location.y, z = location.z, d = direction}, location);
+		location.face(direction);
+		cache.write(location);
 	end
+	
+	turtlecraft.position
 end)();

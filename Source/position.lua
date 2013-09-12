@@ -3,27 +3,27 @@ turtlecraft.position = {};
 (function() 
 
 	local directions = {
-		forward = 270,
-		backward = 90,
-		left = 180,
-		right = 0,
+		north = 270,
+		south = 90,
+		west = 180,
+		east = 0,
 		up = 'up',
 		down = 'down'
 	};
 	turtlecraft.position.directions = directions;
 
 	local facings = {}; -- TODO: These need to be matched up with the turtlecraft directions
-	facings[0] = directions.forward;
-	facings[1] = directions.right;
-	facings[2] = directions.backward;
-	facings[3] = directions.left;
+	facings[0] = directions.north;
+	facings[1] = directions.east;
+	facings[2] = directions.south;
+	facings[3] = directions.west;
 	turtlecraft.position.facings = facings;
 
 	local location = {
 		x = 0, 
 		y = 0, 
 		z = 0, 
-		d = directions.forward
+		d = directions.north
 	};
 	
 	local addons = {
@@ -139,18 +139,18 @@ turtlecraft.position = {};
 		
 		local x, y, z = addons.tryReadGps();
 		local actual = location.d;
-		if (location.d == directions.forward and x < location.x) then actual = directions.left; end
-		if (location.d == directions.backward and x < location.x) then actual = directions.left; end
-		if (location.d == directions.right and x < location.x and y == location.y) then actual = directions.left; end
-		if (location.d == directions.forward and x > location.x) then actual = directions.right; end
-		if (location.d == directions.backward and x > location.x) then actual = directions.right; end
-		if (location.d == directions.left and x > location.x and y == location.y) then actual = directions.right; end
-		if (location.d == directions.forward and y < location.y and x == location.x) then actual = directions.backward; end
-		if (location.d == directions.left and y < location.y) then actual = directions.backward; end
-		if (location.d == directions.right and y < location.y) then actual = directions.backward; end
-		if (location.d == directions.backward and y > location.y and x == location.x) then actual = directions.forward; end
-		if (location.d == directions.left and y > location.y) then actual = directions.forward; end
-		if (location.d == directions.right and y > location.y) then actual = directions.forward; end
+		if (location.d == directions.north and x < location.x) then actual = directions.west; end
+		if (location.d == directions.south and x < location.x) then actual = directions.west; end
+		if (location.d == directions.east and x < location.x and y == location.y) then actual = directions.west; end
+		if (location.d == directions.north and x > location.x) then actual = directions.east; end
+		if (location.d == directions.south and x > location.x) then actual = directions.east; end
+		if (location.d == directions.west and x > location.x and y == location.y) then actual = directions.east; end
+		if (location.d == directions.north and y < location.y and x == location.x) then actual = directions.south; end
+		if (location.d == directions.west and y < location.y) then actual = directions.south; end
+		if (location.d == directions.east and y < location.y) then actual = directions.south; end
+		if (location.d == directions.south and y > location.y and x == location.x) then actual = directions.north; end
+		if (location.d == directions.west and y > location.y) then actual = directions.north; end
+		if (location.d == directions.east and y > location.y) then actual = directions.north; end
 		
 		local adjustRequired = x ~= location.x or y ~= location.y or z ~= location.z or actual ~= location.d;
 		if (adjustRequired) then
@@ -190,13 +190,17 @@ turtlecraft.position = {};
 		if (moveAction ~= nil) then
 			cache.write(indended, previous);
 			moveAction();
-			if (location.trySync()) then return false; end
+			cache.write(intended);
+		elseif ((not addons.positionConfirmed) or (not addons.directionConfirmed)) then
+			cache.write(indended, previous);
+		else
+			cache.write(intended);
 		end
-		cache.write(intended);
 		location.x = x;
 		location.y = y;
 		location.z = z;
 		location.d = d;
+		if (moveAction ~= nil and location.trySync()) then return false; end
 		return true;
 	end
 	

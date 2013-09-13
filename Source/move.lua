@@ -37,5 +37,6 @@ turtlecraft.move = {};
 		if (direction == directions.south) then y = y - 1; end 
 		if (direction == directions.east) then x = x + 1; end
 		if (direction == directions.west) then x = x - 1; end
+		
 	end
 end)();

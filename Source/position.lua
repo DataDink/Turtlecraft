@@ -29,7 +29,7 @@ turtlecraft.position = {};
 	local addons = {
 		positionConfirmed = false,
 		directionConfirmed = false,
-		canSync = false
+		canSync = false,
 	};
 
 	local cache = {
@@ -102,7 +102,7 @@ turtlecraft.position = {};
 	-- Most reliable - but, sadly,  you may not be playing on RenEvo's custom server.
 	addons.tryUpdateCustom = function()
 		-- Unknown yet
-		return false;
+		return false;  
 	end
 	
 	addons.tryReadGps()

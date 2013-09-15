@@ -48,7 +48,7 @@ namespace Tests
                 using (var environment = new LuaEnvironment()) {
                     try {
                         ConfigureEnvironment(environment, files);
-                        test.Invoke(null, new object[] { environment, files });
+                        test.Invoke(null, new object[] { environment });
                         Write("Test Completed: {0}.{1}", test.DeclaringType.Name, test.Name);
                     } catch (Exception ex) {
                         Write("Test Exception: {0}.{1} : {2}", test.DeclaringType.Name, test.Name, ex.Message);

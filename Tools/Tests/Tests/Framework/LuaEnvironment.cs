@@ -10,11 +10,13 @@ namespace Tests.Framework
 
         public Lua Api { get; private set; }
         public FileSystem FS { get; private set; }
+        public Turtle Turtle { get; private set; }
 
         public LuaEnvironment()
         {
             Api = new Lua();
             FS = new FileSystem(this);
+            Turtle = new Turtle(this);
 
             Api.NewTable(_luaValueStorage);
         }
@@ -32,6 +34,11 @@ namespace Tests.Framework
         {
             var expr = (MethodCallExpression)methodCall.Body;
             Api.RegisterFunction(path, target, expr.Method);
+        }
+
+        public object[] Execute(string lua)
+        {
+            return Api.DoString(lua);
         }
 
         public void Dispose()

@@ -23,7 +23,7 @@ turtlecraft.move = {};
 	internal.move = function(direction, before, after, onRetry)
 		local move = "forward";
 		if (direction == directions.up) then move = "up"; end
-		if (direction == directions.down then move = "down"; end
+		if (direction == directions.down) then move = "down"; end
 		
 		local x, y, z, d = turtlecraft.position.get();
 		if (direction == directions.up) then z = z + 1; end
@@ -35,15 +35,15 @@ turtlecraft.move = {};
 		
 		local action = function()
 			while (not turtle[move]()) do
-				if (onRetry ~= nil and onRetry() == false) then return false; end
+				if (onRetry ~= nil and onRetry(direction) == false) then return false; end
 				sleep(1);
 			end
 			return true;
 		end
 		
-		if (before ~= nil and before() == false) then return false; end
+		if (before ~= nil and before(direction) == false) then return false; end
 		if (turtlecraft.position.set(x, y, z, d, action, move) == false) then return false; end
-		if (after ~= nil and after() == false) then return false; end
+		if (after ~= nil and after(direction) == false) then return false; end
 		return true;
 	end
 	
@@ -58,11 +58,10 @@ turtlecraft.move = {};
 	end
 	
 	internal.moveTo = function(x, y, z, before, after, onRetry)
-		local current = {};
-		local current.x, current.y, current.z, current.d = turtlecraft.position.get();
-		if (internal.repeatMove(z, current.z, directions.up, directions.down, before, after, onRetry) == false) then return false; end
-		if (internal.repeatMove(x, current.x, directions.east, directions.west, before, after, onRetry) == false) then return false; end
-		if (internal.repeatMove(y, current.y, directions.north, directions.south, before, after, onRetry) == false) then return false; end
+		local px, py, pz, pd = turtlecraft.position.get();
+		if (internal.repeatMove(pz, x, directions.up, directions.down, before, after, onRetry) == false) then return false; end
+		if (internal.repeatMove(px, y, directions.east, directions.west, before, after, onRetry) == false) then return false; end
+		if (internal.repeatMove(py, z, directions.north, directions.south, before, after, onRetry) == false) then return false; end
 		return true;
 	end
 
@@ -71,12 +70,33 @@ turtlecraft.move = {};
 	end
 	
 	turtlecraft.move.digTo = function(x, y, z, action)
-		return internal.moveTo(x, y, z, turtle.dig, action, turtle.dig);
+		local dig = function(movement)
+			local method = turtle.dig;
+			if (movement == directions.up) then method = turtle.digUp; end
+			if (movement == directions.down) then method = turtle.digDown; end
+			return method();
+		end
+		return internal.moveTo(x, y, z, dig, action, dig);
 	end
 	
 	turtlecraft.move.excavateTo = function(x, y, z, action)
-		local dig = function() {
-			-- TODO - this needs to know what direction it's going - so do the others.
-		}
+		local dig = function(movement)
+			local primary = turtle.dig;
+			local other1 = turtle.digUp;
+			local other2 = turtle.digDown;
+			if (movement == directions.up) then 
+				primary = turtle.digUp; 
+				other1 = turtle.dig;
+				other2 = turtle.digDown;
+			end
+			if (movement == directions.down) then 
+				primary = turtle.digDown; 
+				other1 = turtle.digUp;
+				other2 = turtle.dig;
+			end
+			other1();
+			other2();
+			return method();
+		end
 	end
 end)();

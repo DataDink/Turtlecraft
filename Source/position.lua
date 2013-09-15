@@ -1,8 +1,6 @@
 -- Turtle position tracking as persistent as I can make it.
 
-turtlecraft.position = {
-	inSync = false;
-};
+turtlecraft.position = {};
 
 (function() 
 
@@ -34,6 +32,7 @@ turtlecraft.position = {
 		positionConfirmed = false,
 		directionConfirmed = false,
 		canSync = false,
+		inSync = false,
 	};
 
 	local cache = {
@@ -62,7 +61,6 @@ turtlecraft.position = {
 			directionConfirmed = false
 		};
 		local fuel = tonumber(reader());
-		local move = reader();
 
 		line = fs.readLine();
 		handle.close();
@@ -84,9 +82,6 @@ turtlecraft.position = {
 		if (fuel > turtle.getFuelLevel()) then
 			intended.positionConfirmed = true;
 			intended.directionConfirmed = true;
-		elseif (move ~= nil and move ~= "" and turtle[move] ~= nil and turtle[move]()) then
-			intended.positionConfirmed = true;
-			intended.directionConfirmed = true;
 		elseif (fuel == turtle.getFuelLevel()) then
 			intended.x = previous.x;
 			intended.y = previous.y;
@@ -96,15 +91,12 @@ turtlecraft.position = {
 
 		return intended;
 	end
-	cache.write = function(intended, previous, move) 
+	cache.write = function(intended, previous) 
 		local handle = fs.open(cache.path, "w");
 		if (handle == nil) then return false; end
-		local line = intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel();
-		if (move ~= nil) then line = line .. "," .. move;
-		handle.writeLine(line);
+		handle.writeLine(intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel());
 		if (previous ~= nil) then
-			line = previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d;
-			handle.writeLine(line);
+			handle.writeLine(previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d);
 		end
 		handle.close();
 		return true;
@@ -116,7 +108,7 @@ turtlecraft.position = {
 		return false;  
 	end
 	
-	addons.tryReadGps()
+	addons.tryReadGps = function()
 		if (rednet == nil or gps == nil) then return nil; end
 		rednet.open("right");
 		if (not rednet.isOpen("right")) then return nil; end
@@ -196,7 +188,11 @@ turtlecraft.position = {
 			end
 		end
 		
-		turtlecraft.position.inSync = (addons.positionConfirmed and addons.directionConfirmed) or location.trySync();
+		addons.inSync = (addons.positionConfirmed and addons.directionConfirmed) or location.trySync();
+	end
+	
+	turtlecraft.position.isInSync = function() 
+		return addons.inSync;
 	end
 	
 	turtlecraft.position.get = function() 
@@ -208,7 +204,7 @@ turtlecraft.position = {
 		local previous = {x = location.x, y = location.y, z = location.z, d = location.d};
 		local intended = {x = x, y = y, z = z, d = d};
 		cache.write(intended, previous, move);
-		if (moveAction == nil || moveAction() == false) then return false; end
+		if (moveAction == nil or moveAction() == false) then return false; end
 		cache.write(intended);
 
 		location.x = x;

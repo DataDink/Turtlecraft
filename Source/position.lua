@@ -1,4 +1,8 @@
-turtlecraft.position = {};
+-- Turtle position tracking as persistent as I can make it.
+
+turtlecraft.position = {
+	inSync = false;
+};
 
 (function() 
 
@@ -58,6 +62,7 @@ turtlecraft.position = {};
 			directionConfirmed = false
 		};
 		local fuel = tonumber(reader());
+		local move = reader();
 
 		line = fs.readLine();
 		handle.close();
@@ -79,6 +84,9 @@ turtlecraft.position = {};
 		if (fuel > turtle.getFuelLevel()) then
 			intended.positionConfirmed = true;
 			intended.directionConfirmed = true;
+		elseif (move ~= nil and move ~= "" and turtle[move] ~= nil and turtle[move]()) then
+			intended.positionConfirmed = true;
+			intended.directionConfirmed = true;
 		elseif (fuel == turtle.getFuelLevel()) then
 			intended.x = previous.x;
 			intended.y = previous.y;
@@ -88,12 +96,15 @@ turtlecraft.position = {};
 
 		return intended;
 	end
-	cache.write = function(intended, previous) 
+	cache.write = function(intended, previous, move) 
 		local handle = fs.open(cache.path, "w");
 		if (handle == nil) then return false; end
-		handle.writeLine(intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel());
+		local line = intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel();
+		if (move ~= nil) then line = line .. "," .. move;
+		handle.writeLine(line);
 		if (previous ~= nil) then
-			handle.writeLine(previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d);
+			line = previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d;
+			handle.writeLine(line);
 		end
 		handle.close();
 		return true;
@@ -132,34 +143,41 @@ turtlecraft.position = {};
 		return true;
 	end
 	
-	-- if true than an adjustment was made and should be compensated by the caller
 	addons.trySync = function()
-		if (addons.directionConfirmed) then return false; end
+		if (addons.directionConfirmed and addons.positionConfirmed) then return true; end
 		if (not addons.canSync) then return false; end
 		
-		local x, y, z = addons.tryReadGps();
-		local actual = location.d;
-		if (location.d == directions.north and x < location.x) then actual = directions.west; end
-		if (location.d == directions.south and x < location.x) then actual = directions.west; end
-		if (location.d == directions.east and x < location.x and y == location.y) then actual = directions.west; end
-		if (location.d == directions.north and x > location.x) then actual = directions.east; end
-		if (location.d == directions.south and x > location.x) then actual = directions.east; end
-		if (location.d == directions.west and x > location.x and y == location.y) then actual = directions.east; end
-		if (location.d == directions.north and y < location.y and x == location.x) then actual = directions.south; end
-		if (location.d == directions.west and y < location.y) then actual = directions.south; end
-		if (location.d == directions.east and y < location.y) then actual = directions.south; end
-		if (location.d == directions.south and y > location.y and x == location.x) then actual = directions.north; end
-		if (location.d == directions.west and y > location.y) then actual = directions.north; end
-		if (location.d == directions.east and y > location.y) then actual = directions.north; end
-		
-		local adjustRequired = x ~= location.x or y ~= location.y or z ~= location.z or actual ~= location.d;
-		if (adjustRequired) then
-			location.x = x;
-			location.y = y;
-			location.z = z;
-			location.d = actual;
+		for turns = 1, 4 do
+			if (not turtle.detect()) then break; end
+			location.d = (location.d + 90) % 360;
+			turtle.turnRight();
 		end
-		return adjustRequired;
+		
+		if (turtle.detect()) then return false; end
+		turtle.forward();
+		if (location.d == directions.north) then location.y = location.y + 1; end
+		if (location.d == directions.south) then location.y = location.y - 1; end
+		if (location.d == directions.east) then location.x = location.x + 1; end
+		if (location.d == directions.west) then location.x = location.x - 1; end
+
+		local x, y, z = addons.tryReadGps();
+
+		if (location.d == directions.north and x < location.x) then location.d = directions.west; end
+		if (location.d == directions.south and x < location.x) then location.d = directions.west; end
+		if (location.d == directions.east and x < location.x and y == location.y) then location.d = directions.west; end
+		if (location.d == directions.north and x > location.x) then location.d = directions.east; end
+		if (location.d == directions.south and x > location.x) then location.d = directions.east; end
+		if (location.d == directions.west and x > location.x and y == location.y) then location.d = directions.east; end
+		if (location.d == directions.north and y < location.y and x == location.x) then location.d = directions.south; end
+		if (location.d == directions.west and y < location.y) then location.d = directions.south; end
+		if (location.d == directions.east and y < location.y) then location.d = directions.south; end
+		if (location.d == directions.south and y > location.y and x == location.x) then location.d = directions.north; end
+		if (location.d == directions.west and y > location.y) then location.d = directions.north; end
+		if (location.d == directions.east and y > location.y) then location.d = directions.north; end
+		
+		turtle.back();
+		cache.write(location);
+		return true;
 	end
 	
 	location.init = function() 
@@ -177,30 +195,26 @@ turtlecraft.position = {};
 				addons.tryUpdateCompass();
 			end
 		end
+		
+		turtlecraft.position.inSync = (addons.positionConfirmed and addons.directionConfirmed) or location.trySync();
 	end
 	
 	turtlecraft.position.get = function() 
 		return location.x, location.y, location.z, location.d;
 	end
 	
-	-- Will fail if a syncronization change happened.
-	turtlecraft.position.set = function(x, y, z, d, moveAction) 
+	-- If moveAction does not exist or returns false: will consider out of sync.
+	turtlecraft.position.set = function(x, y, z, d, moveAction, move) 
 		local previous = {x = location.x, y = location.y, z = location.z, d = location.d};
 		local intended = {x = x, y = y, z = z, d = d};
-		if (moveAction ~= nil) then
-			cache.write(indended, previous);
-			moveAction();
-			cache.write(intended);
-		elseif ((not addons.positionConfirmed) or (not addons.directionConfirmed)) then
-			cache.write(indended, previous);
-		else
-			cache.write(intended);
-		end
+		cache.write(intended, previous, move);
+		if (moveAction == nil || moveAction() == false) then return false; end
+		cache.write(intended);
+
 		location.x = x;
 		location.y = y;
 		location.z = z;
 		location.d = d;
-		if (moveAction ~= nil and location.trySync()) then return false; end
 		return true;
 	end
 	

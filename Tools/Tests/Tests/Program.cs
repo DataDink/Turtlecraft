@@ -32,27 +32,27 @@ namespace Tests
                 .ToArray();
 
             // Test compile first
-            using (var environment = new LuaEnvironment()) {
-                try {
-                    ConfigureEnvironment(environment, files);
-                } catch (Exception ex) {
-                    Console.WriteLine("Could not load project: {0}", ex.Message);
-                    Console.WriteLine("Press any key to quit");
-                    Console.ReadKey();
-                    return;
-                }
+            try {
+                new LuaEnvironment(files);
+            } catch (Exception ex) {
+                Console.WriteLine("Could not load project: {0}", ex.Message);
+                Console.WriteLine("Press any key to quit");
+                Console.ReadKey();
+                return;
             }
 
             // Run each test (these should all be static methods accepting a lua environment (LuaEnvironment))
             foreach (var test in tests) {
-                using (var environment = new LuaEnvironment()) {
+                using (var environment = new LuaEnvironment(files)) {
                     try {
-                        ConfigureEnvironment(environment, files);
                         test.Invoke(null, new object[] { environment });
                         Write("Test Completed: {0}.{1}", test.DeclaringType.Name, test.Name);
                     } catch (Exception ex) {
-                        Write("Test Exception: {0}.{1} : {2}", test.DeclaringType.Name, test.Name, ex.Message);
+                        var inner = ex;
+                        while (inner.InnerException != null) inner = inner.InnerException;
+                        Write("Test Exception: {0}.{1} : {2}", test.DeclaringType.Name, test.Name, inner.Message);
                     }
+                    Write("----");
                 }
             }
 
@@ -62,15 +62,9 @@ namespace Tests
             }
         }
 
-        static void ConfigureEnvironment(LuaEnvironment environment, string[] files)
+        public static void Print(object text)
         {
-            environment.RegisterFunction("print", null, () => Print(""));
-            foreach (var file in files) environment.Api.DoFile(file);
-        }
-
-        public static void Print(string text)
-        {
-            Write(text);
+            Write((text ?? "").ToString());
         }
 
         public static void Write(string format, params object[] args)

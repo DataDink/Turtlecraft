@@ -41,7 +41,7 @@ turtlecraft.position = {};
 
 	cache.read = function() 
 		local default = {
-			x = 0, y = 0, z = 0, d = 0,
+			x = location.x, y = location.y, z = location.z, d = location.d,
 			positionConfirmed = false,
 			directionConfirmed = false
 		};
@@ -49,9 +49,12 @@ turtlecraft.position = {};
 		local handle = fs.open(cache.path, "r");
 		if (handle == nil) then return default; end
 		
-		local line = fs.readLine();
-		if (line == nil) then return default; end
-		local reader = string.gmatch(line, "[^,]+");
+		local line1 = handle.readLine();
+		local line2 = handle.readLine();
+		handle.close();
+		
+		if (line1 == nil) then return default; end
+		local reader = string.gmatch(line1, "[^,]+");
 		local intended = {
 			x = tonumber(reader()),
 			y = tonumber(reader()),
@@ -61,17 +64,14 @@ turtlecraft.position = {};
 			directionConfirmed = false
 		};
 		local fuel = tonumber(reader());
-
-		line = fs.readLine();
-		handle.close();
 		
-		if (line == nil) then 
+		if (line2 == nil) then 
 			intended.positionConfirmed = true;
 			intended.directionConfirmed = true;
 			return intended; 
 		end
 		
-		reader = string.gmatch(line, "[^,]+");
+		reader = string.gmatch(line2, "[^,]+");
 		local previous = {
 			x = tonumber(reader()),
 			y = tonumber(reader()),
@@ -89,6 +89,8 @@ turtlecraft.position = {};
 			intended.positionConfirmed = true;
 		end
 
+		print(intended.positionConfirmed);
+		print(intended.directionConfirmed);
 		return intended;
 	end
 	cache.write = function(intended, previous) 
@@ -188,8 +190,9 @@ turtlecraft.position = {};
 			end
 		end
 		
-		addons.inSync = (addons.positionConfirmed and addons.directionConfirmed) or location.trySync();
+		addons.inSync = (addons.positionConfirmed and addons.directionConfirmed) or addons.trySync();
 	end
+	location.init();
 	
 	turtlecraft.position.isInSync = function() 
 		return addons.inSync;

@@ -27,11 +27,11 @@ namespace Tests.Framework
             _reader = new StringReader(Content);
             _writer = mode == "a" ? new StringBuilder(Content) : new StringBuilder(); 
             Table = _environment.CreateTable();
-            _environment.RegisterFunction(Table.Path + ".close", this, () => Close());
-            _environment.RegisterFunction(Table.Path + ".readLine", this, () => ReadLine());
-            _environment.RegisterFunction(Table.Path + ".readAll", this, () => ReadAll());
-            _environment.RegisterFunction(Table.Path + ".write", this, () => Write(""));
-            _environment.RegisterFunction(Table.Path + ".writeLine", this, () => WriteLine(""));
+            _environment.RegisterFunction(Table, "close", this, () => Close());
+            _environment.RegisterFunction(Table, "readLine", this, () => ReadLine());
+            _environment.RegisterFunction(Table, "readAll", this, () => ReadAll());
+            _environment.RegisterFunction(Table, "write", this, () => Write(""));
+            _environment.RegisterFunction(Table, "writeLine", this, () => WriteLine(""));
         }
 
         public event EventHandler Closed;

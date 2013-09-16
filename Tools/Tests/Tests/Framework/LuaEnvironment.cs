@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using LuaInterface;
 
@@ -6,34 +8,57 @@ namespace Tests.Framework
 {
     public class LuaEnvironment : IDisposable
     {
-        private readonly string _luaValueStorage = "_annon_" + Guid.NewGuid().ToString().Replace("-", "");
+        private readonly string[] _files;
 
         public Lua Api { get; private set; }
         public FileSystem FS { get; private set; }
         public Turtle Turtle { get; private set; }
 
-        public LuaEnvironment()
+        public LuaEnvironment(string[] files)
+        {
+            _files = files;
+            Reset();
+        }
+
+        public void Reset()
         {
             Api = new Lua();
+            RegisterFunction("print", null, () => Program.Print(""));
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
-
-            Api.NewTable(_luaValueStorage);
         }
 
-        public TableInfo CreateTable(string path = null)
+        public void Startup()
         {
-            var key = path ?? _luaValueStorage + "._" + Guid.NewGuid().ToString().Replace("-", "");
-
-            Api.NewTable(key);
-            var info = new TableInfo(key, Api.GetTable(key));
-            return info;
+            foreach (var file in _files) {
+                Api.DoFile(file);
+            }
         }
 
-        public void RegisterFunction(string path, object target, Expression<Action> methodCall)
+        public TableInfo CreateTable(string path)
         {
-            var expr = (MethodCallExpression)methodCall.Body;
-            Api.RegisterFunction(path, target, expr.Method);
+            Api.NewTable(path);
+            return new TableInfo(path, Api.GetTable(path));
+        }
+
+        public TableInfo CreateTable()
+        {
+            var table = Api.DoString("return {};");
+            return new TableInfo("", table.FirstOrDefault() as LuaTable);
+        }
+
+        public LuaFunction RegisterFunction(string path, object target, Expression<Action> methodCall)
+        {
+            var method = ((MethodCallExpression)methodCall.Body).Method;
+            return Api.RegisterFunction(path, target, method);
+        }
+
+        public LuaFunction RegisterFunction(TableInfo table, string name, object target, Expression<Action> methodCall)
+        {
+            var method = ((MethodCallExpression)methodCall.Body).Method;
+            var func = Api.RegisterFunction("", target, method);
+            table.Table[name] = func;
+            return func;
         }
 
         public object[] Execute(string lua)

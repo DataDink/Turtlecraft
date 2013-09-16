@@ -64,5 +64,26 @@ namespace Tests
                 environment.Reset();
             }
         }
+
+        [Test]
+        public static void DirectionRecovery(LuaEnvironment environment)
+        {
+            var tests = new[] {
+                "1,1,1,0,0\r\n1,1,1,0",
+                "1,1,1,0,0\r\n1,1,1,90"
+            };
+            var expected = new[] {true, false};
+
+            for (var i = 0; i < tests.Length; i++) {
+                var test = tests[i];
+                var expectedResult = expected[i];
+                environment.FS.Files.Add(DataFile, test);
+                environment.Startup();
+
+                var inSync = environment.Execute("return turtlecraft.position.isInSync();")[0];
+                Assert.AreEqual(expectedResult, inSync);
+                environment.Reset();
+            }
+        }
     }
 }

@@ -87,10 +87,9 @@ turtlecraft.position = {};
 			intended.y = previous.y;
 			intended.z = previous.z;
 			intended.positionConfirmed = true;
+			intended.directionConfirmed = intended.d == previous.d;
 		end
 
-		print(intended.positionConfirmed);
-		print(intended.directionConfirmed);
 		return intended;
 	end
 	cache.write = function(intended, previous) 
@@ -131,6 +130,7 @@ turtlecraft.position = {};
 	end
 	
 	addons.tryUpdateCompass = function()
+		-- todo: This needs to use the peripheral api to "wrap" the compass
 		if (getFacing == nil) then return false; end
 		location.d = facings[getFacing()];
 		addons.directionConfirmed = true;

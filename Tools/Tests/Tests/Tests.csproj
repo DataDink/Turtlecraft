@@ -48,11 +48,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
-    <Compile Include="Framework\AnnonTable.cs" />
+    <Compile Include="Framework\TableInfo.cs" />
     <Compile Include="Framework\FileHandle.cs" />
     <Compile Include="Framework\FileSystem.cs" />
+    <Compile Include="Framework\IPeripheral.cs" />
     <Compile Include="Framework\LuaEnvironment.cs" />
     <Compile Include="Framework\LuaResultEventArgs.cs" />
+    <Compile Include="Framework\Peripheral.cs" />
     <Compile Include="Framework\Turtle.cs" />
     <Compile Include="PositionTests.cs" />
     <Compile Include="Program.cs" />

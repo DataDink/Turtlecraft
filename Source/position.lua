@@ -15,10 +15,10 @@ turtlecraft.position = {};
 	turtlecraft.position.directions = directions;
 
 	local facings = {}; -- TODO: These need to be matched up with the turtlecraft directions
-	facings[0] = directions.north;
-	facings[1] = directions.east;
-	facings[2] = directions.south;
-	facings[3] = directions.west;
+	facings[0] = directions.west;
+	facings[1] = directions.north;
+	facings[2] = directions.east;
+	facings[3] = directions.south;
 	turtlecraft.position.facings = facings;
 
 	local location = {
@@ -103,9 +103,20 @@ turtlecraft.position = {};
 		return true;
 	end
 	
+	addons.getPeripheral = function(ptype)
+		local names = peripheral.getNames();
+		for i, name in pairs(names) do
+			if (peripheral.getType(name) == ptype) then
+				local instance = peripheral.wrap(name);
+				return instance;
+			end
+		end
+		return nil;
+	end
+	
 	-- Most reliable - but, sadly,  you may not be playing on RenEvo's custom server.
 	addons.tryUpdateCustom = function()
-		-- Unknown yet
+		-- NYI
 		return false;  
 	end
 	
@@ -130,9 +141,9 @@ turtlecraft.position = {};
 	end
 	
 	addons.tryUpdateCompass = function()
-		-- todo: This needs to use the peripheral api to "wrap" the compass
-		if (getFacing == nil) then return false; end
-		location.d = facings[getFacing()];
+		local compass = addons.getPeripheral("Compass");
+		if (compass == nil or compass.getFacing == nil) then return false; end
+		location.d = facings[compass.getFacing()];
 		addons.directionConfirmed = true;
 		return true;
 	end

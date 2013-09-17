@@ -13,6 +13,7 @@ namespace Tests.Framework
         public Lua Api { get; private set; }
         public FileSystem FS { get; private set; }
         public Turtle Turtle { get; private set; }
+        public Peripheral Peripheral { get; private set; }
 
         public LuaEnvironment(string[] files)
         {
@@ -26,6 +27,7 @@ namespace Tests.Framework
             RegisterFunction("print", null, () => Program.Print(""));
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
+            Peripheral = new Peripheral(this);
         }
 
         public void Startup()
@@ -57,7 +59,7 @@ namespace Tests.Framework
         {
             var method = ((MethodCallExpression)methodCall.Body).Method;
             var func = Api.RegisterFunction("", target, method);
-            table.Table[name] = func;
+            table.Add(name, func);
             return func;
         }
 

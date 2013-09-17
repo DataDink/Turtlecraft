@@ -53,10 +53,10 @@ namespace Tests.Framework
                 ? Files.Keys.ToArray()
                 : Files.Keys.Where(k => k.StartsWith(path, StringComparison.InvariantCultureIgnoreCase)).ToArray();
             var table = _environment.CreateTable();
-            for (var i = 1; i <= paths.Length; i++) {
-                table.Table[i] = paths[i - 1];
+            foreach (var p in paths) {
+                table.Add(p);
             }
-            return table.Table;
+            return table.Instance;
         }
 
         private bool Exists(string path)
@@ -136,7 +136,7 @@ namespace Tests.Framework
                 _openHandles.Remove(handle);
                 Files[path] = handle.Content;
             };
-            return handle.Table.Table;
+            return handle.Table.Instance;
         }
     }
 }

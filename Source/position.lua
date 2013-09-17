@@ -15,10 +15,10 @@ turtlecraft.position = {};
 	turtlecraft.position.directions = directions;
 
 	local facings = {}; -- TODO: These need to be matched up with the turtlecraft directions
-	facings[0] = directions.west;
-	facings[1] = directions.north;
-	facings[2] = directions.east;
-	facings[3] = directions.south;
+	facings[0] = directions.south;
+	facings[1] = directions.west;
+	facings[2] = directions.north;
+	facings[3] = directions.east;
 	turtlecraft.position.facings = facings;
 
 	local location = {
@@ -121,9 +121,13 @@ turtlecraft.position = {};
 	end
 	
 	addons.tryReadGps = function()
-		if (rednet == nil or gps == nil) then return nil; end
-		rednet.open("right");
-		if (not rednet.isOpen("right")) then return nil; end
+		var side = "";
+		if (peripheral.getType("right") == "modem") then side = "right"; end
+		if (peripheral.getType("left") == "modem") then side = "left"; end
+		if (side == "") then return nil; end
+		
+		rednet.open(side);
+		if (not rednet.isOpen(side)) then return nil; end
 		local x, z, y = gps.locate(10); -- I orientate my coordinates differently
 		return x, y, z;
 	end
@@ -196,9 +200,8 @@ turtlecraft.position = {};
 		addons.directionConfirmed = recovery.directionConfirmed;
 		
 		if (not addons.tryUpdateCustom()) then
-			if (not addons.tryUpdateGps()) then
-				addons.tryUpdateCompass();
-			end
+			addons.tryUpdateGps();
+			addons.tryUpdateCompass();
 		end
 		
 		addons.inSync = (addons.positionConfirmed and addons.directionConfirmed) or addons.trySync();
@@ -207,6 +210,14 @@ turtlecraft.position = {};
 	
 	turtlecraft.position.isInSync = function() 
 		return addons.inSync;
+	end
+	
+	turtlecraft.position.syncTo = function(x, y, z, d)
+		location.x = x;
+		location.y = y;
+		location.z = z;
+		location.d = d;
+		addons.inSync = true;
 	end
 	
 	turtlecraft.position.get = function() 

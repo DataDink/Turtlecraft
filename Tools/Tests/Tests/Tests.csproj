@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
+    <Compile Include="Framework\Compass.cs" />
     <Compile Include="Framework\TableInfo.cs" />
     <Compile Include="Framework\FileHandle.cs" />
     <Compile Include="Framework\FileSystem.cs" />

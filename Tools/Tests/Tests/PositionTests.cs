@@ -85,5 +85,21 @@ namespace Tests
                 environment.Reset();
             }
         }
+
+        [Test]
+        public static void RecoverByCompass(LuaEnvironment environment)
+        {
+            var compass = new Compass(environment);
+            environment.Peripheral.Register.Add("right", compass);
+
+            environment.FS.Files.Add(DataFile, "1,1,1,270,0\r\n1,1,1,0");
+            compass.OnGetFacing += (s, e) => e.Result = 0;
+
+            environment.Startup();
+            var coords = environment.Execute("return turtlecraft.position.get();");
+            var inSync = environment.Execute("return turtlecraft.position.isInSync();")[0];
+            Assert.AreEqual(true, inSync);
+            Assert.AreEqual(90d, coords[3]);
+        }
     }
 }

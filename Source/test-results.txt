@@ -1,1 +1,10 @@
 Test Completed: PositionTests.DefaultPosition
+----
+Test Completed: PositionTests.RecoverBySingleLine
+----
+Test Completed: PositionTests.RecoverByFuelMarker
+----
+Test Completed: PositionTests.DirectionRecovery
+----
+Test Completed: PositionTests.RecoverByCompass
+----

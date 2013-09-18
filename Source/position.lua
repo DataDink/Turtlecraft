@@ -145,7 +145,7 @@ turtlecraft.position = {};
 	end
 	
 	addons.tryUpdateCompass = function()
-		local compass = addons.getPeripheral("Compass");
+		local compass = addons.getPeripheral("compass");
 		if (compass == nil or compass.getFacing == nil) then return false; end
 		location.d = facings[compass.getFacing()];
 		addons.directionConfirmed = true;

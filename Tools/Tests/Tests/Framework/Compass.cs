@@ -8,7 +8,7 @@ namespace Tests.Framework
 {
     public class Compass : IPeripheral
     {
-        public string Type { get { return "Compass"; } }
+        public string Type { get { return "compass"; } }
         public LuaTable Instance { get; private set; }
 
         public Compass(LuaEnvironment environment)

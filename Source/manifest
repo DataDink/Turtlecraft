@@ -2,3 +2,4 @@ global.lua
 position.lua
 fuel.lua
 move.lua
+excavate.lua

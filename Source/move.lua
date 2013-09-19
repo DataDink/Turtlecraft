@@ -64,6 +64,10 @@ turtlecraft.move = {};
 		if (internal.repeatMove(py, z, directions.north, directions.south, before, after, onRetry) == false) then return false; end
 		return true;
 	end
+	
+	turtlecraft.move.face = function(direction)
+		return internal.face(direction);
+	end
 
 	turtlecraft.move.to = function(x, y, z, action)
 		return internal.moveTo(x, y, z, nil, action, nil);

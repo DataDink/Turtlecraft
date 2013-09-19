@@ -6,32 +6,46 @@ turtlecraft.excavate = {};
 	local directions = position.directions;
 
 	local inventory = {};
-	local marker = {};
 	local move = {};
+	local plot = {};
 	
-	marker.init = function()
+	plot.path = turtlecraft.directory .. "excavate.data";
+	plot.init = function(forward, left, right, up, down)
 		local x, y, z, d = position.get();
-		marker.startedAt = {x = x, y = y, z = z, d = d};
-		marker.returnTo = {x = x, y = y, z = z, d = d};
-		marker.forward = d;
-		marker.right = (d + 90) % 360;
-		marker.backward = (d + 180) % 360;
-		marker.left = (d + 270) % 360;
+		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
+		plot.stepX = 1;
+		plot.stepY = 1;
+		plot.stepZ = -3;
+		
+		plot.maxZ = z + math.abs(up);
+		plot.minZ = z - math.abs(down);
+		plot.maxX = x; plot.minX = x; 
+		plot.maxY = y; plot.minY = y;
+		if (d == directions.north) then
+			plot.maxY = plot.maxY + math.abs(forward);
+			plot.minX =  plot.minX - math.abs(left);
+			plot.maxX = plot.maxX + math.abs(right);
+		elseif (d == directions.south) then
+			plot.minY = plot.minY - math.abs(forward);
+			plot.minX =  plot.minX - math.abs(right);
+			plot.maxX = plot.maxX + math.abs(left);
+		elseif (d == directions.east) then
+			plot.maxX = plot.maxX + math.abs(forward);
+			plot.minY = plot.minY - math.abs(left);
+			plot.maxY = plot.maxY + math.abs(right);
+		else
+			plot.minX = plot.minX - math.abs(forward);
+			plot.minY = plot.minY - math.abs(right);
+			plot.maxY = plot.maxY + math.abs(left);
+		end
+		
+		plot.progress = {x = plot.minX, y = plot.minY, z = plot.maxZ};
 	end
-	marker.init();
-
-	marker.mark = function() 
-		local x, y, z = position.get();
-		marker.returnTo.x = x; 
-		marker.returnTo.y = y; 
-		marker.returnTo.z = z; 
-	end
-	
-	marker.calcReturn = function()
+	plot.calcReturn = function()
 		local x, y, z, d = position.get();
-		local distx = math.abs(marker.startedAt.x - x);
-		local disty = math.abs(marker.startedAt.y - y);
-		local distz = math.abs(marker.startedAt.z - z);
+		local distx = math.abs(plot.home.x - x);
+		local disty = math.abs(plot.home.y - y);
+		local distz = math.abs(plot.home.z - z);
 		return distx + disty + distz + 5;
 	end
 	
@@ -45,7 +59,7 @@ turtlecraft.excavate = {};
 	end
 	inventory.needsUnload = function() return inventory.calcRemainingSlots() == 0; end
 	inventory.unload = function()
-		turtlecraft.move.face(marker.backward);
+		turtlecraft.move.face(plot.backward);
 		for i = 2, 16 do
 			if (turtle.getItemCount(i) > 0) then
 				turtle.select(i);
@@ -58,28 +72,31 @@ turtlecraft.excavate = {};
 	
 	-- Movement
 	move.home = function(callback)
-		marker.mark();
-		turtlecraft.move.digTo(marker.startedAt.x, marker.startedAt.y, marker.startedAt.z);
+		plot.mark();
+		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		callback();
-		turtlecraft.move.face(marker.forward);
-		turtlecraft.move.digTo(marker.returnTo.x, marker.returnTo.y, marker.returnTo.z);
+		turtlecraft.move.face(plot.forward);
+		turtlecraft.move.digTo(plot.returnTo.x, plot.returnTo.y, plot.returnTo.z);
 	end
 	move.finish = function()
-		turtlecraft.move.digTo(marker.startedAt.x, marker.startedAt.y, marker.startedAt.z);
-		turtlecraft.move.face(marker.backward);
+		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
+		turtlecraft.move.face(plot.backward);
 		inventory.unload();
 		turtle.select(1);
 		turtle.drop();
 		turtlecraft.move.face(directions.forward);
 	end
+	move.plot = function (forward, left, right, up, down)
+		local x, y, z, d = turtlecraft.position.get();
+		local plot = {};
+		plot.forward = d;
+		plot.right = (d + 90) % 360;
+		plot.backward = (d + 180) % 360;
+		plot.left = (d + 270) % 360;
+	end
 	move.excavate = function(forward, left, right, up, down)
-		local aMin = 0;
-		local aMax = marker.startedAt.y + math.abs(forward);
-		local xmin = marker.startedAt.x - math.abs(left);
-		local xmax = marker.startedAt.x + math.abs(right);
-		local zmin = marker.startedAt.z - math.abs(down);
-		local zmax = marker.startedAt.z + math.abs(up);
-		
+
+	
 		local y = marker.startedAt.y;
 		local ystep = 1
 		

@@ -232,10 +232,10 @@ turtlecraft.position = {};
 	end
 	
 	-- If moveAction does not exist or returns false: will consider out of sync.
-	turtlecraft.position.set = function(x, y, z, d, moveAction, move) 
+	turtlecraft.position.set = function(x, y, z, d, moveAction) 
 		local previous = {x = location.x, y = location.y, z = location.z, d = location.d};
 		local intended = {x = x, y = y, z = z, d = d};
-		cache.write(intended, previous, move);
+		cache.write(intended, previous);
 		if (moveAction == nil or moveAction() == false) then return false; end
 		cache.write(intended);
 

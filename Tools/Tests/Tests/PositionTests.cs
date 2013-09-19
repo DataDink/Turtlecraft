@@ -165,5 +165,24 @@ namespace Tests
             Assert.AreEqual(0d, position[2]);
             Assert.AreEqual(270d, position[3]);
         }
+
+        [Test]
+        public static void CachePosition(LuaEnvironment environment)
+        {
+            environment.Turtle.OnGetFuelLevel += (s, e) => e.Result = 5;
+            environment.Startup();
+            var nonmoving = environment.Execute("return turtlecraft.position.set(1, 2, 3, 4)")[0];
+            Assert.AreEqual(false, nonmoving);
+            Assert.AreEqual(1, environment.FS.Files.Count);
+            Assert.AreEqual("1,2,3,4,5\r\n0,0,0,270\r\n", environment.FS.Files[DataFile]);
+
+            environment.Reset();
+            environment.Turtle.OnGetFuelLevel += (s, e) => e.Result = 5;
+            environment.Startup();
+            var moving = environment.Execute("return turtlecraft.position.set(1, 2, 3, 4, function() return true; end)")[0];
+            Assert.AreEqual(true, moving);
+            Assert.AreEqual(1, environment.FS.Files.Count);
+            Assert.AreEqual("1,2,3,4,5\r\n", environment.FS.Files[DataFile]);
+        }
     }
 }

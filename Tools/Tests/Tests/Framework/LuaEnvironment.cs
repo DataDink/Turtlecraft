@@ -53,6 +53,11 @@ namespace Tests.Framework
             return new TableInfo("", table.FirstOrDefault() as LuaTable);
         }
 
+        public LuaFunction RegisterFunction(object target, Expression<Action> methodCall)
+        {
+            return RegisterFunction("", target, methodCall);
+        }
+
         public LuaFunction RegisterFunction(string path, object target, Expression<Action> methodCall)
         {
             var method = ((MethodCallExpression)methodCall.Body).Method;
@@ -61,8 +66,7 @@ namespace Tests.Framework
 
         public LuaFunction RegisterFunction(TableInfo table, string name, object target, Expression<Action> methodCall)
         {
-            var method = ((MethodCallExpression)methodCall.Body).Method;
-            var func = Api.RegisterFunction("", target, method);
+            var func = RegisterFunction(target, methodCall);
             table.Add(name, func);
             return func;
         }

@@ -6,47 +6,101 @@ turtlecraft.excavate = {};
 	local directions = position.directions;
 
 	local inventory = {};
-	local move = {};
 	local plot = {};
+	local move = {};
+	local ui = {};
 	
 	plot.path = turtlecraft.directory .. "excavate.data";
 	plot.init = function(forward, left, right, up, down)
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
-		plot.stepX = 1;
-		plot.stepY = 1;
-		plot.stepZ = -3;
-		
-		plot.maxZ = z + math.abs(up);
-		plot.minZ = z - math.abs(down);
-		plot.maxX = x; plot.minX = x; 
-		plot.maxY = y; plot.minY = y;
+		plot.step = {x = 1, y = 1, z = -3};
+		plot.min = {x = x, y = y, z = z - math.abs(down)};
+		plot.max = {x = x, y = y, z = z + math.abs(up)};
+
 		if (d == directions.north) then
-			plot.maxY = plot.maxY + math.abs(forward);
-			plot.minX =  plot.minX - math.abs(left);
-			plot.maxX = plot.maxX + math.abs(right);
+			plot.max.y = plot.max.y + math.abs(forward);
+			plot.min.x =  plot.min.x - math.abs(left);
+			plot.max.x = plot.max.x + math.abs(right);
 		elseif (d == directions.south) then
-			plot.minY = plot.minY - math.abs(forward);
-			plot.minX =  plot.minX - math.abs(right);
-			plot.maxX = plot.maxX + math.abs(left);
+			plot.min.y = plot.min.y - math.abs(forward);
+			plot.min.x =  plot.min.x - math.abs(right);
+			plot.max.x = plot.max.x + math.abs(left);
 		elseif (d == directions.east) then
-			plot.maxX = plot.maxX + math.abs(forward);
-			plot.minY = plot.minY - math.abs(left);
-			plot.maxY = plot.maxY + math.abs(right);
+			plot.max.x = plot.max.x + math.abs(forward);
+			plot.min.y = plot.min.y - math.abs(left);
+			plot.max.y = plot.max.y + math.abs(right);
 		else
-			plot.minX = plot.minX - math.abs(forward);
-			plot.minY = plot.minY - math.abs(right);
-			plot.maxY = plot.maxY + math.abs(left);
+			plot.min.x = plot.min.x - math.abs(forward);
+			plot.min.y = plot.min.y - math.abs(right);
+			plot.max.y = plot.max.y + math.abs(left);
 		end
 		
-		plot.progress = {x = plot.minX, y = plot.minY, z = plot.maxZ};
+		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
+	end
+	plot.update = function()
+		local x, y, z, d = position.get();
+		plot.progress = {x = x, y = y, z = z};
+		local file = fs.open(plot.path, "w");
+		file.writeLine(plot.home.x .. "," .. plot.home.y .. "," .. plot.home.z .. "," .. plot.home.d);
+		file.writeLine(x .. "," .. y .. "," .. z);
+		file.writeLine(plot.min.x .. "," .. plot.min.y .. "," .. plot.min.z);
+		file.writeLine(plot.max.x .. "," .. plot.max.y .. "," .. plot.max.z);
+		file.writeLine(plot.step.x .. "," .. plot.step.y .. "," .. plot.step.z);
+		file.close();
+	end
+	plot.reset = function()
+		fs.delete(plot.path);
+		local x, y, z, d = position.get();
+		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
+		plot.progress = {x = x, y = y, z = z};
+		plot.min = {x = x, y = y, z = z};
+		plot.max = {x = x, y = y, z = z};
+		plot.step = {x = 1, y = 1, z = -3};
+	end
+	plot.recover = function()
+		if (not fs.exists(plot.path)) then return false; end
+		local file = fs.open(plot.path, "r");
+		local home = file.readLine();
+		local progress = file.readLine();
+		local boundsmin = file.readLine();
+		local boundsmax = file.readLine();
+		local resume = file.readLine();
+		file.close();
+		if ((not position.isInSync()) or home == nil or progress == nil or boundsmin == nil or boundsmax == nil or resume == nil) then 
+			print("Warning: Unable to resume dig");
+			return false; 
+		end
+		local valuePattern = "[^,]+";
+		
+		local setters = {
+			home = home,
+			progress = progress,
+			min = boundsmin,
+			max = boundsmax,
+			step = resume
+		};
+		
+		for index, data in pairs(setters) do
+			local reader = string.gmatch(data, valuePattern);
+			local target = plot[index];
+			target.x = tonumber(reader() or 0);
+			target.y = tonumber(reader() or 0);
+			target.z = tonumber(reader() or 0);
+			target.d = tonumber(reader() or "");
+		end
+		
+		return true;
+	end
+	plot.calcDistance = function(x, y, z)
+		local fx, fy, fz, fd = position.get();
+		local distx = math.abs(fx - x);
+		local disty = math.abs(fy - y);
+		local distz = math.abs(fz - z);
+		return distx + disty + distz + 5;
 	end
 	plot.calcReturn = function()
-		local x, y, z, d = position.get();
-		local distx = math.abs(plot.home.x - x);
-		local disty = math.abs(plot.home.y - y);
-		local distz = math.abs(plot.home.z - z);
-		return distx + disty + distz + 5;
+		return plot.calcDistance(plot.home.x, plot.home.y, plot.home.z);
 	end
 	
 	-- Inventory
@@ -59,7 +113,7 @@ turtlecraft.excavate = {};
 	end
 	inventory.needsUnload = function() return inventory.calcRemainingSlots() == 0; end
 	inventory.unload = function()
-		turtlecraft.move.face(plot.backward);
+		turtlecraft.move.face(plot.home.d);
 		for i = 2, 16 do
 			if (turtle.getItemCount(i) > 0) then
 				turtle.select(i);
@@ -75,102 +129,109 @@ turtlecraft.excavate = {};
 		plot.mark();
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		callback();
-		turtlecraft.move.face(plot.forward);
-		turtlecraft.move.digTo(plot.returnTo.x, plot.returnTo.y, plot.returnTo.z);
+		turtlecraft.move.face((plot.home.d + 180) % 360);
+		turtlecraft.move.digTo(plot.progress.x, plot.progress.y, plot.progress.z);
 	end
 	move.finish = function()
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
-		turtlecraft.move.face(plot.backward);
+		turtlecraft.move.face(plot.home.d);
 		inventory.unload();
 		turtle.select(1);
 		turtle.drop();
-		turtlecraft.move.face(directions.forward);
+		turtlecraft.move.face((plot.home.d + 180) % 360);
+		plot.reset();
 	end
-	move.plot = function (forward, left, right, up, down)
-		local x, y, z, d = turtlecraft.position.get();
-		local plot = {};
-		plot.forward = d;
-		plot.right = (d + 90) % 360;
-		plot.backward = (d + 180) % 360;
-		plot.left = (d + 270) % 360;
-	end
-	move.excavate = function(forward, left, right, up, down)
-
-	
-		local y = marker.startedAt.y;
-		local ystep = 1
-		
-		local row = 0;
-		local rowStep = y / math.abs(y);
-		local rowMax = math.max(0, y);
-		local rowMin = math.min(0, y);
-		
-		local column = 0;
-		local columnStep = x / math.abs(x);
-		local columnMax = math.max(0, x);
-		local columnMin = math.min(0, x);
-		
-		local layer = 0;
-		local layerStart = z / math.abs(z);
-		local layerStep = layerStart * 3;
-		local layerMax = math.max(0, z);
-		local layerMin = math.min(0, z);
-		
-		for layer = layerStart, z, layerStep do
-			move.face(directions.forward);
-			if (not move.to(position.current.x, position.current.y, layer)) then
-				print("Returning: Reached unbreakable blocks");
-				move.finish();
-				return;
-			end
-			
-			while (row >= rowMin and row <= rowMax) do
-				while (column >= columnMin and column <= columnMax) do
-					
-					if (fuel.needsRefuel()) then
-						print("Returning for refuel...");
-						move.home(function() 
-							print("Waiting for more fuel in slot 1.");
-							turtle.refuel();
-							while (not turtle.refuel(1)) do
-								sleep(3);
-								turtle.select(1);
-							end
-							fuel.initialize();
-							print("Continuing");
-						end);
-					end
-					
-					if (inventory.needsUnload()) then
-						print("Returning for unload...");
-						move.home(function() 
-							inventory.unload();
-							print("Continuing");
-						end);
-					end
-					
-					if (not move.to(column, row, layer)) then
-						print("Returning: Reached unbreakable blocks");
-						return move.finish();
-					end
-					
-					column = column + columnStep;
-				end
-				if (column > columnMax) then column = columnMax; end
-				if (column < columnMin) then column = columnMin; end
-				columnStep = -columnStep;
-				row = row + rowStep;
-			end
-			if (row > rowMax) then row = rowMax; end
-			if (row < rowMin) then row = rowMin; end
-			rowStep = -rowStep;				
+	move.next = function()
+		local resumeDist = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
+		local homeDist = plot.calcReturn();
+		local fuel = turtlecraft.fuel.estimateRemaining();
+		if (inventory.needsUnload() or fuel <= resumeDist or fuel <= homeDist) then
+			move.home(function() 
+				local distance = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
+				turtle.fuel.require(distance);
+				inventory.unload();
+			end);
 		end
-		
-		print("Returning: Mission complete");
-		move.finish();
+		plot.progress.x = plot.progress.x + plot.step.x;
+		if (plot.progress.x > plot.max.x or plot.progress.x < plot.min.x) then
+			plot.step.x = -plot.step.x;
+			plot.progress.x = plot.progress.x + plot.step.x;
+			plot.progress.y = plot.progress.y + plot.step.y;
+			if (plot.progress.y > plot.max.y or plot.progress.y < plot.min.y) then
+				plot.step.y = -plot.step.y;
+				plot.progress.y = plot.progress.y + plot.step.y;
+				plot.progress.z = plot.progress.z + plot.step.z;
+				if (plot.progress.z > plot.max.z) then
+					move.finish();
+					return false;
+				end
+			end
+		end
+		if (not turtlecraft.move.excavateTo(plot.progress.x, plot.progress.y, plot.progress.z)) then 
+			move.finish();
+			return false;
+		end
+		plot.update();
+		return true;
 	end
-
-	excavator.start = function(x, y, z)
-		move.excavate(x, y, z);
+	move.start = function(forward, left, right, up, down)
+		plot.init(forward, left, right, up, down);
+		while (move.next()) do
+			sleep(0.001);
+		end
+	end
+	
+	-- UI
+	ui.print = function(x, y, message)
+		term.setCursorPos(x, y);
+		term.clearLine();
+		term.write(message);
+	end
+	ui.readNumber = function(x, y)
+		term.setCursorPos(x, y);
+		return tonumber(read());
+		if (value == nil) then return 0; end
+		return value;
+	end
+	ui.printHeader = function()
+		ui.print(1, 1, "Turtlecraft v" .. turtlecraft.version .. " Excavator");
+		ui.print(1, 2, "============================");
+	end
+	
+	if (plot.recover()) then
+		term.clear();
+		ui.printHeader();
+		ui.print(1, 3, "Resuming dig...");
+		while (move.next()) do
+			sleep(0.001);
+		end
+	end
+	
+	turtlecraft.excavate.start = function()
+		term.clear();
+		ui.printHeader();
+		ui.print(1, 3, "How far forward?");
+		local forward = ui.readNumber(18, 3);
+		if (forward == 0) then return false; end
+		ui.print(1, 3, "How far left?");
+		local left = ui.readNumber(15, 3);
+		ui.print(1, 3, "How far right?");
+		local right = ui.readNumber(16, 3);
+		if (left == 0 and right == 0) then return false; end
+		ui.print(1, 3, "How far up?");
+		local up = ui.readNumber(13, 3);
+		ui.print(1, 3, "How far down?");
+		local down = ui.readNumber(15, 3);
+		if (up == 0 and down == 0) then return false; end
+		
+		term.clear();
+		ui.printHeader();
+		move.start(forward, left, right, up, down);
+		term.clear();
+		ui.printHeader();
+		ui.print(1, 3, "Digging is complete.");
+		ui.print(1, 4, "Press enter to continue.");
+		term.setCursorPos(0, 0);
+		read();
 	end
 end)();	

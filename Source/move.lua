@@ -100,7 +100,8 @@ turtlecraft.move = {};
 			end
 			other1();
 			other2();
-			return method();
+			return primary();
 		end
+		return internal.moveTo(x, y, z, dig, action, dig);
 	end
 end)();

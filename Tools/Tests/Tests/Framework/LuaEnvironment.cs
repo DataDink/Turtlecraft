@@ -14,6 +14,8 @@ namespace Tests.Framework
         public FileSystem FS { get; private set; }
         public Turtle Turtle { get; private set; }
         public Peripheral Peripheral { get; private set; }
+        public Rednet Rednet { get; private set; }
+        public Gps Gps { get; private set; }
 
         public LuaEnvironment(string[] files)
         {
@@ -28,6 +30,8 @@ namespace Tests.Framework
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
             Peripheral = new Peripheral(this);
+            Rednet = new Rednet(this);
+            Gps = new Gps(this);
         }
 
         public void Startup()

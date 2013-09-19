@@ -101,5 +101,69 @@ namespace Tests
             Assert.AreEqual(true, inSync);
             Assert.AreEqual(90d, coords[3]);
         }
+
+        [Test]
+        public static void RecoverByGps(LuaEnvironment environment)
+        {
+            // with compass
+            environment.Rednet.OnIsOpen += (s, e) => e.Result = true;
+            environment.Peripheral.Register.Add("right", new Modem());
+            environment.Peripheral.Register.Add("left", new Compass(environment));
+            environment.Peripheral.Register.Values.OfType<Compass>().First().OnGetFacing += (s, e) => e.Result = 3; // east
+            environment.Gps.X = 1;
+            environment.Gps.Y = 2;
+            environment.Gps.Z = 3;
+            environment.Startup();
+            var synced = environment.Execute("return turtlecraft.position.isInSync();")[0];
+            var position = environment.Execute("return turtlecraft.position.get();");
+
+            Assert.AreEqual(true, synced);
+            Assert.AreEqual(1d, position[0]);
+            Assert.AreEqual(2d, position[1]);
+            Assert.AreEqual(3d, position[2]);
+            Assert.AreEqual(0d, position[3]);
+            
+            // with movement
+            environment.Reset();
+            environment.Rednet.OnIsOpen += (s, e) => e.Result = true;
+            environment.Peripheral.Register.Add("right", new Modem());
+            environment.Gps.X = 0;
+            environment.Gps.Y = 0;
+            environment.Gps.Z = 0;
+            environment.Turtle.OnDetect += (s, e) => e.Result = false;
+            environment.Turtle.OnForward += (s, e) => {
+                e.Result = true;
+                environment.Gps.X = 0;
+                environment.Gps.Y = 1; // moves north should calculate to 270
+                environment.Gps.Z = 0;
+            };
+            environment.Startup();
+            synced = environment.Execute("return turtlecraft.position.isInSync();")[0];
+            position = environment.Execute("return turtlecraft.position.get();");
+
+            Assert.AreEqual(true, synced);
+            Assert.AreEqual(0d, position[0]);
+            Assert.AreEqual(0d, position[1]);
+            Assert.AreEqual(0d, position[2]);
+            Assert.AreEqual(270d, position[3]);
+
+            // with only gps
+            environment.Reset();
+            environment.Rednet.OnIsOpen += (s, e) => e.Result = true;
+            environment.Peripheral.Register.Add("right", new Modem());
+            environment.Gps.X = 0;
+            environment.Gps.Y = 0;
+            environment.Gps.Z = 0;
+            environment.Turtle.OnDetect += (s, e) => e.Result = true;
+            environment.Startup();
+            synced = environment.Execute("return turtlecraft.position.isInSync();")[0];
+            position = environment.Execute("return turtlecraft.position.get();");
+
+            Assert.AreEqual(false, synced);
+            Assert.AreEqual(0d, position[0]);
+            Assert.AreEqual(0d, position[1]);
+            Assert.AreEqual(0d, position[2]);
+            Assert.AreEqual(270d, position[3]);
+        }
     }
 }

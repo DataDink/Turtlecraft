@@ -95,7 +95,7 @@ turtlecraft.position = {};
 	cache.write = function(intended, previous) 
 		local handle = fs.open(cache.path, "w");
 		if (handle == nil) then return false; end
-		handle.writeLine(intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d + "," .. turtle.getFuelLevel());
+		handle.writeLine(intended.x .. "," .. intended.y .. "," .. intended.z .. "," .. intended.d .. "," .. turtle.getFuelLevel());
 		if (previous ~= nil) then
 			handle.writeLine(previous.x .. "," .. previous.y .. "," .. previous.z .. "," .. previous.d);
 		end
@@ -121,7 +121,7 @@ turtlecraft.position = {};
 	end
 	
 	addons.tryReadGps = function()
-		var side = "";
+		local side = "";
 		if (peripheral.getType("right") == "modem") then side = "right"; end
 		if (peripheral.getType("left") == "modem") then side = "left"; end
 		if (side == "") then return nil; end
@@ -164,27 +164,34 @@ turtlecraft.position = {};
 		
 		if (turtle.detect()) then return false; end
 		turtle.forward();
-		if (location.d == directions.north) then location.y = location.y + 1; end
-		if (location.d == directions.south) then location.y = location.y - 1; end
-		if (location.d == directions.east) then location.x = location.x + 1; end
-		if (location.d == directions.west) then location.x = location.x - 1; end
+		
+		local x = location.x;
+		local y = location.y;
+		local z = location.z;
+		local d = location.d;
+		
+		if (d == directions.north) then y = y + 1; end
+		if (d == directions.south) then y = y - 1; end
+		if (d == directions.east) then x = x + 1; end
+		if (d == directions.west) then x = x - 1; end
 
-		local x, y, z = addons.tryReadGps();
+		local xx, yy, zz = addons.tryReadGps();
 
-		if (location.d == directions.north and x < location.x) then location.d = directions.west; end
-		if (location.d == directions.south and x < location.x) then location.d = directions.west; end
-		if (location.d == directions.east and x < location.x and y == location.y) then location.d = directions.west; end
-		if (location.d == directions.north and x > location.x) then location.d = directions.east; end
-		if (location.d == directions.south and x > location.x) then location.d = directions.east; end
-		if (location.d == directions.west and x > location.x and y == location.y) then location.d = directions.east; end
-		if (location.d == directions.north and y < location.y and x == location.x) then location.d = directions.south; end
-		if (location.d == directions.west and y < location.y) then location.d = directions.south; end
-		if (location.d == directions.east and y < location.y) then location.d = directions.south; end
-		if (location.d == directions.south and y > location.y and x == location.x) then location.d = directions.north; end
-		if (location.d == directions.west and y > location.y) then location.d = directions.north; end
-		if (location.d == directions.east and y > location.y) then location.d = directions.north; end
+		if (d == directions.north and xx < x) then d = directions.west; end
+		if (d == directions.south and xx < x) then d = directions.west; end
+		if (d == directions.east and xx < x and yy == y) then d = directions.west; end
+		if (d == directions.north and xx > x) then d = directions.east; end
+		if (d == directions.south and xx > x) then d = directions.east; end
+		if (d == directions.west and xx > x and yy == y) then d = directions.east; end
+		if (d == directions.north and yy < y and xx == x) then d = directions.south; end
+		if (d == directions.west and yy < y) then d = directions.south; end
+		if (d == directions.east and yy < y) then d = directions.south; end
+		if (d == directions.south and yy > y and xx == x) then d = directions.north; end
+		if (d == directions.west and yy > y) then d = directions.north; end
+		if (d == directions.east and yy > y) then d = directions.north; end
 		
 		turtle.back();
+		location.d = d;
 		cache.write(location);
 		return true;
 	end

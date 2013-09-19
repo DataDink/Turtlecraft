@@ -62,11 +62,6 @@ namespace Tests
             }
         }
 
-        public static void Print(object text)
-        {
-            Write((text ?? "").ToString());
-        }
-
         public static void Write(string format, params object[] args)
         {
             Console.WriteLine(format, args);

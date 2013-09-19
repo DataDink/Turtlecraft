@@ -26,12 +26,30 @@ namespace Tests.Framework
         public void Reset()
         {
             Api = new Lua();
-            RegisterFunction("print", null, () => Program.Print(""));
+            RegisterFunction("print", this, () => Print(""));
+            RegisterFunction("sleep", this, () => Sleep(0));
+
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
             Peripheral = new Peripheral(this);
             Rednet = new Rednet(this);
             Gps = new Gps(this);
+        }
+
+        public event EventHandler OnPrint; 
+
+        private void Print(object text)
+        {
+            Program.Write((text ?? "").ToString());
+            if (OnPrint != null) OnPrint(this, null);
+        }
+
+        public event EventHandler OnSleep;
+
+        private void Sleep(double seconds)
+        {
+            // no, we won't really sleep!
+            if (OnSleep != null) OnSleep(this, null);
         }
 
         public void Startup()

@@ -189,7 +189,7 @@ turtlecraft.excavate = {};
 	end
 	ui.readNumber = function(x, y)
 		term.setCursorPos(x, y);
-		return tonumber(read());
+		local value = tonumber(read() or "");
 		if (value == nil) then return 0; end
 		return value;
 	end

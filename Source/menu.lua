@@ -29,7 +29,7 @@ turtlecraft.menu.dig.action.excavate = {
 		local width, height = term.getSize();
 		writeLine(1, 1, "Turtlecraft v" .. turtlecraft.version .. ".");
 		writeLine(1, 2, "====================");
-		writeLine(1, height, "--Use up/down and enter/esc--");
+		writeLine(1, height, "--Use up/down and enter/left--");
 		
 		local displayCount = height - 4;
 		local startIndex = math.max(0, selectedIndex - displayCount);
@@ -48,6 +48,10 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	local selectItem = function()
 		local menu = currentMenu();
+		term.clear();
+		writeLine(1, 1, selectedIndex);
+		writeLine(1, 2, menu);
+		writeLine(1, 3, table.getn(menu));
 		local item = menu[selectedIndex].action;
 		if (typeof(item) == "function") then
 			item();
@@ -83,6 +87,6 @@ turtlecraft.menu.dig.action.excavate = {
 		if (key == 28) then selectItem(); end
 		if (key == 200) then upArrow(); end
 		if (key == 208) then downArrow(); end
-		if (key == 1) then goBack(); end
+		if (key == 203) then goBack(); end
 	end
 end)();

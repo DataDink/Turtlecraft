@@ -141,8 +141,6 @@ turtlecraft.excavate = {};
 		plot.reset();
 	end
 	move.next = function()
-		print(plot.home.d);
-		print(plot.home.x);
 		local resumeDist = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
 		local homeDist = plot.calcReturn();
 		local fuel = turtlecraft.fuel.estimateRemaining();

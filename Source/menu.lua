@@ -15,7 +15,7 @@ turtlecraft.menu.dig.action.excavate = {
 	local history = {turtlecraft.menu};
 	
 	local writeLine = function(x, y, text)
-		term.setCursorPos(1, 1);
+		term.setCursorPos(x, y);
 		term.clearLine();
 		term.write(text);
 	end
@@ -78,7 +78,6 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	while (true) do
 		drawMenu();
-		writeLine(4, 4, selectedIndex);
 		sleep(0.01);
 		local key = turtlecraft.input.readKey();
 		if (key == 28) then selectItem(); end

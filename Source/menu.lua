@@ -12,7 +12,8 @@ turtlecraft.menu.dig.action.excavate = {
 
 (function()
 	local selectedIndex = 1;
-	local history = {turtlecraft.menu};
+	local history = {};
+	table.insert(history, turtlecraft.menu);
 	
 	local writeLine = function(x, y, text)
 		term.setCursorPos(x, y);

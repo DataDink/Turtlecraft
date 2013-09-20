@@ -78,6 +78,7 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	while (true) do
 		drawMenu();
+		writeLine(4, 4, selectedIndex);
 		sleep(0.01);
 		local key = turtlecraft.input.readKey();
 		if (key == 28) then selectItem(); end

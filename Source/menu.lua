@@ -22,6 +22,7 @@ turtlecraft.menu.dig.action.excavate = {
 	end
 	
 	local currentMenu = function()
+		print(table.getn(history));
 		return history[table.getn(history)];
 	end
 	

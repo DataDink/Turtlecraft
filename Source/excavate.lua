@@ -209,18 +209,18 @@ turtlecraft.excavate = {};
 	turtlecraft.excavate.start = function()
 		term.clear();
 		ui.printHeader();
-		ui.print(1, 3, "How far forward?");
-		local forward = ui.readNumber(18, 3);
+		ui.print(1, 4, "How far forward?");
+		local forward = ui.readNumber(18, 4);
 		if (forward == 0) then return false; end
-		ui.print(1, 3, "How far left?");
-		local left = ui.readNumber(15, 3);
-		ui.print(1, 3, "How far right?");
-		local right = ui.readNumber(16, 3);
+		ui.print(1, 4, "How far left?");
+		local left = ui.readNumber(15, 4);
+		ui.print(1, 4, "How far right?");
+		local right = ui.readNumber(16, 4);
 		if (left == 0 and right == 0) then return false; end
-		ui.print(1, 3, "How far up?");
-		local up = ui.readNumber(13, 3);
-		ui.print(1, 3, "How far down?");
-		local down = ui.readNumber(15, 3);
+		ui.print(1, 4, "How far up?");
+		local up = ui.readNumber(13, 4);
+		ui.print(1, 4, "How far down?");
+		local down = ui.readNumber(15, 4);
 		if (up == 0 and down == 0) then return false; end
 		
 		term.clear();
@@ -228,8 +228,8 @@ turtlecraft.excavate = {};
 		move.start(forward, left, right, up, down);
 		term.clear();
 		ui.printHeader();
-		ui.print(1, 3, "Digging is complete.");
-		ui.print(1, 4, "Press enter to continue.");
+		ui.print(1, 4, "Digging is complete.");
+		ui.print(1, 5, "Press enter to continue.");
 		term.setCursorPos(0, 0);
 		read();
 	end

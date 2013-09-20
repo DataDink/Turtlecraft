@@ -126,7 +126,6 @@ turtlecraft.excavate = {};
 	
 	-- Movement
 	move.home = function(callback)
-		plot.mark();
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		callback();
 		turtlecraft.move.face((plot.home.d + 180) % 360);

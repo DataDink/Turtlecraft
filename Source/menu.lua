@@ -51,7 +51,7 @@ turtlecraft.menu[1].action[1] = {
 	local selectItem = function()
 		local menu = currentMenu();
 		local item = menu[selectedIndex].action;
-		if (typeof(item) == "function") then
+		if (type(item) == "function") then
 			item();
 		else
 			table.insert(history, item);

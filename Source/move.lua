@@ -9,7 +9,7 @@ turtlecraft.move = {};
 		if (direction == directions.up or direction == directions.down) then return true; end
 		local x, y, z, d = turtlecraft.position.get();
 		if (d == direction) then return true; end
-		if (d % 90 ~= 0 or direction ~= 90) then error("Facing directions must be multiples of 90 degrees"); end
+		if (d % 90 ~= 0) then error("Facing directions must be multiples of 90 degrees"); end
 		if ((d + 270) % 360 == direction) then
 			turtlecraft.position.set(x, y, z, direction, turtle.turnLeft);
 		else

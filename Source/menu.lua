@@ -13,9 +13,9 @@ turtlecraft.menu.dig.action.excavate = {
 (function()
 	local selectedIndex = 1;
 	local history = {};
-	print(turtlecraft.menu);
-	error("break");
 	table.insert(history, turtlecraft.menu);
+	print(history[1]);
+	error("break");
 	
 	local writeLine = function(x, y, text)
 		term.setCursorPos(x, y);

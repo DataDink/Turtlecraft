@@ -23,8 +23,6 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	local currentMenu = function()
 		local item = history[table.getn(history)];
-		print(item);
-		error("break");
 		return item;
 	end
 	
@@ -52,6 +50,8 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	local selectItem = function()
 		local menu = currentMenu();
+		print(menu);
+		error("break");
 		local item = menu[selectedIndex].action;
 		if (typeof(item) == "function") then
 			item();

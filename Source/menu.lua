@@ -13,6 +13,8 @@ turtlecraft.menu.dig.action.excavate = {
 (function()
 	local selectedIndex = 1;
 	local history = {};
+	print(turtlecraft.menu);
+	error("break");
 	table.insert(history, turtlecraft.menu);
 	
 	local writeLine = function(x, y, text)
@@ -51,10 +53,6 @@ turtlecraft.menu.dig.action.excavate = {
 	
 	local selectItem = function()
 		local menu = currentMenu();
-		term.clear();
-		writeLine(1, 1, selectedIndex);
-		writeLine(1, 2, menu);
-		writeLine(1, 3, table.getn(menu));
 		local item = menu[selectedIndex].action;
 		if (typeof(item) == "function") then
 			item();

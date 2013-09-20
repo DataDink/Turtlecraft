@@ -1,10 +1,12 @@
 turtlecraft.menu = {}
 
-turtlecraft.menu.dig = {
-	title = "Dig Functions",
-	action = {}
-};
-turtlecraft.menu.dig.action.excavate = {
+turtlecraft.menu[1] = {
+	title = "Dig functions",
+	action = {};
+}
+
+turtlecraft.menu[1].action = {};
+turtlecraft.menu[1].action[1] = {
 	title = "Excavator / Quarry",
 	action = turtlecraft.excavate.start
 };
@@ -36,22 +38,18 @@ turtlecraft.menu.dig.action.excavate = {
 		local displayCount = height - 4;
 		local startIndex = math.max(0, selectedIndex - displayCount);
 		local endIndex = startIndex + displayCount;
-		local index = 1;
 		local menu = currentMenu();
-		for k, item in pairs(menu) do
+		for index, item in ipairs(menu) do
 			if (index > startIndex and index <= endIndex) then
 				local text = item.title;
 				if (index == selectedIndex) then text = ">" .. text .. "<"; end
 				writeLine(1, index - startIndex + 3, text);
 			end
-			index = index + 1;
 		end
 	end
 	
 	local selectItem = function()
 		local menu = currentMenu();
-		print(menu);
-		error("break");
 		local item = menu[selectedIndex].action;
 		if (typeof(item) == "function") then
 			item();

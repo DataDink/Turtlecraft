@@ -147,7 +147,7 @@ turtlecraft.excavate = {};
 		if (inventory.needsUnload() or fuel <= resumeDist or fuel <= homeDist) then
 			move.home(function() 
 				local distance = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
-				turtle.fuel.require(distance);
+				turtlecraft.fuel.require(distance);
 				inventory.unload();
 			end);
 		end

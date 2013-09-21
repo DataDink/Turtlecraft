@@ -62,6 +62,7 @@
     <Compile Include="Framework\Term.cs" />
     <Compile Include="Framework\Turtle.cs" />
     <Compile Include="FuelTests.cs" />
+    <Compile Include="MoveTests.cs" />
     <Compile Include="PositionTests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -43,7 +43,7 @@ turtlecraft.move = {};
 		
 		internal.face(direction);
 		if (before ~= nil and before(direction) == false) then return false; end
-		if (turtlecraft.position.set(x, y, z, d, action) == false) then return false; end
+		if (turtlecraft.position.set(x, y, z, direction, action) == false) then return false; end
 		if (after ~= nil and after(direction) == false) then return false; end
 		return true;
 	end
@@ -60,9 +60,9 @@ turtlecraft.move = {};
 	
 	internal.moveTo = function(x, y, z, before, after, onRetry)
 		local px, py, pz, pd = turtlecraft.position.get();
-		if (internal.repeatMove(pz, x, directions.up, directions.down, before, after, onRetry) == false) then return false; end
-		if (internal.repeatMove(px, y, directions.east, directions.west, before, after, onRetry) == false) then return false; end
-		if (internal.repeatMove(py, z, directions.north, directions.south, before, after, onRetry) == false) then return false; end
+		if (internal.repeatMove(px, x, directions.east, directions.west, before, after, onRetry) == false) then return false; end
+		if (internal.repeatMove(py, y, directions.north, directions.south, before, after, onRetry) == false) then return false; end
+		if (internal.repeatMove(pz, z, directions.up, directions.down, before, after, onRetry) == false) then return false; end
 		return true;
 	end
 	

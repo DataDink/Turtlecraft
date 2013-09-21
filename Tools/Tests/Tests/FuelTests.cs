@@ -22,7 +22,7 @@ namespace Tests
             environment.Execute("turtlecraft.fuel.require(10);");
             var calc = environment.Execute("return turtlecraft.fuel.estimateRemaining();")[0];
 
-            Assert.AreEqual(35, calc);
+            Assert.AreEqual(35d, calc);
         }
 
     }

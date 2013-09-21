@@ -52,7 +52,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnCraft;
-        public bool Craft(int quantity)
+        private bool Craft(int quantity)
         {
             CallsMade.Add("craft(" + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -61,7 +61,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnForward;
-        public bool Forward()
+        private bool Forward()
         {
             CallsMade.Add("forward()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -70,7 +70,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnBack;
-        public bool Back()
+        private bool Back()
         {
             CallsMade.Add("back()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -79,7 +79,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnUp;
-        public bool Up()
+        private bool Up()
         {
             CallsMade.Add("up()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -88,7 +88,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDown;
-        public bool Down()
+        private bool Down()
         {
             CallsMade.Add("down()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -97,7 +97,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnTurnLeft;
-        public bool TurnLeft()
+        private bool TurnLeft()
         {
             CallsMade.Add("turnLeft()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -106,7 +106,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnTurnRight;
-        public bool TurnRight()
+        private bool TurnRight()
         {
             CallsMade.Add("turnRight()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -115,7 +115,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnAttack;
-        public bool Attack()
+        private bool Attack()
         {
             CallsMade.Add("attack()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -124,7 +124,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnAttackUp;
-        public bool AttackUp()
+        private bool AttackUp()
         {
             CallsMade.Add("attackUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -133,7 +133,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnAttackDown;
-        public bool AttackDown()
+        private bool AttackDown()
         {
             CallsMade.Add("attackDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -142,7 +142,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDig;
-        public bool Dig()
+        private bool Dig()
         {
             CallsMade.Add("dig()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -151,7 +151,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDigUp;
-        public bool DigUp()
+        private bool DigUp()
         {
             CallsMade.Add("digUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -160,7 +160,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDigDown;
-        public bool DigDown()
+        private bool DigDown()
         {
             CallsMade.Add("digDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -169,7 +169,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnPlaceUp;
-        public bool PlaceUp()
+        private bool PlaceUp()
         {
             CallsMade.Add("placeUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -178,7 +178,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnPlaceDown;
-        public bool PlaceDown()
+        private bool PlaceDown()
         {
             CallsMade.Add("forward()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -187,7 +187,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDetect;
-        public bool Detect()
+        private bool Detect()
         {
             CallsMade.Add("detect()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -196,7 +196,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDetectUp;
-        public bool DetectUp()
+        private bool DetectUp()
         {
             CallsMade.Add("detectUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -205,7 +205,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDetectDown;
-        public bool DetectDown()
+        private bool DetectDown()
         {
             CallsMade.Add("detectDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -214,7 +214,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnCompare;
-        public bool Compare()
+        private bool Compare()
         {
             CallsMade.Add("compare()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -223,7 +223,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnCompareUp;
-        public bool CompareUp()
+        private bool CompareUp()
         {
             CallsMade.Add("compareUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -232,7 +232,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnCompareDown;
-        public bool CompareDown()
+        private bool CompareDown()
         {
             CallsMade.Add("compareDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -241,7 +241,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnSuck;
-        public bool Suck()
+        private bool Suck()
         {
             CallsMade.Add("suck()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -250,7 +250,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnSuckUp;
-        public bool SuckUp()
+        private bool SuckUp()
         {
             CallsMade.Add("suckUp()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -259,7 +259,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnSuckDown;
-        public bool SuckDown()
+        private bool SuckDown()
         {
             CallsMade.Add("suckDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -268,7 +268,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<int>> OnGetFuelLevel;
-        public int GetFuelLevel()
+        private int GetFuelLevel()
         {
             CallsMade.Add("forward()");
             var result = new LuaResultEventArgs<int> { Result = 0 };
@@ -277,7 +277,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnSelect;
-        public bool Select(int slotNum)
+        private bool Select(int slotNum)
         {
             CallsMade.Add("select(" + slotNum + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -286,7 +286,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<int>> OnGetItemCount;
-        public int GetItemCount(int slotNum)
+        private int GetItemCount(int slotNum)
         {
             CallsMade.Add("getItemCount(" + slotNum + ")");
             var result = new LuaResultEventArgs<int> { Result = 0 };
@@ -295,7 +295,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<int>> OnGetItemSpace;
-        public int GetItemSpace(int slotNum)
+        private int GetItemSpace(int slotNum)
         {
             CallsMade.Add("getItemSpace(" + slotNum + ")");
             var result = new LuaResultEventArgs<int> { Result = 0 };
@@ -304,7 +304,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnCompareTo;
-        public bool CompareTo(int slotNum)
+        private bool CompareTo(int slotNum)
         {
             CallsMade.Add("compareTo(" + slotNum + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -313,7 +313,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDrop;
-        public bool Drop(int quantity)
+        private bool Drop(int quantity)
         {
             CallsMade.Add("drop(" + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -322,7 +322,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDropUp;
-        public bool DropUp(int quantity)
+        private bool DropUp(int quantity)
         {
             CallsMade.Add("dropUp(" + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -331,7 +331,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnDropDown;
-        public bool DropDown(int quantity)
+        private bool DropDown(int quantity)
         {
             CallsMade.Add("dropDown(" + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -340,7 +340,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnRefuel;
-        public bool Refuel(int quantity)
+        private bool Refuel(int quantity)
         {
             CallsMade.Add("refuel(" + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -349,7 +349,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnPlace;
-        public bool Place(string signText = "")
+        private bool Place(string signText = "")
         {
             CallsMade.Add("place(" + (signText ?? "") + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };
@@ -358,7 +358,7 @@ namespace Tests.Framework
         }
 
         public event EventHandler<LuaResultEventArgs<bool>> OnTransferTo;
-        public bool TransferTo(int slotNum, int quantity = 0)
+        private bool TransferTo(int slotNum, int quantity = 0)
         {
             CallsMade.Add("transferTo(" + slotNum + "," + quantity + ")");
             var result = new LuaResultEventArgs<bool> { Result = true };

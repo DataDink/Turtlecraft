@@ -1,3 +1,9 @@
+Test Completed: FuelTests.CalculateFuelRemaining
+----
+Test Completed: MoveTests.FacingMovements
+----
+Test Completed: MoveTests.PositionMovements
+----
 Test Completed: PositionTests.DefaultPosition
 ----
 Test Completed: PositionTests.RecoverBySingleLine
@@ -7,4 +13,8 @@ Test Completed: PositionTests.RecoverByFuelMarker
 Test Completed: PositionTests.DirectionRecovery
 ----
 Test Completed: PositionTests.RecoverByCompass
+----
+Test Completed: PositionTests.RecoverByGps
+----
+Test Completed: PositionTests.CachePosition
 ----

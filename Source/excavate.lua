@@ -134,6 +134,7 @@ turtlecraft.excavate = {};
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		turtlecraft.move.face(plot.home.d);
 		inventory.unload();
+		print("entered");
 		turtle.select(1);
 		turtle.drop();
 		turtlecraft.move.face((plot.home.d + 180) % 360);
@@ -154,7 +155,7 @@ turtlecraft.excavate = {};
 			move.finish();
 			return false;
 		end
-
+		
 		plot.progress.x = plot.progress.x + plot.step.x;
 		if (plot.progress.x > plot.max.x or plot.progress.x < plot.min.x) then
 			plot.step.x = -plot.step.x;
@@ -164,7 +165,7 @@ turtlecraft.excavate = {};
 				plot.step.y = -plot.step.y;
 				plot.progress.y = plot.progress.y + plot.step.y;
 				plot.progress.z = plot.progress.z + plot.step.z;
-				if (plot.progress.z > plot.max.z) then
+				if (plot.progress.z < plot.min.z) then
 					move.finish();
 					return false;
 				end

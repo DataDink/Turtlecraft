@@ -161,7 +161,6 @@ turtlecraft.excavate = {};
 		
 		local movemethod = turtlecraft.move.excavateTo;
 		local target = {x = plot.progress.x, y = plot.progress.y, z = plot.progress.z};
-		print("target set");
 		target.x = target.x + plot.step.x;
 		if (target.x > plot.max.x or target.x < plot.min.x) then
 			plot.step.x = -plot.step.x;
@@ -182,10 +181,7 @@ turtlecraft.excavate = {};
 			end
 		end
 		
-		print(target.x .. " " .. target.y .. " " .. target.z);
-		print(plot.progress.x .. " " .. plot.progress.y .. " " .. plot.progress.z);
-		
-		if (not movemethod(plot.progress.x, plot.progress.y, plot.progress.z)) then 
+		if (not movemethod(target.x, target.y, target.z)) then 
 			print("move failed");
 			local x, y, z, d = turtlecraft.position.get();
 			if (x == plot.progress.x and y == plot.progress.y and z == plot.progress.z) then

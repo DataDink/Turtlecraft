@@ -53,7 +53,8 @@ turtlecraft.menu[1] = {
 		for index, item in ipairs(menu) do
 			if (index > startIndex and index <= endIndex) then
 				local text = item.title;
-				if (index == selectedIndex) then text = ">" .. text .. "<"; end
+				if (index == selectedIndex) then text = ">" .. text .. "<"; 
+				else text = " " .. text; end
 				writeLine(1, index - startIndex + 3, text);
 			end
 		end

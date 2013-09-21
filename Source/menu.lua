@@ -6,7 +6,7 @@ turtlecraft.menu[1] = {
 
 	turtlecraft.menu[1].action = {};
 	turtlecraft.menu[1].action[1] = {
-		title = "Excavator / Quarry",
+		title = "Excavate",
 		action = turtlecraft.excavate.start
 	};
 	turtlecraft.menu[1].action[2] = {

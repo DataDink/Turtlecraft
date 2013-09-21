@@ -1,0 +1,10 @@
+local manifest = http.get("https://raw.github.com/DataDink/Turtlecraft/master/Source/manifest");
+local fileName = manifest.readLine();
+while (fileName ~= nil) do
+	print(file);
+	local file = http.get("https://raw.github.com/DataDink/Turtlecraft/master/Source/" .. fileName);
+	local exec, err = loadstring(file);
+	if (err ~= nil) then error(err); end
+	exec();
+	fileName = manifest.readLine();
+end

@@ -5,6 +5,7 @@ end
 turtlecraft = {};
 turtlecraft.version = 0.01;
 turtlecraft.directory = "turtlecraft_data/";
+if (not fs.exists(turtlecraft.directory)) then fs.makeDir(turtlecraft.directory); end
 
 turtlecraft.math = {};
 turtlecraft.math.round = function(number)

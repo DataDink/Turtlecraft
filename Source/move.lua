@@ -21,6 +21,7 @@ turtlecraft.move = {};
 	end
 	
 	internal.move = function(direction, before, after, onRetry)
+		print(direction);
 		local move = turtle.forward;
 		if (direction == directions.up) then move = turtle.up; end
 		if (direction == directions.down) then move = turtle.down; end

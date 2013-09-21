@@ -1,3 +1,5 @@
+Test Completed: ExcavateTests.MovementTest
+----
 Test Completed: FuelTests.CalculateFuelRemaining
 ----
 Test Completed: MoveTests.FacingMovements

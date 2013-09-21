@@ -23,7 +23,9 @@ namespace Tests
             using (var dlg = new OpenFileDialog {Title = "Please select Manifest file"}) {
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 var path = Path.GetDirectoryName(dlg.FileName);
-                files = File.ReadAllLines(dlg.FileName).Select(n => Path.Combine(path, n)).ToArray();
+                files = File.ReadAllLines(dlg.FileName).Select(n => Path.Combine(path, n))
+                        .Where(f => !f.EndsWith("menu.lua"))
+                        .ToArray();
             }
 
             var assembly = typeof(Program).Assembly;

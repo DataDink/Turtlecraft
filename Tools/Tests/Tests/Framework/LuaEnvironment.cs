@@ -16,6 +16,7 @@ namespace Tests.Framework
         public Peripheral Peripheral { get; private set; }
         public Rednet Rednet { get; private set; }
         public Gps Gps { get; private set; }
+        public Term Term { get; private set; }
 
         public LuaEnvironment(string[] files)
         {
@@ -34,6 +35,7 @@ namespace Tests.Framework
             Peripheral = new Peripheral(this);
             Rednet = new Rednet(this);
             Gps = new Gps(this);
+            Term = new Term(this);
         }
 
         public event EventHandler OnPrint; 

@@ -152,7 +152,7 @@ turtlecraft.excavate = {};
 			end);
 		end
 		print(plot.progress.x .. " " .. plot.progress.y .. " " .. plot.progress.z);
-		print(plot.step.x .. " " .. plot.step.y .. " " .. plot.z);
+		print(plot.step.x .. " " .. plot.step.y .. " " .. plot.step.z);
 		print(plot.min.x .. " " .. plot.min.y .. " " .. plot.min.z);
 		print(plot.max.x .. " " .. plot.max.y .. " " .. plot.max.z);
 		

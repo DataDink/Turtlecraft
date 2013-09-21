@@ -35,7 +35,6 @@ turtlecraft.excavate = {};
 			plot.min.y = plot.min.y - math.abs(right);
 			plot.max.y = plot.max.y + math.abs(left);
 		end
-		
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end
 	plot.update = function()
@@ -151,11 +150,11 @@ turtlecraft.excavate = {};
 				inventory.unload();
 			end);
 		end
-		print(plot.progress.x .. " " .. plot.progress.y .. " " .. plot.progress.z);
-		print(plot.step.x .. " " .. plot.step.y .. " " .. plot.step.z);
-		print(plot.min.x .. " " .. plot.min.y .. " " .. plot.min.z);
-		print(plot.max.x .. " " .. plot.max.y .. " " .. plot.max.z);
-		error('test');
+		if (not turtlecraft.move.digTo(plot.progress.x, plot.progress.y, plot.progress.z)) then
+			move.finish();
+			return false;
+		end
+
 		plot.progress.x = plot.progress.x + plot.step.x;
 		if (plot.progress.x > plot.max.x or plot.progress.x < plot.min.x) then
 			plot.step.x = -plot.step.x;

@@ -5,7 +5,6 @@ turtlecraft.move = {};
 	local directions = turtlecraft.position.directions;
 	
 	internal.face = function(direction)
-		print(direction or "NA");
 		if (direction == directions.up or direction == directions.down) then return true; end
 		local x, y, z, d = turtlecraft.position.get();
 		if (d == direction) then return true; end
@@ -22,9 +21,9 @@ turtlecraft.move = {};
 	end
 	
 	internal.move = function(direction, before, after, onRetry)
-		local move = "forward";
-		if (direction == directions.up) then move = "up"; end
-		if (direction == directions.down) then move = "down"; end
+		local move = turtle.forward;
+		if (direction == directions.up) then move = turtle.up; end
+		if (direction == directions.down) then move = turtle.down; end
 		
 		local x, y, z, d = turtlecraft.position.get();
 		if (direction == directions.up) then z = z + 1; end
@@ -35,15 +34,16 @@ turtlecraft.move = {};
 		if (direction == directions.west) then x = x - 1; end
 		
 		local action = function()
-			while (not turtle[move]()) do
+			while (not move()) do
 				if (onRetry ~= nil and onRetry(direction) == false) then return false; end
 				sleep(1);
 			end
 			return true;
 		end
 		
+		internal.face(direction);
 		if (before ~= nil and before(direction) == false) then return false; end
-		if (turtlecraft.position.set(x, y, z, d, action, move) == false) then return false; end
+		if (turtlecraft.position.set(x, y, z, d, action) == false) then return false; end
 		if (after ~= nil and after(direction) == false) then return false; end
 		return true;
 	end

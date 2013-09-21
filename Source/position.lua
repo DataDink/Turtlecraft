@@ -237,7 +237,10 @@ turtlecraft.position = {};
 		local previous = {x = location.x, y = location.y, z = location.z, d = location.d};
 		local intended = {x = x, y = y, z = z, d = d};
 		cache.write(intended, previous);
-		if (moveAction == nil or moveAction() == false) then return false; end
+		if (moveAction == nil or moveAction() == false) then 
+			cache.write(previous);
+			return false; 
+		end
 		cache.write(intended);
 
 		location.x = x;

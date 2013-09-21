@@ -15,8 +15,8 @@ turtlecraft.excavate = {};
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
 		plot.step = {x = 1, y = 1, z = -3};
-		plot.min = {x = x, y = y, z = z - math.abs(down)};
-		plot.max = {x = x, y = y, z = z + math.abs(up)};
+		plot.min = {x = x, y = y, z = z - math.abs(down) + 1};
+		plot.max = {x = x, y = y, z = z + math.abs(up) - 1};
 
 		if (d == directions.north) then
 			plot.max.y = plot.max.y + math.abs(forward);
@@ -134,7 +134,6 @@ turtlecraft.excavate = {};
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		turtlecraft.move.face(plot.home.d);
 		inventory.unload();
-		print("entered");
 		turtle.select(1);
 		turtle.drop();
 		turtlecraft.move.face((plot.home.d + 180) % 360);
@@ -144,6 +143,7 @@ turtlecraft.excavate = {};
 		local resumeDist = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
 		local homeDist = plot.calcReturn();
 		local fuel = turtlecraft.fuel.estimateRemaining();
+
 		if (inventory.needsUnload() or fuel <= resumeDist or fuel <= homeDist) then
 			move.home(function() 
 				local distance = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
@@ -165,6 +165,9 @@ turtlecraft.excavate = {};
 				plot.step.y = -plot.step.y;
 				plot.progress.y = plot.progress.y + plot.step.y;
 				plot.progress.z = plot.progress.z + plot.step.z;
+				if (plot.progress.z == plot.min.z - 1 or plot.progress.z == plot.min.z - 2) then 
+					plot.progress.z = plot.min.z; 
+				end
 				if (plot.progress.z < plot.min.z) then
 					move.finish();
 					return false;

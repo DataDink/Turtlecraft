@@ -27,7 +27,7 @@ turtlecraft.fuel = {};
 		return current + unburned;
 	end
 	
-	turtlecraft.fuel.require = function(count) 
+	turtlecraft.fuel.require = function(count)
 		if (count == nil) then count = 1; end
 		while (turtle.getFuelLevel() < count) do
 			if (not internal.burn()) then

@@ -34,6 +34,7 @@ turtlecraft.move = {};
 		if (direction == directions.west) then x = x - 1; end
 		
 		local action = function()
+			turtlecraft.fuel.require(1);
 			while (not move()) do
 				if (onRetry ~= nil and onRetry(direction) == false) then return false; end
 				sleep(.01);

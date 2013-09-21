@@ -180,7 +180,7 @@ namespace Tests.Framework
         public event EventHandler<LuaResultEventArgs<bool>> OnPlaceDown;
         private bool PlaceDown()
         {
-            CallsMade.Add("forward()");
+            CallsMade.Add("placeDown()");
             var result = new LuaResultEventArgs<bool> { Result = true };
             if (OnPlaceDown != null) OnPlaceDown(this, result);
             return result.Result;
@@ -270,7 +270,7 @@ namespace Tests.Framework
         public event EventHandler<LuaResultEventArgs<int>> OnGetFuelLevel;
         private int GetFuelLevel()
         {
-            CallsMade.Add("forward()");
+            CallsMade.Add("getFuelLevel()");
             var result = new LuaResultEventArgs<int> { Result = 0 };
             if (OnGetFuelLevel != null) OnGetFuelLevel(this, result);
             return result.Result;

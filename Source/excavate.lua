@@ -182,7 +182,7 @@ turtlecraft.excavate = {};
 		
 		if (not movemethod(plot.progress.x, plot.progress.y, plot.progress.z)) then 
 			local x, y, z, d = turtlecraft.position.get();
-			if (x == plot.progress.x and y = plot.progress.y and z == plot.progress.z) then
+			if (x == plot.progress.x and y == plot.progress.y and z == plot.progress.z) then
 				print("Unable to dig further");
 				move.finish();
 				return false;

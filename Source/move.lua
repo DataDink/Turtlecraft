@@ -36,7 +36,7 @@ turtlecraft.move = {};
 		local action = function()
 			while (not move()) do
 				if (onRetry ~= nil and onRetry(direction) == false) then return false; end
-				sleep(1);
+				sleep(.01);
 			end
 			return true;
 		end

@@ -16,7 +16,7 @@ turtlecraft.fuel = {};
 		local preburn = turtle.getFuelLevel();
 		if (not turtle.refuel(internal.itemsPerBurn)) then return false; end
 		local postburn = turtle.getFuelLevel();
-		internal.fuelPerBurn = preburn - postburn;
+		internal.fuelPerBurn = postburn - preburn;
 		return true;
 	end
 	

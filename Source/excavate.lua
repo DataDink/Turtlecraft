@@ -28,12 +28,12 @@ turtlecraft.excavate = {};
 			plot.max.x = plot.max.x + math.abs(left);
 		elseif (d == directions.east) then
 			plot.max.x = plot.max.x + math.abs(forward);
-			plot.min.y = plot.min.y - math.abs(left);
-			plot.max.y = plot.max.y + math.abs(right);
-		else
-			plot.min.x = plot.min.x - math.abs(forward);
 			plot.min.y = plot.min.y - math.abs(right);
 			plot.max.y = plot.max.y + math.abs(left);
+		else
+			plot.min.x = plot.min.x - math.abs(forward);
+			plot.min.y = plot.min.y - math.abs(left);
+			plot.max.y = plot.max.y + math.abs(right);
 		end
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end

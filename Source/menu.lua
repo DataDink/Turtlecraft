@@ -10,15 +10,15 @@ turtlecraft.menu[1] = {
 		action = turtlecraft.excavate.start
 	};
 	turtlecraft.menu[1].action[2] = {
-		title = "Eat",
-		action = function() print("NYI"); read(); end
-	};
-	turtlecraft.menu[1].action[2] = {
-		title = "Fill Space",
+		title = "Eat Area",
 		action = function() print("NYI"); read(); end
 	};
 	turtlecraft.menu[1].action[3] = {
-		title = "Empty Space",
+		title = "Fill Area",
+		action = function() print("NYI"); read(); end
+	};
+	turtlecraft.menu[1].action[4] = {
+		title = "Empty Area",
 		action = function() print("NYI"); read(); end
 	};
 

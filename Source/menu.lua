@@ -44,7 +44,7 @@ turtlecraft.menu[1] = {
 		local width, height = term.getSize();
 		writeLine(1, 1, "Turtlecraft v" .. turtlecraft.version .. ".");
 		writeLine(1, 2, "====================");
-		writeLine(1, height, "--Use up/down and enter/left--");
+		writeLine(1, height, "**Use up/down and enter/left**");
 		
 		local displayCount = height - 4;
 		local startIndex = math.max(0, selectedIndex - displayCount);

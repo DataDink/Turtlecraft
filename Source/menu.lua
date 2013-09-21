@@ -1,15 +1,26 @@
 turtlecraft.menu = {}
-
 turtlecraft.menu[1] = {
 	title = "Dig functions",
 	action = {};
 }
 
-turtlecraft.menu[1].action = {};
-turtlecraft.menu[1].action[1] = {
-	title = "Excavator / Quarry",
-	action = turtlecraft.excavate.start
-};
+	turtlecraft.menu[1].action = {};
+	turtlecraft.menu[1].action[1] = {
+		title = "Excavator / Quarry",
+		action = turtlecraft.excavate.start
+	};
+	turtlecraft.menu[1].action[2] = {
+		title = "Eat",
+		action = function() print("NYI"); read(); end
+	};
+	turtlecraft.menu[1].action[2] = {
+		title = "Fill Space",
+		action = function() print("NYI"); read(); end
+	};
+	turtlecraft.menu[1].action[3] = {
+		title = "Empty Space",
+		action = function() print("NYI"); read(); end
+	};
 
 
 (function()

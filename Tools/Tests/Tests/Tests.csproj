@@ -59,6 +59,7 @@
     <Compile Include="Framework\LuaEnvironment.cs" />
     <Compile Include="Framework\LuaResultEventArgs.cs" />
     <Compile Include="Framework\Peripheral.cs" />
+    <Compile Include="Framework\Term.cs" />
     <Compile Include="Framework\Turtle.cs" />
     <Compile Include="PositionTests.cs" />
     <Compile Include="Program.cs" />

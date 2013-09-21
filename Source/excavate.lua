@@ -203,6 +203,7 @@ turtlecraft.excavate = {};
 	ui.printHeader = function()
 		ui.print(1, 1, "Turtlecraft v" .. turtlecraft.version .. " Excavator");
 		ui.print(1, 2, "============================");
+		print("");
 	end
 	
 	if (plot.recover()) then

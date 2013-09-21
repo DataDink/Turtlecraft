@@ -5,6 +5,7 @@ turtlecraft.move = {};
 	local directions = turtlecraft.position.directions;
 	
 	internal.face = function(direction)
+		print(direction);
 		if (direction == directions.up or direction == directions.down) then return true; end
 		local x, y, z, d = turtlecraft.position.get();
 		if (d == direction) then return true; end

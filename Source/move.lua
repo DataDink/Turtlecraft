@@ -20,8 +20,26 @@ turtlecraft.move = {};
 		return true;
 	end
 	
+	internal.dig = function() return (not turtle.detect()) or turtle.dig();	end
+	internal.digUp = function() return (not turtle.detectUp()) or turtle.digUp(); end
+	internal.digDown = function() return (not turtle.detectDown()) or turtle.digDown(); end
+	internal.excavate = function() 
+		internal.digUp();
+		internal.digDown();
+		return internal.dig();
+	end
+	internal.excavateUp = function()
+		internal.dig();
+		internal.digDown();
+		return internal.digUp();
+	end
+	internal.excavateDown = function()
+		internal.dig();
+		internal.digUp();
+		return internal.digDown();
+	end
+	
 	internal.move = function(direction, before, after, onRetry)
-		print(direction);
 		local move = turtle.forward;
 		if (direction == directions.up) then move = turtle.up; end
 		if (direction == directions.down) then move = turtle.down; end
@@ -77,33 +95,19 @@ turtlecraft.move = {};
 	end
 	
 	turtlecraft.move.digTo = function(x, y, z, action)
-		local dig = function(movement)
-			local method = turtle.dig;
-			if (movement == directions.up) then method = turtle.digUp; end
-			if (movement == directions.down) then method = turtle.digDown; end
-			return method();
+		local dig = function(direction)
+			if (direction == directions.up) then return internal.digUp();
+			elseif (direction == directions.down) then return internal.digDown();
+			else return internal.dig(); end			
 		end
 		return internal.moveTo(x, y, z, dig, action, dig);
 	end
 	
 	turtlecraft.move.excavateTo = function(x, y, z, action)
-		local dig = function(movement)
-			local primary = turtle.dig;
-			local other1 = turtle.digUp;
-			local other2 = turtle.digDown;
-			if (movement == directions.up) then 
-				primary = turtle.digUp; 
-				other1 = turtle.dig;
-				other2 = turtle.digDown;
-			end
-			if (movement == directions.down) then 
-				primary = turtle.digDown; 
-				other1 = turtle.digUp;
-				other2 = turtle.dig;
-			end
-			other1();
-			other2();
-			return primary();
+		local dig = function(direction)
+			if (direction == directions.up) then return internal.excavateUp();
+			elseif (direction == directions.down) then return internal.excavateDown();
+			else return internal.excavate(); end			
 		end
 		return internal.moveTo(x, y, z, dig, action, dig);
 	end

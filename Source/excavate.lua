@@ -125,14 +125,12 @@ turtlecraft.excavate = {};
 	
 	-- Movement
 	move.home = function(callback)
-	print("home");
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		callback();
 		turtlecraft.move.face((plot.home.d + 180) % 360);
 		turtlecraft.move.digTo(plot.progress.x, plot.progress.y, plot.progress.z);
 	end
 	move.finish = function()
-	print("finish");
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		turtlecraft.move.face(plot.home.d);
 		inventory.unload();
@@ -140,10 +138,8 @@ turtlecraft.excavate = {};
 		turtle.drop();
 		turtlecraft.move.face((plot.home.d + 180) % 360);
 		plot.reset();
-		read();
 	end
 	move.next = function()
-	print("next");
 		local resumeDist = plot.calcDistance(plot.progress.x, plot.progress.y, plot.progress.z);
 		local homeDist = plot.calcReturn();
 		local fuel = turtlecraft.fuel.estimateRemaining();

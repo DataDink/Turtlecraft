@@ -133,6 +133,7 @@ turtlecraft.excavate = {};
 		turtlecraft.move.digTo(plot.progress.x, plot.progress.y, plot.progress.z);
 	end
 	move.finish = function()
+		fs.delete(plot.path);
 		turtlecraft.move.digTo(plot.home.x, plot.home.y, plot.home.z);
 		turtlecraft.move.face(plot.home.d);
 		inventory.unload();
@@ -160,6 +161,7 @@ turtlecraft.excavate = {};
 		
 		local movemethod = turtlecraft.move.excavateTo;
 		local target = {x = plot.progress.x, y = plot.progress.y, z = plot.progress.z};
+		print("target set");
 		target.x = target.x + plot.step.x;
 		if (target.x > plot.max.x or target.x < plot.min.x) then
 			plot.step.x = -plot.step.x;
@@ -180,7 +182,11 @@ turtlecraft.excavate = {};
 			end
 		end
 		
+		print(target.x .. " " .. target.y .. " " .. target.z);
+		print(plot.progress.x .. " " .. plot.progress.y .. " " .. plot.progress.z);
+		
 		if (not movemethod(plot.progress.x, plot.progress.y, plot.progress.z)) then 
+			print("move failed");
 			local x, y, z, d = turtlecraft.position.get();
 			if (x == plot.progress.x and y == plot.progress.y and z == plot.progress.z) then
 				print("Unable to dig further");

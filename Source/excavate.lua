@@ -81,6 +81,7 @@ turtlecraft.excavate = {};
 		};
 		
 		for index, data in pairs(setters) do
+			print(index .. " " .. data);
 			local reader = string.gmatch(data, valuePattern);
 			local target = plot[index];
 			target.x = tonumber(reader() or 0);

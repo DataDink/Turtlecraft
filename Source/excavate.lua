@@ -81,18 +81,16 @@ turtlecraft.excavate = {};
 		};
 		
 		for index, data in pairs(setters) do
-			print(index .. " " .. data .. " " .. type(index));
 			local reader = string.gmatch(data, valuePattern);
-			print(reader());
+			if (plot[index] == nil) then plot[index] = {}; end
 			local target = plot[index];
-			print(target);
-			error("test");
 			target.x = tonumber(reader() or 0);
 			target.y = tonumber(reader() or 0);
 			target.z = tonumber(reader() or 0);
 			target.d = tonumber(reader() or "");
 		end
 		
+		fs.delete(plot.path);
 		return true;
 	end
 	plot.calcDistance = function(x, y, z)

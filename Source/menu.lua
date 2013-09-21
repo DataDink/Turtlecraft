@@ -89,6 +89,16 @@ turtlecraft.menu[1] = {
 		end
 	end
 	
+	if (not turtlecraft.position.isInSync()) then
+		term.clear();
+		writeLine(1, 1, "The turtle's position has gotten out of sync.");
+		writeLine(1, 2, "If there was a function in progress it has likely been cancelled.");
+		writeLine(1, 3, "Press any key to continue");
+		local _, _, _, d = turtlecraft.position.get();
+		turtlecraft.position.set(0, 0, 0, d);
+		turtlecraft.input.readKey();
+	end
+	
 	while (true) do
 		drawMenu();
 		sleep(0.01);

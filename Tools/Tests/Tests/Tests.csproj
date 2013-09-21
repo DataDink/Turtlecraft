@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assert.cs" />
+    <Compile Include="ExcavateTests.cs" />
     <Compile Include="Framework\Compass.cs" />
     <Compile Include="Framework\Gps.cs" />
     <Compile Include="Framework\Modem.cs" />

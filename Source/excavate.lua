@@ -237,4 +237,9 @@ turtlecraft.excavate = {};
 		term.setCursorPos(0, 0);
 		read();
 	end
+	
+	turtlecraft.excavate.debug = {};
+	turtlecraft.excavate.debug.start = function(forward, left, right, up, down)
+		move.start(forward, left, right, up, down);
+	end
 end)();	

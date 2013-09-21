@@ -158,27 +158,35 @@ turtlecraft.excavate = {};
 			return false;
 		end
 		
-		plot.progress.x = plot.progress.x + plot.step.x;
-		if (plot.progress.x > plot.max.x or plot.progress.x < plot.min.x) then
+		local movemethod = turtlecraft.move.excavateTo;
+		local target = {x = plot.progress.x, y = plot.progress.y, z = plot.progress.z};
+		target.x = target.x + plot.step.x;
+		if (target.x > plot.max.x or target.x < plot.min.x) then
 			plot.step.x = -plot.step.x;
-			plot.progress.x = plot.progress.x + plot.step.x;
-			plot.progress.y = plot.progress.y + plot.step.y;
-			if (plot.progress.y > plot.max.y or plot.progress.y < plot.min.y) then
+			target.x = target.x + plot.step.x;
+			target.y = plot.progress.y + plot.step.y;
+			if (target.y > plot.max.y or target.y < plot.min.y) then
 				plot.step.y = -plot.step.y;
-				plot.progress.y = plot.progress.y + plot.step.y;
-				plot.progress.z = plot.progress.z + plot.step.z;
-				if (plot.progress.z == plot.min.z - 1 or plot.progress.z == plot.min.z - 2) then 
-					plot.progress.z = plot.min.z; 
+				target.y = target.y + plot.step.y;
+				target.z = target.z + plot.step.z;
+				movemethod = turtlecraft.move.digTo;
+				if (target.z == plot.min.z - 1 or target.z == plot.min.z - 2) then 
+					target.z = plot.min.z; 
 				end
-				if (plot.progress.z < plot.min.z) then
+				if (target.z < plot.min.z) then
 					move.finish();
 					return false;
 				end
 			end
 		end
-		if (not turtlecraft.move.excavateTo(plot.progress.x, plot.progress.y, plot.progress.z)) then 
-			move.finish();
-			return false;
+		
+		if (not movemethod(plot.progress.x, plot.progress.y, plot.progress.z)) then 
+			local x, y, z, d = turtlecraft.position.get();
+			if (x == plot.progress.x and y = plot.progress.y and z == plot.progress.z) then
+				print("Unable to dig further");
+				move.finish();
+				return false;
+			end
 		end
 		plot.update();
 		return true;

@@ -2,7 +2,7 @@ local manifest = http.get("https://raw.github.com/DataDink/Turtlecraft/master/So
 local fileName = manifest.readLine();
 while (fileName ~= nil) do
 	print(file);
-	local file = http.get("https://raw.github.com/DataDink/Turtlecraft/master/Source/" .. fileName);
+	local file = http.get("https://raw.github.com/DataDink/Turtlecraft/master/Source/" .. fileName).readAll();
 	local exec, err = loadstring(file);
 	if (err ~= nil) then error(err); end
 	exec();

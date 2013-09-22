@@ -171,6 +171,7 @@ turtlecraft.excavate = {};
 				target.y = target.y + plot.step.y;
 				target.z = target.z + plot.step.z;
 				movemethod = turtlecraft.move.digTo;
+				turtle.digUp(); -- little hack
 				if (target.z == plot.min.z - 1 or target.z == plot.min.z - 2) then 
 					target.z = plot.min.z; 
 				end

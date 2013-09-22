@@ -39,7 +39,7 @@ turtlecraft.term.clear = function(title, footer)
 	turtlecraft.term.write(1, 1, headerText);
 	local underline = "";
 	for i = 1, width do
-		underline = underline + "=";
+		underline = underline .. "=";
 	end
 	turtlecraft.term.write(1, 2, underline);
 	if (footer ~= nil) then

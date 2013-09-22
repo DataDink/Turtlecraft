@@ -49,5 +49,6 @@ turtlecraft.help = {}
 		text = text .. "Select 'Dig functions' to excavate, fill/clear areas, or 'eat'\r\n";
 		text = text .. "Select 'Build functions' to have your turtle help you create 2d and 3d shapes\r\n";
 		text = text .. "There is a whole world of things you can make your turtle do. Turtlecraft will only help you with these few things.\r\n";
+		show(text);
 	end
 end)();

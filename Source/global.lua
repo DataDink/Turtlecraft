@@ -58,7 +58,7 @@ end
 turtlecraft.term.notifyResume = function(ofWhat)
 	turtlecraft.term.clear();
 	local text = "The turtle will resume";
-	if (ofWhat ~= nil) then text = text .. " " .. ofWhat;
+	if (ofWhat ~= nil) then text = text .. " " .. ofWhat; end
 	text = text .. " in 15 seconds.";
 	turtlecraft.term.write(1, 4, text);
 	turtlecraft.term.write(1, 5, "Press any key to cancel.");

@@ -4,11 +4,11 @@ turtlecraft.excavate = {};
 
 	local position = turtlecraft.position;
 	local directions = position.directions;
+	local terminal = turtlecraft.term;
 
 	local inventory = {};
 	local plot = {};
 	local move = {};
-	local ui = {};
 	
 	plot.path = turtlecraft.directory .. "excavate.data";
 	plot.init = function(forward, left, right, up, down)
@@ -202,58 +202,51 @@ turtlecraft.excavate = {};
 	end
 	
 	-- UI
-	ui.print = function(x, y, message)
-		term.setCursorPos(x, y);
-		term.clearLine();
-		term.write(message);
-	end
-	ui.readNumber = function(x, y)
+	local readNumber = function(x, y)
 		term.setCursorPos(x, y);
 		local value = tonumber(read() or "");
 		if (value == nil) then return 0; end
 		return value;
 	end
-	ui.printHeader = function()
-		ui.print(1, 1, "Turtlecraft v" .. turtlecraft.version .. " Excavator");
-		ui.print(1, 2, "============================");
-		print("");
-	end
 	
 	if (plot.recover()) then
-		term.clear();
-		ui.printHeader();
-		ui.print(1, 3, "Resuming dig...");
+		if (not terminal.notifyResume("excavating")) then
+			terminal.clear("Excavate");
+			terminal.write(1, 5, "Excavate cancelled...");
+			sleep(3);
+			return;
+		end
+		terminal.clear("Excavate");
+		terminal.write(1, 5, "Resuming excavate...");
+		terminal.setCursorPos(1, 6);
 		while (move.next()) do
 			sleep(0.001);
 		end
 	end
 	
 	turtlecraft.excavate.start = function()
-		term.clear();
-		ui.printHeader();
-		ui.print(1, 4, "How far forward?");
-		local forward = ui.readNumber(18, 4);
+		terminal.clear("Excavate");
+		terminal.write(1, 4, "How far forward?");
+		local forward = readNumber(18, 4);
 		if (forward == 0) then return false; end
-		ui.print(1, 4, "How far left?");
-		local left = ui.readNumber(15, 4);
-		ui.print(1, 4, "How far right?");
-		local right = ui.readNumber(16, 4);
+		terminal.write(1, 4, "How far left?");
+		local left = readNumber(15, 4);
+		terminal.write(1, 4, "How far right?");
+		local right = readNumber(16, 4);
 		if (left == 0 and right == 0) then return false; end
-		ui.print(1, 4, "How far up?");
-		local up = ui.readNumber(13, 4);
-		ui.print(1, 4, "How far down?");
-		local down = ui.readNumber(15, 4);
+		terminal.write(1, 4, "How far up?");
+		local up = readNumber(13, 4);
+		terminal.write(1, 4, "How far down?");
+		local down = readNumber(15, 4);
 		if (up == 0 and down == 0) then return false; end
 		
-		term.clear();
-		ui.printHeader();
+		terminal.clear("Excavate");
 		move.start(forward, left, right, up, down);
-		term.clear();
-		ui.printHeader();
-		ui.print(1, 4, "Digging is complete.");
-		ui.print(1, 5, "Press enter to continue.");
+		terminal.clear("Excavate");
+		terminal.write(1, 4, "Digging is complete.");
+		terminal.write(1, 5, "Press enter to continue.");
 		term.setCursorPos(0, 0);
-		read();
+		turtlecraft.input.readKey(10);
 	end
 	
 	turtlecraft.excavate.debug = {};

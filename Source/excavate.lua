@@ -244,7 +244,7 @@ turtlecraft.excavate = {};
 		move.start(forward, left, right, up, down);
 		terminal.clear("Excavate");
 		terminal.write(1, 4, "Digging is complete.");
-		terminal.write(1, 5, "Press enter to continue.");
+		terminal.write(1, 5, "Press any key to continue.");
 		term.setCursorPos(0, 0);
 		turtlecraft.input.readKey(10);
 	end

@@ -53,7 +53,7 @@ turtlecraft.term.scrolled = function(column, row, scrollTo, text)
 	local top = 4;
 	local position = row - scroll;
 	if (position < 1 or position > display) then return; end
-	turtlecraft.term(1, position + top, text);
+	turtlecraft.term.write(1, position + top, text);
 end
 turtlecraft.term.notifyResume = function(ofWhat)
 	turtlecraft.term.clear();

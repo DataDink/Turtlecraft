@@ -17,7 +17,7 @@ turtlecraft.help = {}
 		for line in lines do
 			local words = string.gmatch(text, "%S+");
 			for word in words do
-				local word = word + " ";
+				local word = word .. " ";
 				local wordLength = string.len(word);
 				local rowLength = string.len(rowText);
 				if (rowLength + wordLength >= width) then
@@ -29,6 +29,7 @@ turtlecraft.help = {}
 						row = 1;
 					end
 				end
+				rowText = rowText .. word;
 			end
 			print(rowText);
 			rowText = "";

@@ -35,7 +35,7 @@ turtlecraft.term.clear = function(title, footer)
 	term.clear();
 	local width, height = term.getSize();
 	local headerText = "Turtlecraft v" .. turtlecraft.version;
-	if (title ~= nil) then headerText = headerText .. " - " .. title;
+	if (title ~= nil) then headerText = headerText .. " - " .. title; end
 	turtlecraft.term.write(1, 1, headerText);
 	local underline = "";
 	for i = 1, width do

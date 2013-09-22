@@ -56,7 +56,7 @@ turtlecraft.term.scrolled = function(column, row, scrollTo, text)
 	turtlecraft.term.write(1, position + top, text);
 end
 turtlecraft.term.notifyResume = function(ofWhat)
-	if (ofWhat == nil) then ofWhat = "previous function";
+	if (ofWhat == nil) then ofWhat = "previous function"; end
 	turtlecraft.term.clear();
 	turtlecraft.term.write(1, 4, "Resuming: " .. ofWhat);
 	turtlecraft.term.write(1, 5, "in 15 seconds.");

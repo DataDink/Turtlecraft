@@ -80,4 +80,23 @@ turtlecraft.help = {}
 		.. "when asked before it resumes after re-placing or rebooting. ";
 		show(text);
 	end
+	
+	turtlecraft.help.build = function()
+		local text = "Project: This is your virtual 3d 'canvas' that you are creating when adding shapes.\n"
+		.. "Clear: This will erase all data from your project.\n"
+		.. "Add: This will add a new shape (sphere, line, cube, etc...) to your project.\n"
+		.. "Stats: This will calculate how many blocks will be required and how much memory your current project is using.\n"
+		.. "Send to monitor: This will attempt to render your current project on a monitor using ASCII art. "
+		.. "The bigger your monitor the better you will be able to see what your project should look like "
+		.. "when it is built. "
+		.. "Start building: This will tell the turtle to start building your project. It will build from bottom "
+		.. "to top and will not return to refuel or reload. If the turtle runs out of fuel or blocks to build with "
+		.. "it must be given more supplies at its current position. If the turtle is unloaded or otherwise "
+		.. "interrupted it will attempt to resume building upon reload. "
+		.. "WARNING: Unload recovery is not perfect, so there is still a small chance that when the turtle "
+		.. "resumes building that it could get offset a square. Because the turtle persistently attempts to "
+		.. "resume you will have to make sure to cancel the resume when it is reloaded during the 15 second "
+		.. "startup period in order to prevent it from resuming a previously triggered build. ";
+		show(text);
+	end
 end)();

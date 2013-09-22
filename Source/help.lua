@@ -17,7 +17,7 @@ turtlecraft.help = {}
 		local rowText = "";
 		local lines = string.gmatch(text, "[^\n]+");
 		for line in lines do
-			local words = string.gmatch(text, "%S+");
+			local words = string.gmatch(line, "%S+");
 			for word in words do
 				local word = word .. " ";
 				local wordLength = string.len(word);

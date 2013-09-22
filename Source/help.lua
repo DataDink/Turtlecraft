@@ -5,11 +5,13 @@ turtlecraft.help = {}
 		print("Press any key to read more...");
 		turtlecraft.input.readKey();
 		term.clear();
+		term.setCursorPos(1, 1);
 	end
 
 	local show = function(text)
 		local width, height = term.getSize();
 		term.clear();
+		term.setCursorPos(1, 1);
 		
 		local row = 1;
 		local rowText = "";

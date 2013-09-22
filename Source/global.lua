@@ -56,12 +56,11 @@ turtlecraft.term.scrolled = function(column, row, scrollTo, text)
 	turtlecraft.term.write(1, position + top, text);
 end
 turtlecraft.term.notifyResume = function(ofWhat)
+	if (ofWhat == nil) then ofWhat = "previous function";
 	turtlecraft.term.clear();
-	local text = "The turtle will resume";
-	if (ofWhat ~= nil) then text = text .. " " .. ofWhat; end
-	text = text .. " in 15 seconds.";
-	turtlecraft.term.write(1, 4, text);
-	turtlecraft.term.write(1, 5, "Press any key to cancel.");
+	turtlecraft.term.write(1, 4, "Resuming: " .. ofWhat);
+	turtlecraft.term.write(1, 5, "in 15 seconds.");
+	turtlecraft.term.write(1, 6, "Press any key to cancel.");
 	local code = turtlecraft.input.readKey(15);
 	turtlecraft.term.clear();
 	return code == nil;

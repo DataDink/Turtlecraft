@@ -27,7 +27,7 @@ end
 
 turtlecraft.term = {};
 turtlecraft.term.write = function(column, row, text)
-	term.setCursorPos(columnd, row);
+	term.setCursorPos(column, row);
 	term.clearLine();
 	term.write(text);
 end

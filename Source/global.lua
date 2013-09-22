@@ -55,7 +55,7 @@ turtlecraft.term.scrolled = function(column, row, scrollTo, text)
 	if (position < 1 or position > display) then return; end
 	turtlecraft.term(1, position + top, text);
 end
-turtlecraft.term.notifyResume = function(ofWhat) {
+turtlecraft.term.notifyResume = function(ofWhat)
 	turtlecraft.term.clear();
 	local text = "The turtle will resume";
 	if (ofWhat ~= nil) then text = text .. " " .. ofWhat;
@@ -65,4 +65,4 @@ turtlecraft.term.notifyResume = function(ofWhat) {
 	local code = turtlecraft.input.readKey(15);
 	turtlecraft.term.clear();
 	return code == nil;
-}
+end

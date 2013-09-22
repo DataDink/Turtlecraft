@@ -17,8 +17,6 @@ turtlecraft.help = {}
 		local rowText = "";
 		local lines = string.gmatch(text, "[^\n]+");
 		for line in lines do
-			print(line);
-			error(string.len(line));
 			local words = string.gmatch(text, "%S+");
 			for word in words do
 				local word = word .. " ";
@@ -47,10 +45,10 @@ turtlecraft.help = {}
 	end
 	
 	turtlecraft.help.general = function()
-		local text = "Turtlecraft is a menu-driven system that will help you utilize your turtle for various creating, digging, and collection functions.\r\n"
-		.. "Select 'Dig functions' to excavate, fill/clear areas, or 'eat'.\r\n"
-		.. "Select 'Build functions' to have your turtle help you create 2d and 3d shapes.\r\n"
-		.. "There is a whole world of things you can make your turtle do. Turtlecraft will only help you with these few things.\r\n";
+		local text = "Turtlecraft is a menu-driven system that will help you utilize your turtle for various creating, digging, and collection functions.\n"
+		.. "Select 'Dig functions' to excavate, fill/clear areas, or 'eat'.\n"
+		.. "Select 'Build functions' to have your turtle help you create 2d and 3d shapes.\n"
+		.. "There is a whole world of things you can make your turtle do. Turtlecraft will only help you with these few things.\n";
 		show(text);
 	end
 end)();

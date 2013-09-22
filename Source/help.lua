@@ -39,6 +39,7 @@ turtlecraft.help = {}
 				row = 1;
 			end
 		end
+		continue();
 	end
 	
 	turtlecraft.help.general = function()

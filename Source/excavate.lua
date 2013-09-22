@@ -218,7 +218,7 @@ turtlecraft.excavate = {};
 		end
 		terminal.clear("Excavate");
 		terminal.write(1, 5, "Resuming excavate...");
-		terminal.setCursorPos(1, 6);
+		term.setCursorPos(1, 6);
 		while (move.next()) do
 			sleep(0.001);
 		end

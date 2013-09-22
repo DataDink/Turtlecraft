@@ -39,14 +39,18 @@ turtlecraft.menu[2] = {
 		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
 	turtlecraft.menu[2].action[3] = {
-		title = "Send to monitor",
+		title = "Project stats",
 		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
 	turtlecraft.menu[2].action[4] = {
-		title = "Start building",
+		title = "Send to monitor",
 		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
 	turtlecraft.menu[2].action[5] = {
+		title = "Start building",
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+	};
+	turtlecraft.menu[2].action[6] = {
 		title = "Halp meh!",
 		action = turtlecraft.help.build
 	};

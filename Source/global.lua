@@ -50,7 +50,7 @@ turtlecraft.term.scrolled = function(column, row, scrollTo, text)
 	local _, height = term.getSize();
 	local scroll = math.max(0, scrollTo - height + 1);
 	local display = height - 5;
-	local top = 4;
+	local top = 3;
 	local position = row - scroll;
 	if (position < 1 or position > display) then return; end
 	turtlecraft.term.write(1, position + top, text);

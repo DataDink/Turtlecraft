@@ -3,4 +3,5 @@ position.lua
 fuel.lua
 move.lua
 excavate.lua
+help.lua
 menu.lua

@@ -3,7 +3,6 @@ turtlecraft.menu[1] = {
 	title = "Dig functions",
 	action = {};
 }
-
 	turtlecraft.menu[1].action = {};
 	turtlecraft.menu[1].action[1] = {
 		title = "Excavate",
@@ -11,28 +10,61 @@ turtlecraft.menu[1] = {
 	};
 	turtlecraft.menu[1].action[2] = {
 		title = "Eat Area",
-		action = function() print("NYI"); read(); end
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
 	turtlecraft.menu[1].action[3] = {
 		title = "Fill Area",
-		action = function() print("NYI"); read(); end
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
 	turtlecraft.menu[1].action[4] = {
 		title = "Empty Area",
-		action = function() print("NYI"); read(); end
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
 	};
+	turtlecraft.menu[1].action[5] = {
+		title = "Halp meh!"
+		action = turtlecraft.help.dig
+	};
+	
+turtlecraft.menu[2] = {
+	title = "Build functions",
+	action = {};
+}
+	turtlecraft.menu[2].action = {};
+	turtlecraft.menu[2].action[1] = {
+		title = "Clear project"
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+	};
+	turtlecraft.menu[2].action[2] = {
+		title = "Add a shape"
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+	};
+	turtlecraft.menu[2].action[3] = {
+		title = "Send to monitor"
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+	};
+	turtlecraft.menu[2].action[4] = {
+		title = "Start building"
+		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+	};
+	turtlecraft.menu[2].action[5] = {
+		title = "Halp meh!"
+		action = turtlecraft.help.build
+	};
+	
+turtlecraft.menu[3] = {
+	title = "Halp meh!",
+	action = turtlecraft.help.general
+}
+
 
 
 (function()
+	local terminal = turtlecraft.term;
 	local selectedIndex = 1;
 	local history = {};
 	table.insert(history, turtlecraft.menu);
 	
-	local writeLine = function(x, y, text)
-		term.setCursorPos(x, y);
-		term.clearLine();
-		term.write(text);
-	end
+	local writeLine = terminal.writeLine;
 	
 	local currentMenu = function()
 		local item = history[table.getn(history)];
@@ -40,23 +72,14 @@ turtlecraft.menu[1] = {
 	end
 	
 	local drawMenu = function()
-		term.clear();
-		local width, height = term.getSize();
-		writeLine(1, 1, "Turtlecraft v" .. turtlecraft.version .. ".");
-		writeLine(1, 2, "====================");
-		writeLine(1, height, "**Use up/down and enter/left**");
+		terminal.clear("Menu", "** Use up/down and left/enter keys **");
 		
-		local displayCount = height - 4;
-		local startIndex = math.max(0, selectedIndex - displayCount);
-		local endIndex = startIndex + displayCount;
 		local menu = currentMenu();
 		for index, item in ipairs(menu) do
-			if (index > startIndex and index <= endIndex) then
-				local text = item.title;
-				if (index == selectedIndex) then text = ">" .. text .. "<"; 
-				else text = " " .. text; end
-				writeLine(1, index - startIndex + 3, text);
-			end
+			local text = item.title;
+			if (index == selectedIndex) then text = ">" .. text .. "<"; 
+			else text = " " .. text; end
+			terminal.scrolled(1, index, selectedIndex, text);
 		end
 	end
 	

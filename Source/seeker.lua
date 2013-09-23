@@ -26,7 +26,7 @@ turtlecraft.seeker = {};
 			dig = turtle.digDown,
 			digBack = turtle.digUp,
 			compare = turtle.compareDown,
-			compareBack = turtle.compareUp
+			compareBack = turtle.compareUp,
 			place = turtle.placeDown,
 			placeBack = turtle.placeUp
 		},
@@ -63,8 +63,8 @@ turtlecraft.seeker = {};
 	end
 	
 	local seekPattern = function(direction, empty)
-		if (direction = directions.up and turtle.detectDown() ~= empty) then return methods.down; end
-		if (direction = directions.down and turtle.detectUp() ~= empty) then return methods.up; end
+		if (direction == directions.up and turtle.detectDown() ~= empty) then return methods.down; end
+		if (direction == directions.down and turtle.detectUp() ~= empty) then return methods.up; end
 		
 		local pattern = {turtle.turnRight, turtle.turnLeft, turtle.turnLeft, turtle.turnLeft};
 		for i, turn in pairs(pattern) do
@@ -81,22 +81,35 @@ turtlecraft.seeker = {};
 	
 	local seekAndRecover = function(direction, empty)
 		local result = seekPattern(direction, empty);
-		if (result ~= nil) return result; end
+		if (result ~= nil) then return result; end
 		turtle.up();
 		for v = 1, 3 do 
 			for h = 1, 4 do
+				turtlecraft.fuel.require(3);
 				turtle.forward();
 				turtle.forward();
 				turtle.turnRight();
 				result = seekPattern;
-				if (result ~= nil) return result; end
+				if (result ~= nil) then return result; end
 			end
 		end
 		return nil;
 	end
 	
 	local selectSlot = function() 
-		
+		while true do
+			for i = 2, 16 do
+				if (turtle.getItemCount(i) > 0) then 
+					turtle.select(i);
+					return i; 
+				end
+			end
+			turtlecraft.term.write(1, 5, "Please add more inventory...");
+			turtlecraft.input.onInventory();
+			turtlecraft.term.write(1, 5, "Resuming in 15 seconds...");
+			sleep(15);
+			turtlecraft.term.write(1, 5, "Resuming");
+		end
 	end
 	
 	turtlecraft.seeker.fill = function(direction)
@@ -106,11 +119,18 @@ turtlecraft.seeker = {};
 		end
 		cache.write("fill", direction);
 		
-		local method = false;
-		repeat
-			method = seekAndRecover(direction, true);
-			if (method == methods.forward) then method.move();
+		local repeater = function() return seekAndRecover(direction, true); end
+		for method in repeater do
+			local ismove = method == methods.forward 
+				or (direction == directions.down and method == methods.down)
+				or (direction == directions.up and method == methods.up);
+			if (ismove) then 
+				turtlecraft.fuel.require(1);
+				method.move();
 			else 
-			
+				selectSlot();
+				method.place();
+			end
+		end
 	end
 end)();

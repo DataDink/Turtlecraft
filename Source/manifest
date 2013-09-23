@@ -3,5 +3,6 @@ position.lua
 fuel.lua
 move.lua
 excavate.lua
+seeker.lua
 help.lua
 menu.lua

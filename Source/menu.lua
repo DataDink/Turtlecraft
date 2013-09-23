@@ -14,7 +14,7 @@ turtlecraft.menu[1] = {
 	};
 	turtlecraft.menu[1].action[3] = {
 		title = "Fill Area",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.seeker.fill
 	};
 	turtlecraft.menu[1].action[4] = {
 		title = "Empty Area",

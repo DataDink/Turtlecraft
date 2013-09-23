@@ -24,6 +24,13 @@ turtlecraft.input.readKey = function(timeout)
 	if (event == "timer") then return nil; end
 	return code;
 end
+turtlecraft.input.onInventory = function(timeout)
+	if (timeout ~= nil) then os.startTimer(timeout); end
+	local event = ""; local code = 0;
+	repeat event = os.pullEvent(); until (event == "turtle_inventory" or event == "timer");
+	if (event == "timer") then return false; end
+	return true;
+end
 
 turtlecraft.term = {};
 turtlecraft.term.write = function(column, row, text)

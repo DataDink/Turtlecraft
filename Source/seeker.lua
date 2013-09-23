@@ -121,10 +121,10 @@ turtlecraft.seeker = {};
 				elseif (step()) then
 					while (check() and turtle.dig()) do sleep(0.5); end
 					turtle.forward();
-				elseif (progress.detect())
+				elseif (progress.detect()) then
 					while (progress.detect() and progress.dig()) do sleep(0.5); end
 					progress.move();
-				elseif (not search())
+				elseif (not search()) then
 					turtlecraft.term.clear("All Gone?");
 					turtlecraft.term.write(1, 5, "I got lost!");
 					turtlecraft.input.readKey(10);

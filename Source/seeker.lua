@@ -62,6 +62,22 @@ turtlecraft.seeker = {};
 		return reader(), reader();
 	end
 	
+	local selectSlot = function() 
+		while true do
+			for i = 2, 16 do
+				if (turtle.getItemCount(i) > 0) then 
+					turtle.select(i);
+					return i; 
+				end
+			end
+			turtlecraft.term.write(1, 5, "Please add more inventory...");
+			turtlecraft.input.onInventory();
+			turtlecraft.term.write(1, 5, "Resuming in 15 seconds...");
+			sleep(15);
+			turtlecraft.term.write(1, 5, "Resuming");
+		end
+	end
+	
 	local seekPattern = function(direction, empty)
 		if (direction == directions.up and turtle.detectDown() ~= empty) then return methods.down; end
 		if (direction == directions.down and turtle.detectUp() ~= empty) then return methods.up; end
@@ -96,22 +112,7 @@ turtlecraft.seeker = {};
 		return nil;
 	end
 	
-	local selectSlot = function() 
-		while true do
-			for i = 2, 16 do
-				if (turtle.getItemCount(i) > 0) then 
-					turtle.select(i);
-					return i; 
-				end
-			end
-			turtlecraft.term.write(1, 5, "Please add more inventory...");
-			turtlecraft.input.onInventory();
-			turtlecraft.term.write(1, 5, "Resuming in 15 seconds...");
-			sleep(15);
-			turtlecraft.term.write(1, 5, "Resuming");
-		end
-	end
-	
+	-- the oddball
 	turtlecraft.seeker.fill = function(direction)
 		if (direction == nil) then 
 			direction = directions.down; 
@@ -119,18 +120,12 @@ turtlecraft.seeker = {};
 		end
 		cache.write("fill", direction);
 		
-		local repeater = function() return seekAndRecover(direction, true); end
-		for method in repeater do
-			local ismove = method == methods.forward 
-				or (direction == directions.down and method == methods.down)
-				or (direction == directions.up and method == methods.up);
-			if (ismove) then 
-				turtlecraft.fuel.require(1);
-				method.move();
-			else 
-				selectSlot();
-				method.place();
+		turtlecraft.term.clear();
+		turtlecraft.term.write(1, 5, "Press Q to stop");
+		turtlecraft.input.escapeOnKey(16, function() 
+			while true do
+				turtle.turnRight();
 			end
-		end
+		end);
 	end
 end)();

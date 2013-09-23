@@ -24,6 +24,15 @@ turtlecraft.input.readKey = function(timeout)
 	if (event == "timer") then return nil; end
 	return code;
 end
+turtlecraft.input.escapeOnKey = function(keyCode, delegate)
+	local getKey = function() 
+		while true do
+			local event, code = os.pullEvent("key");
+			if (code == keyCode) then return; end
+		end
+	end
+	parallel.waitForAny(getKey, delegate);
+end
 turtlecraft.input.onInventory = function(timeout)
 	if (timeout ~= nil) then os.startTimer(timeout); end
 	local event = ""; local code = 0;

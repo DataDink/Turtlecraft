@@ -50,6 +50,97 @@ turtlecraft.seeker = {};
 			turtlecraft.term.write(1, 5, "Press Q to stop");
 		end
 	end
+	
+	local eat = function(compare, direction)
+		if (direction == nil) then 
+			direction = directions.down; 
+			if (turtle.detectUp() and not turtle.detectDown()) then direction = directions.up; end
+		end
+		
+		if (compare and turtle.getItemCount(2) == 0) then
+			turtle.select(2);
+			if (turtle.detectUp()) then turtle.digUp()
+			elseif (turtle.detectDown()) then turtle.digDown()
+			else
+				turtlecraft.term.clear();
+				turtlecraft.term.write(1, 5, "I need a sample block to unfill with.");
+				turtlecraft.input.readKey(5);
+				return;
+			end
+			cache.write("unfill", direction);
+		else
+			cache.write("eat", direction);
+		end
+		
+		local checkUp = turtle.detectUp;
+		local checkDown = turtle.detectDown;
+		local check = turtle.detect;
+		if (compare) then
+			checkUp = function() turtle.select(2); return turtle.compareUp(); end
+			checkDown = function() turtle.select(2); return turtle.compareDown(); end
+			check = function() turtle.select(2); return turtle.compare(); end
+		end
+		
+		local priority = { move = turtle.up, detect = checkUp, dig = turtle.digUp };
+		local progress = { move = turtle.down, detect = checkDown, dig = turtle.digDown };
+		if (direction == directions.up) then
+			priority = { move = turtle.down, detect = checkDown, dig = turtle.digDown };
+			progress = { move = turtle.up, detect = checkUp, dig = turtle.digUp };
+		end
+		
+		local step = function()
+			for i, turn in pairs(pattern) do
+				turn();
+				if (check()) then return true; end
+			end
+			return false;
+		end
+		
+		local search = function()
+			priority.move();
+			for vert = 1, 3 do
+				for horz = 1, 4 do
+					turtlecraft.fuel.require(2);
+					turtle.forward(); turtle.forward();
+					if (priority.detect() or progress.detect() or step()) then return true; end
+					turtle.turnLeft();
+				end
+				progress.move();
+			end
+			return false;
+		end
+		
+		turtlecraft.term.clear("Munch Munch");
+		turtlecraft.term.write(1, 5, "Press Q to stop");
+		turtlecraft.input.escapeOnKey(16, function()
+			while true do
+				turtlecraft.fuel.require(1);
+				if (priority.detect()) then
+					priority.dig();
+					priority.move();
+				elseif (step()) then
+					while (check() and turtle.dig()) do sleep(0.5); end
+					turtle.forward();
+				elseif (progress.detect())
+					while (progress.detect() and progress.dig()) do sleep(0.5); end
+					progress.move();
+				elseif (not search())
+					turtlecraft.term.clear("All Gone?");
+					turtlecraft.term.write(1, 5, "I got lost!");
+					turtlecraft.input.readKey(10);
+					return;
+				end
+			end
+		end);
+	end
+	
+	turtlecraft.seeker.eat = function(direction)
+		eat(false, direction);
+	end
+	
+	turtlecraft.seeker.unfill = function(direction)
+		eat(true, direction);
+	end
 		
 	turtlecraft.seeker.fill = function(direction)
 		if (direction == nil) then 
@@ -97,5 +188,6 @@ turtlecraft.seeker = {};
 				end							
 			end
 		end);
+		cache.complete();
 	end
 end)();

@@ -60,10 +60,9 @@ turtlecraft.help = {}
 		.. "If the turtle is unloaded or interrupted it will attempt to resume the next time it reloads "
 		.. "automatically.\n\n"
 		.. "Eat: This will attempt to eat blocks starting from its current location. "
-		.. "When it can find no more blocks to eat, the turtle will return to its start position. "
-		.. "The turtle will return to unload and refuel behind its starting position. "
-		.. "WARNING: Do not leave this unattended. Use ctrl-T or break it to stop. "
-		.. "Eating will not resume after being interrupted/unloaded.\n\n"
+		.. "This will not return when out of fuel or full of inventory. You will need to find "
+		.. "and satisfy the turtle's needs. "
+		.. "WARNING: This can end up very bad if left unattended! DO NOT LEAVE UNATTENDED!\n"
 		.. "Fill: This will attempt to fill an area using a circulating movement pattern. "
 		.. "This must be pre-loaded with blocks to unload and the turtle will not return "
 		.. "to reload or refuel. This will not dig or break blocks for any reason."
@@ -72,12 +71,11 @@ turtlecraft.help = {}
 		.. "to avoid boxing itself in a corner. YOU MAY LOSE YOUR TURTLE. \n\n"
 		.. "Empty: Much like 'Eat', this will attempt to empty an area, but will only eat one type of block. "
 		.. "The block that it will eat can either be pre-loaded into slot 2 (slot 1 is for fuel and ignored) "
-		.. "or the turtle will eat the first block that it finds and then only continue to eat that type. "
+		.. "or the turtle will eat the first block that it finds above or below and then only continue to eat that type. "
 		.. "This uses a circulating movement pattern to find blocks and should probably not be left unattended. "
 		.. "This will not return to refuel or unload and will instead wait for you to fix whatever it needs "
 		.. "at whatever its current location. "
-		.. "WARNING: Because this resumes you must break/ctrl-t to stop the process and then hit any key "
-		.. "when asked before it resumes after re-placing or rebooting. ";
+		.. "WARNING: This pattern may wander off. You should probably not leave this unattended.";
 		show(text);
 	end
 	

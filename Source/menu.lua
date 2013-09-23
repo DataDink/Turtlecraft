@@ -10,7 +10,7 @@ turtlecraft.menu[1] = {
 	};
 	turtlecraft.menu[1].action[2] = {
 		title = "Eat Area",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.seeker.eat
 	};
 	turtlecraft.menu[1].action[3] = {
 		title = "Fill Area",
@@ -18,7 +18,7 @@ turtlecraft.menu[1] = {
 	};
 	turtlecraft.menu[1].action[4] = {
 		title = "Empty Area",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.seeker.unfill
 	};
 	turtlecraft.menu[1].action[5] = {
 		title = "Halp meh!",

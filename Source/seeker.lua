@@ -83,6 +83,8 @@ turtlecraft.seeker = {};
 						return;
 					end
 					progress.move();
+					selectSlot();
+					progress.place();
 				end							
 			end
 		end);

@@ -174,7 +174,7 @@ namespace Tests
             var nonmoving = environment.Execute("return turtlecraft.position.set(1, 2, 3, 4)")[0];
             Assert.AreEqual(false, nonmoving);
             Assert.AreEqual(1, environment.FS.Files.Count);
-            Assert.AreEqual("1,2,3,4,5\r\n0,0,0,270\r\n", environment.FS.Files[DataFile]);
+            Assert.AreEqual("0,0,0,270,5\r\n", environment.FS.Files[DataFile]);
 
             environment.Reset();
             environment.Turtle.OnGetFuelLevel += (s, e) => e.Result = 5;

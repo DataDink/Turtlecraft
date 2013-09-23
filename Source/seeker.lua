@@ -57,6 +57,7 @@ turtlecraft.seeker = {};
 		
 		local step = function()
 			for i, turn in pairs(pattern) do
+				turn();
 				if (turtle.back()) then return true; end
 			end
 			return false;

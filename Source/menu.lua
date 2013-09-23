@@ -36,7 +36,7 @@ turtlecraft.menu[2] = {
 	};
 	turtlecraft.menu[2].action[2] = {
 		title = "Add a shape",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.builder.add
 	};
 	turtlecraft.menu[2].action[3] = {
 		title = "Project stats",
@@ -59,8 +59,6 @@ turtlecraft.menu[3] = {
 	title = "Halp meh!",
 	action = turtlecraft.help.general
 }
-
-
 
 (function()
 	local terminal = turtlecraft.term;

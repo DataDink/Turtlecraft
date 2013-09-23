@@ -68,7 +68,7 @@ turtlecraft.seeker = {};
 		turtlecraft.input.escapeOnKey(16, function() 
 			while true do
 				turtlecraft.fuel.require(1);
-				if (priority.detect()) then 
+				if (not priority.detect()) then 
 					priority.move();
 				elseif (step()) then
 					selectSlot();

@@ -196,9 +196,13 @@ turtlecraft.excavate = {};
 	end
 	move.start = function(forward, left, right, up, down)
 		plot.init(forward, left, right, up, down);
-		while (move.next()) do
-			sleep(0.001);
-		end
+		turtlecraft.write(1, 5, "Press Q to cancel");
+		turtlecraft.input.escapeOnKey(16, function()
+			while (move.next()) do
+				sleep(0.001);
+			end
+		end);
+		plot.reset();
 	end
 	
 	-- UI

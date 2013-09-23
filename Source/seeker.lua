@@ -25,29 +25,38 @@ turtlecraft.seeker = {};
 		return reader(), reader();
 	end
 	
-	local waitInventory = function()
+	local whileFull = function()
+		local wait = 0;
 		while true do
-			sleep(1);
-			for i = 2, 16 do
-				if (turtle.getItemCount(i) > 0) then return; end
+			for i = 1, 16 do
+				if (turtle.getItemCount(i) == 0) then 
+					sleep(wait);
+					return; 
+				end
 			end
+			wait = 15;
+			turtlecraft.term.clear("Inventory");
+			turtlecraft.term.write(1, 5, "Please unload me...");
+			sleep(1);
 		end
 	end
 	
 	local selectSlot = function() 
+		local wait = 0;
 		while true do
 			for i = 2, 16 do
 				if (turtle.getItemCount(i) > 0) then 
-					turtle.select(i);
-					return i; 
+					sleep(wait);
+					if (turtle.getItemCount(i) > 0) then 
+						turtle.select(i);
+						return i; 
+					end
 				end
 			end
-			turtlecraft.term.clear("Fill");
+			wait = 15;
+			turtlecraft.term.clear("Inventory");
 			turtlecraft.term.write(1, 5, "Please add more inventory...");
-			waitInventory();
-			turtlecraft.term.write(1, 5, "Resuming in 15 seconds...");
-			sleep(15);
-			turtlecraft.term.write(1, 5, "Press Q to stop");
+			sleep(1);
 		end
 	end
 	
@@ -59,8 +68,13 @@ turtlecraft.seeker = {};
 		
 		if (compare and turtle.getItemCount(2) == 0) then
 			turtle.select(2);
-			if (turtle.detectUp()) then turtle.digUp()
-			elseif (turtle.detectDown()) then turtle.digDown()
+			turtlecraft.fuel.require(1);
+			if (turtle.detectUp()) then 
+				turtle.digUp();
+				turtle.up();
+			elseif (turtle.detectDown()) then 
+				turtle.digDown();
+				turtle.down();
 			else
 				turtlecraft.term.clear();
 				turtlecraft.term.write(1, 5, "I need a sample block to unfill with.");
@@ -115,6 +129,7 @@ turtlecraft.seeker = {};
 		turtlecraft.input.escapeOnKey(16, function()
 			while true do
 				turtlecraft.fuel.require(1);
+				whileFull();
 				if (priority.detect()) then
 					priority.dig();
 					priority.move();

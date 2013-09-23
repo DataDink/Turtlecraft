@@ -25,14 +25,14 @@ turtlecraft.seeker = {};
 		return reader(), reader();
 	end
 	
-	local waitInventory = function() {
+	local waitInventory = function()
 		while true do
 			sleep(1);
 			for i = 2, 16 do
 				if (turtle.getItemCount(i) > 0) then return; end
 			end
 		end
-	}
+	end
 	
 	local selectSlot = function() 
 		while true do

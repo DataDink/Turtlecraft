@@ -49,10 +49,10 @@ turtlecraft.seeker = {};
 		end
 		cache.write("fill", direction);
 		local priority = { move = turtle.up, detect = turtle.detectUp };
-		local progress = { move = turtle.down, detect = turtle.detectDown, place = turtle.placeDown };
+		local progress = { move = turtle.down, detect = turtle.detectDown, place = turtle.placeUp };
 		if (direction == directions.up) then
 			priority = { move = turtle.down, detect = turtle.detectDown };
-			progress = { move = turtle.up, detect = turtle.detectUp, place = turtle.placeUp };
+			progress = { move = turtle.up, detect = turtle.detectUp, place = turtle.placeDown };
 		end
 		
 		local step = function()

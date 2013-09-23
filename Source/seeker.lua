@@ -25,6 +25,15 @@ turtlecraft.seeker = {};
 		return reader(), reader();
 	end
 	
+	local waitInventory = function() {
+		while true do
+			sleep(1);
+			for i = 2, 16 do
+				if (turtle.getItemCount(i) > 0) then return; end
+			end
+		end
+	}
+	
 	local selectSlot = function() 
 		while true do
 			for i = 2, 16 do
@@ -35,7 +44,7 @@ turtlecraft.seeker = {};
 			end
 			turtlecraft.term.clear("Fill");
 			turtlecraft.term.write(1, 5, "Please add more inventory...");
-			turtlecraft.input.onInventory();
+			waitInventory();
 			turtlecraft.term.write(1, 5, "Resuming in 15 seconds...");
 			sleep(15);
 			turtlecraft.term.write(1, 5, "Press Q to stop");

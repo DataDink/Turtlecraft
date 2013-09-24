@@ -438,25 +438,15 @@ turtlecraft.builder = {};
 		turtlecraft.term.write(1, 8, "3 = sphere, 4 = torus");
 		turtlecraft.term.write(1, 8, "Enter nothing to keep this a 2D shape.");
 		turtlecraft.term.write(1, 9, "Extrusion: ");
-		local extrusion = "";
 		local availableExtrusions = {"tube", "cone", "sphere", "torus"};
-		while true do
-			extrusion = read();
-			if (extrusion == nil or extrusion == "") then break; end
-			local index = tonumber(extrusion or 0);
-			print(index);
-			for i, v in ipairs(availableExtrusions) do
-			print(i);
-				if (index == i) then
-					extrusion = v;
-					break;
-				end
-				if (extrusion == v) then break; end
-			end
-			turtlecraft.term.write(1, 9, "Come again? ");
+		local extrusion = read() or "";
+		local index = tonumber(extrusion or 0);
+		for i, v in ipairs(availableExtrusions) do
+			if (index == i) then extrusion = v; break; end
+			if (extrusion == v) then break; end
 		end
 		local extrudeMethod = function(radius, shape) return shape; end
-		if (extrusion ~= nil and extrusion ~= "") then extrudeMethod = extrude[extrusion]; end
+		if (extrude[extrusion] ~= nil) then extrudeMethod = extrude[extrusion]; end
 		
 		local shape = {};
 		if (extrusion == "torus") then

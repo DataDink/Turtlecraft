@@ -389,12 +389,12 @@ turtlecraft.builder = {};
 		end
 		
 		turtlecraft.term.write(1, 4, "Block Count: " .. blockCount);
-		turtlecraft.term.write(1, 5, north .. " blocks north.");
-		turtlecraft.term.write(1, 6, south .. " blocks south.");
-		turtlecraft.term.write(1, 7, east .. " blocks east.");
-		turtlecraft.term.write(1, 8, west .. " blocks west.");
-		turtlecraft.term.write(1, 9, up .. " blocks up.");
-		turtlecraft.term.write(1, 10, down .. " blocks down.");
+		turtlecraft.term.write(1, 5, math.abs(north) .. " blocks north.");
+		turtlecraft.term.write(1, 6, math.abs(south) .. " blocks south.");
+		turtlecraft.term.write(1, 7, math.abs(east) .. " blocks east.");
+		turtlecraft.term.write(1, 8, math.abs(west) .. " blocks west.");
+		turtlecraft.term.write(1, 9, math.abs(up) .. " blocks up.");
+		turtlecraft.term.write(1, 10, math.abs(down) .. " blocks down.");
 		turtlecraft.input.readKey(15);
 	end
 	
@@ -436,8 +436,8 @@ turtlecraft.builder = {};
 		turtlecraft.term.write(1, 5, "2D shape into a 3D shape: ");
 		turtlecraft.term.write(1, 7, "1 = tube, 2 = cone, ");
 		turtlecraft.term.write(1, 8, "3 = sphere, 4 = torus");
-		turtlecraft.term.write(1, 8, "Enter nothing to keep this a 2D shape.");
-		turtlecraft.term.write(1, 9, "Extrusion: ");
+		turtlecraft.term.write(1, 9, "Enter nothing to keep this a 2D shape.");
+		turtlecraft.term.write(1, 10, "Extrusion: ");
 		local availableExtrusions = {"tube", "cone", "sphere", "torus"};
 		local extrusion = read() or "";
 		local index = tonumber(extrusion or 0);

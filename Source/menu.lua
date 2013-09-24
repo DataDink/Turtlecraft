@@ -48,7 +48,7 @@ turtlecraft.menu[2] = {
 	};
 	turtlecraft.menu[2].action[5] = {
 		title = "Start building",
-		action = turtlecraft.builder.build
+		action = turtlecraft.builder.start
 	};
 	turtlecraft.menu[2].action[6] = {
 		title = "Halp meh!",

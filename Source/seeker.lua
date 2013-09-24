@@ -21,7 +21,7 @@ turtlecraft.seeker = {};
 		local file = fs.open(path, "r");
 		local data = file.readLine();
 		file.close();
-		if (data == nil) return nil;
+		if (data == nil) then return nil;
 		local reader = string.gmatch(data, "[^,]+");
 		return reader(), reader();
 	end

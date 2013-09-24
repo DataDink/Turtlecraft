@@ -154,6 +154,7 @@ turtlecraft.builder = {};
 			if (v.z > up) then up = v.z; end
 			if (v.z < down) then down = v.z; end
 		end
+		return north, south, east, west, up, down;
 	end
 	
 	-- collections

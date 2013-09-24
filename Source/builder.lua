@@ -424,7 +424,8 @@ turtlecraft.builder = {};
 		end
 		
 		local start = project.data[1];
-		turtlecraft.move.digTo(start.x, start.y, start.z);
+		local x, y, z, d = turtlecraft.position.get();
+		turtlecraft.move.digTo(start.x + x, start.y + y, start.z + z);
 		local start = recover.enable();
 		resume(start);
 	end

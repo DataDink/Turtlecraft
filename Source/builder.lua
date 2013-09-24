@@ -37,7 +37,7 @@ turtlecraft.builder = {};
 	recover.isEnabled = function()
 		return fs.exists(builderPath);
 	end
-	recover.enable = function()
+	recover.set = function()
 		local x, y, z, d = turtlecraft.position.get();
 		local file = fs.open(builderPath, "w");
 		file.write(x .. "," .. y .. "," .. z);
@@ -425,8 +425,9 @@ turtlecraft.builder = {};
 		
 		local start = project.data[1];
 		local x, y, z, d = turtlecraft.position.get();
+		print(x .. "," .. y .. "," .. z);
 		turtlecraft.move.digTo(start.x + x, start.y + y, start.z + z);
-		local start = recover.enable();
+		local start = recover.set();
 		resume(start);
 	end
 

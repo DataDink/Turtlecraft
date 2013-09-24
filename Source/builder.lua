@@ -38,7 +38,7 @@ turtlecraft.builder = {};
 		return fs.exists(builderPath);
 	end
 	recover.enable = function()
-		local file = fs.open(builderPath);
+		local file = fs.open(builderPath, "w");
 		file.write("in progress");
 		file.close();
 	end

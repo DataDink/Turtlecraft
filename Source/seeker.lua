@@ -182,7 +182,7 @@ turtlecraft.seeker = {};
 		end
 		
 		turtlecraft.term.clear("Fill");
-		turtlecraft.term.write(1, 5, "Press Q to stop");
+		turtlecraft.term.write(1, 5, "Press Q to stop...");
 		turtlecraft.input.escapeOnKey(16, function() 
 			while true do
 				turtlecraft.fuel.require(1);

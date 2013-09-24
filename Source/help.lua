@@ -61,11 +61,11 @@ turtlecraft.help = {}
 		.. "automatically.\n\n"
 		.. "Eat: This will attempt to eat blocks starting from its current location. "
 		.. "This will not return when out of fuel or full of inventory. You will need to find "
-		.. "and satisfy the turtle's needs. "
+		.. "and satisfy the turtle's needs.\n"
 		.. "WARNING: This can end up very bad if left unattended! DO NOT LEAVE UNATTENDED!\n"
 		.. "Fill: This will attempt to fill an area using a circulating movement pattern. "
 		.. "This must be pre-loaded with blocks to unload and the turtle will not return "
-		.. "to reload or refuel. This will not dig or break blocks for any reason."
+		.. "to reload or refuel. This will not dig or break blocks for any reason.\n"
 		.. "WARNING: Your turtle is very likely to get stuck when filling in non-box shapes. "
 		.. "For non-box shapes always start the turtle in a small area to work its way into a large area "
 		.. "to avoid boxing itself in a corner. YOU MAY LOSE YOUR TURTLE. \n\n"
@@ -74,7 +74,7 @@ turtlecraft.help = {}
 		.. "or the turtle will eat the first block that it finds above or below and then only continue to eat that type. "
 		.. "This uses a circulating movement pattern to find blocks and should probably not be left unattended. "
 		.. "This will not return to refuel or unload and will instead wait for you to fix whatever it needs "
-		.. "at whatever its current location. "
+		.. "at whatever its current location.\n"
 		.. "WARNING: This pattern may wander off. You should probably not leave this unattended.";
 		show(text);
 	end
@@ -83,18 +83,16 @@ turtlecraft.help = {}
 		local text = "Project: This is your virtual 3d 'canvas' that you are creating when adding shapes.\n"
 		.. "Clear: This will erase all data from your project.\n"
 		.. "Add: This will add a new shape (sphere, line, cube, etc...) to your project.\n"
-		.. "Stats: This will calculate how many blocks will be required and how much memory your current project is using.\n"
+		.. "Stats: This will calculate how many blocks and space your project requires.\n"
 		.. "Send to monitor: This will attempt to render your current project on a monitor using ASCII art. "
 		.. "The bigger your monitor the better you will be able to see what your project should look like "
-		.. "when it is built. "
+		.. "when it is built.\n"
 		.. "Start building: This will tell the turtle to start building your project. It will build from bottom "
 		.. "to top and will not return to refuel or reload. If the turtle runs out of fuel or blocks to build with "
 		.. "it must be given more supplies at its current position. If the turtle is unloaded or otherwise "
-		.. "interrupted it will attempt to resume building upon reload. "
-		.. "WARNING: Unload recovery is not perfect, so there is still a small chance that when the turtle "
-		.. "resumes building that it could get offset a square. Because the turtle persistently attempts to "
-		.. "resume you will have to make sure to cancel the resume when it is reloaded during the 15 second "
-		.. "startup period in order to prevent it from resuming a previously triggered build. ";
+		.. "interrupted it will attempt to resume building upon reload.\n"
+		.. "WARNING: Build recovery is not perfect, so there is still a small chance that when the turtle "
+		.. "resumes building that it could get offset a square.";
 		show(text);
 	end
 end)();

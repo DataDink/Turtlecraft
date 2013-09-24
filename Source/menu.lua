@@ -32,7 +32,7 @@ turtlecraft.menu[2] = {
 	turtlecraft.menu[2].action = {};
 	turtlecraft.menu[2].action[1] = {
 		title = "Clear project",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.builder.clear
 	};
 	turtlecraft.menu[2].action[2] = {
 		title = "Add a shape",
@@ -40,15 +40,15 @@ turtlecraft.menu[2] = {
 	};
 	turtlecraft.menu[2].action[3] = {
 		title = "Project stats",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.builder.stats
 	};
 	turtlecraft.menu[2].action[4] = {
 		title = "Send to monitor",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = function() term.clear(); print("Not Yet Implemented"); read(); end
 	};
 	turtlecraft.menu[2].action[5] = {
 		title = "Start building",
-		action = function() term.clear(); print("This is not yet implemented..."); read(); end
+		action = turtlecraft.builder.build
 	};
 	turtlecraft.menu[2].action[6] = {
 		title = "Halp meh!",

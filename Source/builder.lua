@@ -25,7 +25,6 @@ turtlecraft.builder = {};
 		local handle = fs.open(projectPath, "w");
 		handle.write(file);
 		handle.close();
-		read();
 	end
 	project.clear = function()
 		project.data = {};

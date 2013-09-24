@@ -386,11 +386,11 @@ turtlecraft.builder = {};
 			project.save();
 			turtlecraft.term.clear("Delete Project");
 			turtlecraft.term.write(1, 4, "Project erased!");
-			sleep(3);
+			turtlecraft.input.readKey(5);
 		else
 			turtlecraft.term.clear("Delete Project");
 			turtlecraft.term.write(1, 4, "Erase cancelled!");
-			sleep(3);
+			turtlecraft.input.readKey(5);
 		end
 	end
 	
@@ -400,7 +400,7 @@ turtlecraft.builder = {};
 		
 		if (blockCount == 0) then
 			turtlecraft.term.write(1, 4, "Your project is empty");
-			sleep(5);
+			turtlecraft.input.readKey(5);
 			return;
 		end
 		
@@ -431,7 +431,7 @@ turtlecraft.builder = {};
 		resume(offset);
 	end
 	
-	turtlecraft.builder.add = function()
+	turtlecraft.builder.trim = function()
 		turtlecraft.term.clear("Trim");
 		turtlecraft.term.write(1, 4, "This will allow you to trim off");
 		turtlecraft.term.write(1, 5, "blocks from the sides of your project.");
@@ -481,7 +481,7 @@ turtlecraft.builder = {};
 		
 		turtlecraft.term.clear("Trim");
 		turtlecraft.term.write(1, 4, "Trim complete!");
-		turtlecraft.input.readKey(10);
+		turtlecraft.input.readKey(5);
 	end
 
 	turtlecraft.builder.add = function()
@@ -605,7 +605,7 @@ turtlecraft.builder = {};
 		
 		turtlecraft.term.clear("Add Shape");
 		turtlecraft.term.write(1, 4, "All done!");
-		sleep(5);
+		turtlecraft.input.readKey(5);
 	end
 	
 	if (recover.isEnabled()) then

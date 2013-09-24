@@ -28,6 +28,7 @@ turtlecraft.builder = {};
 		print(handle);
 		handle.write(file);
 		handle.close();
+		read();
 	end
 	project.clear = function()
 		project.data = {};

@@ -209,7 +209,7 @@ turtlecraft.builder = {};
 	
 	-- Shape extrusion
 	local extrude = {};
-	local extrude.tube = function(radius, crossSection)
+	extrude.tube = function(radius, crossSection)
 		local result = {};
 		for z = -radius, radius do
 			for i, v in ipairs(crossSection) do
@@ -222,7 +222,7 @@ turtlecraft.builder = {};
 		end
 		return result;
 	end
-	local extrude.cone = function(radius, crossSection)
+	extrude.cone = function(radius, crossSection)
 		local result = {};
 		for z = -radius, radius do
 			local scale = 1 / radius * 2 * math.abs(z - radius);
@@ -236,7 +236,7 @@ turtlecraft.builder = {};
 		end
 		return result;
 	end
-	local extrude.sphere = function(radius, crossSection)
+	extrude.sphere = function(radius, crossSection)
 		local result = {};
 		local step = calc.angleStep(radius);
 		for angle = 0, 180, step do
@@ -253,7 +253,7 @@ turtlecraft.builder = {};
 		end
 		return result;
 	end
-	local extrude.torus = function(radius, crossSection)
+	extrude.torus = function(radius, crossSection)
 		local result = {};
 		local step = calc.angleStep(radius);
 		local edge = 0;
@@ -275,4 +275,4 @@ turtlecraft.builder = {};
 		return result;
 	end
 
-end);
+end)();

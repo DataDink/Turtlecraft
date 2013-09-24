@@ -117,7 +117,6 @@ turtlecraft.seeker = {};
 				for horz = 1, 4 do
 					turtlecraft.fuel.require(2);
 					turtle.forward(); turtle.forward();
-					print('test');
 					if (priority.detect() or progress.detect() or step()) then return true; end
 					turtle.turnLeft();
 				end

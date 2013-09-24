@@ -66,7 +66,7 @@ turtlecraft.menu[3] = {
 	local history = {};
 	table.insert(history, turtlecraft.menu);
 	
-	local writeLine = terminal.writeLine;
+	local writeLine = terminal.write;
 	
 	local currentMenu = function()
 		local item = history[table.getn(history)];
@@ -117,7 +117,6 @@ turtlecraft.menu[3] = {
 	
 	if (not turtlecraft.position.isInSync()) then
 		term.clear();
-		print('test2');
 		writeLine(1, 1, "The turtle's position has gotten out of sync.");
 		writeLine(1, 2, "If there was a function in progress it has likely been cancelled.");
 		writeLine(1, 3, "Press any key to continue");

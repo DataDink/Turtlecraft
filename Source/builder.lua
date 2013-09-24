@@ -38,9 +38,21 @@ turtlecraft.builder = {};
 		return fs.exists(builderPath);
 	end
 	recover.enable = function()
+		local x, y, z, d = turtlecraft.position.get();
 		local file = fs.open(builderPath, "w");
-		file.write("in progress");
+		file.write(x .. "," .. y .. "," .. z);
 		file.close();
+		return {x = x, y = y, z = z};
+	end
+	recover.get = function()
+		local file = fs.open(builderPath, "r");
+		local reader = string.gmatch(file.readAll(), "[^,]+");
+		file.close();
+		return {
+			x = tonumber(reader()),
+			y = tonumber(reader()),
+			z = tonumber(reader())
+		};
 	end
 	recover.disable = function()
 		fs.delete(builderPath);
@@ -331,18 +343,22 @@ turtlecraft.builder = {};
 		end
 	end
 	
-	local resume = function()
-		recover.enable();
+	local resume = function(start)
 		turtlecraft.term.clear("Build Project");
 		turtlecraft.term.write(1, 4, "Press Q to cancel");
 		turtlecraft.input.escapeOnKey(16, function() 
 			local startFound = false;
 			local x, y, z, d = turtlecraft.position.get();
 			for i, v in ipairs(project.data) do
+				local target = {
+					x = v.x + start.x,
+					y = v.y + start.y,
+					z = v.z + start.z
+				};
 				if (not startFound) then
-					startFound = v.x == x and v.y == y and v.z == z;
+					startFound = target.x == x and target.y == y and target.z == z;
 				else
-					turtlecraft.move.digTo(v.x, v.y, v.z);
+					turtlecraft.move.digTo(target.x, target.y, target.z);
 					if (turtle.detectDown()) then turtle.digDown(); end
 					selectSlot();
 					turtle.placeDown();
@@ -409,7 +425,8 @@ turtlecraft.builder = {};
 		
 		local start = project.data[1];
 		turtlecraft.move.digTo(start.x, start.y, start.z);
-		resume();
+		local start = recover.enable();
+		resume(start);
 	end
 
 	turtlecraft.builder.add = function()
@@ -537,6 +554,7 @@ turtlecraft.builder = {};
 	end
 	
 	if (recover.isEnabled()) then
-		resume();
+		local start = resume.get();
+		resume(start);
 	end
 end)();

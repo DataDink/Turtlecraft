@@ -468,12 +468,12 @@ turtlecraft.builder = {};
 		
 		local result = {};
 		for i, v in ipairs(project.data) do
-			if (v.y < north and
-				v.y > south and
-				v.x < east and
-				v.x > west and
-				v.z < up and
-				v.z > down) then
+			if (v.y <= north and
+				v.y >= south and
+				v.x <= east and
+				v.x >= west and
+				v.z <= up and
+				v.z >= down) then
 				table.insert(result, v);
 			end
 		end

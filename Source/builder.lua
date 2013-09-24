@@ -77,7 +77,7 @@ turtlecraft.builder = {};
 		return math.sqrt(x*x + y*y + z*z);
 	end
 	calc.angleStep = function(radius)
-		return 22.5 / radius;
+		return (45 / radius) / 2; -- halving this for better results after rounding
 	end
 	calc.rotateVector = function(vector, xaxis, yaxis, zaxis)
 		if (xaxis == nil) then xaxis = 0; end
@@ -135,7 +135,7 @@ turtlecraft.builder = {};
 			z = to.z - from.z
 		}
 		local length = calc.measure(vector.x, vector.y, vector.z);
-		for d = 0, length, 0.5 do
+		for d = 0, length, 0.5 do -- halving this for better results after rounding
 			table.insert(vectors, {
 				x = from.x + vector.x / length * d,
 				y = from.y + vector.y / length * d,
@@ -143,6 +143,17 @@ turtlecraft.builder = {};
 			});
 		end
 		return vectors;
+	end
+	calc.bounds = function(vectors)
+		local west = 0; local east = 0; local north = 0; local south = 0; local up = 0; local down = 0;
+		for i, v in ipairs(vectors) do
+			if (v.x < west) then west = v.x; end
+			if (v.x > east) then east = v.x; end
+			if (v.y > north) then north = v.y; end
+			if (v.y < south) then south = v.y; end
+			if (v.z > up) then up = v.z; end
+			if (v.z < down) then down = v.z; end
+		end
 	end
 	
 	-- collections
@@ -393,16 +404,8 @@ turtlecraft.builder = {};
 			return;
 		end
 		
-		local west = 0; local east = 0; local north = 0; local south = 0; local up = 0; local down = 0;
-		for i, v in ipairs(project.data) do
-			if (v.x < west) then west = v.x; end
-			if (v.x > east) then east = v.x; end
-			if (v.y > north) then north = v.y; end
-			if (v.y < south) then south = v.y; end
-			if (v.z > up) then up = v.z; end
-			if (v.z < down) then down = v.z; end
-		end
-		
+		local north, south, east, west, up, down = calc.bounds(project.data);
+				
 		turtlecraft.term.write(1, 4, "Block Count: " .. blockCount);
 		turtlecraft.term.write(1, 5, math.abs(north) .. " blocks north.");
 		turtlecraft.term.write(1, 6, math.abs(south) .. " blocks south.");
@@ -427,6 +430,59 @@ turtlecraft.builder = {};
 		turtlecraft.move.digTo(start.x + offset.x, start.y + offset.y, start.z + offset.z);
 		resume(offset);
 	end
+	
+	turtlecraft.builder.add = function()
+		turtlecraft.term.clear("Trim");
+		turtlecraft.term.write(1, 4, "This will allow you to trim off");
+		turtlecraft.term.write(1, 5, "blocks from the sides of your project.");
+		
+		local maxNorth, maxSouth, maxEast, maxWest, maxUp, maxDown = calc.bounds(project.data);
+		
+		turtlecraft.term.write(1, 6, "How much from the north?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxNorth .."): ");
+		local north = maxNorth - math.max(0, math.min(maxNorth, tonumber(read() or 0)));
+		
+		turtlecraft.term.write(1, 6, "How much from the south?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxSouth .."): ");
+		local south = maxSouth - math.max(0, math.min(maxSouth, tonumber(read() or 0)));
+		
+		turtlecraft.term.write(1, 6, "How much from the east?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxEast .."): ");
+		local east = maxEast - math.max(0, math.min(maxEast, tonumber(read() or 0)));
+		
+		turtlecraft.term.write(1, 6, "How much from the west?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxWest .."): ");
+		local west = maxWest - math.max(0, math.min(maxWest, tonumber(read() or 0)));
+		
+		turtlecraft.term.write(1, 6, "How much from the up?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxUp .."): ");
+		local up = maxUp - math.max(0, math.min(maxUp, tonumber(read() or 0)));
+		
+		turtlecraft.term.write(1, 6, "How much from the down?");
+		turtlecraft.term.write(1, 7, "(0-" .. maxDown .."): ");
+		local down = maxDown - math.max(0, math.min(maxDown, tonumber(read() or 0)));
+
+		turtlecraft.term.clear("Trim");
+		turtlecraft.term.write(1, 4, "Calculating...");
+		
+		local result = {};
+		for i, v in ipairs(project.data) do
+			if (v.y < north and
+				v.y > south and
+				v.x < east and
+				v.x > west and
+				v.z < up and
+				v.z > down) then
+				table.insert(result, v);
+			end
+		end
+		project.data = result;
+		project.save();
+		
+		turtlecraft.term.clear("Trim");
+		turtlecraft.term.write(1, 4, "Trim complete!");
+		turtlecraft.input.readKey(10);
+	end
 
 	turtlecraft.builder.add = function()
 		turtlecraft.term.clear("Add Shape");
@@ -445,7 +501,7 @@ turtlecraft.builder = {};
 		turtlecraft.term.write(1, 4, "Now choose the radius of your base");
 		turtlecraft.term.write(1, 5, "shape. (Radius is from center to edge)");
 		turtlecraft.term.write(1, 6, "Radius: ");
-		local radius = tonumber(read() or 0);
+		local radius = math.abs(tonumber(read() or 0));
 		
 		if (radius == 0) then return; end
 		
@@ -471,7 +527,7 @@ turtlecraft.builder = {};
 			turtlecraft.term.clear("Extrude Shape");
 			turtlecraft.term.write(1, 4, "I need a radius for your torus.");
 			turtlecraft.term.write(1, 5, "Radius: ");
-			local tradius = tonumber(read() or 0);
+			local tradius = math.abs(tonumber(read() or 0));
 			if (tradius == 0) then return; end
 			shape = extrudeMethod(tradius, shapeMethod(radius));
 		else

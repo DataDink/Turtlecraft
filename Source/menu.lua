@@ -39,18 +39,22 @@ turtlecraft.menu[2] = {
 		action = turtlecraft.builder.add
 	};
 	turtlecraft.menu[2].action[3] = {
+		title = "Trim project",
+		action = turtlecraft.builder.trim
+	};
+	turtlecraft.menu[2].action[4] = {
 		title = "Project stats",
 		action = turtlecraft.builder.stats
 	};
-	turtlecraft.menu[2].action[4] = {
+	turtlecraft.menu[2].action[5] = {
 		title = "Send to monitor",
 		action = function() term.clear(); print("Not Yet Implemented"); read(); end
 	};
-	turtlecraft.menu[2].action[5] = {
+	turtlecraft.menu[2].action[6] = {
 		title = "Start building",
 		action = turtlecraft.builder.start
 	};
-	turtlecraft.menu[2].action[6] = {
+	turtlecraft.menu[2].action[7] = {
 		title = "Halp meh!",
 		action = turtlecraft.help.build
 	};

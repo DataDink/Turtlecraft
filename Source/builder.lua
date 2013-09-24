@@ -424,8 +424,8 @@ turtlecraft.builder = {};
 		end
 		
 		turtlecraft.term.clear("Radius");
-		turtlecraft.term.write(1, 4, "Now choose the radius of your base shape.");
-		turtlecraft.term.write(1, 5, "(Radius is from center to edge)");
+		turtlecraft.term.write(1, 4, "Now choose the radius of your base");
+		turtlecraft.term.write(1, 5, "shape. (Radius is from center to edge)");
 		turtlecraft.term.write(1, 6, "Radius: ");
 		local radius = tonumber(read() or 0);
 		
@@ -434,7 +434,8 @@ turtlecraft.builder = {};
 		turtlecraft.term.clear("Extrude Shape");
 		turtlecraft.term.write(1, 4, "Now you must choose how to extrude your");
 		turtlecraft.term.write(1, 5, "2D shape into a 3D shape: ");
-		turtlecraft.term.write(1, 7, "1 = tube, 2 = cone, 3 = sphere, 4 = torus");
+		turtlecraft.term.write(1, 7, "1 = tube, 2 = cone, ");
+		turtlecraft.term.write(1, 8, "3 = sphere, 4 = torus");
 		turtlecraft.term.write(1, 8, "Enter nothing to keep this a 2D shape.");
 		turtlecraft.term.write(1, 9, "Extrusion: ");
 		local extrusion = "";
@@ -443,14 +444,16 @@ turtlecraft.builder = {};
 			extrusion = read();
 			if (extrusion == nil or extrusion == "") then break; end
 			local index = tonumber(extrusion or 0);
+			print(index);
 			for i, v in ipairs(availableExtrusions) do
+			print(i);
 				if (index == i) then
 					extrusion = v;
 					break;
 				end
 				if (extrusion == v) then break; end
 			end
-			turtlecraft.turm.write(1, 9, "Come again? ");
+			turtlecraft.term.write(1, 9, "Come again? ");
 		end
 		local extrudeMethod = function(radius, shape) return shape; end
 		if (extrusion ~= nil and extrusion ~= "") then extrudeMethod = extrude[extrusion]; end

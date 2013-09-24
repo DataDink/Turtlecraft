@@ -15,6 +15,8 @@ turtlecraft.seeker = {};
 	end
 	cache.complete = function()
 		fs.delete(path);
+		print("deleting " .. path);
+		read();
 	end
 	cache.read = function()
 		if (not fs.exists(path)) then return nil; end

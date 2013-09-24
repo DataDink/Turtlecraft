@@ -77,7 +77,7 @@ turtlecraft.builder = {};
 		return math.sqrt(x*x + y*y + z*z);
 	end
 	calc.angleStep = function(radius)
-		return 45 / radius;
+		return 22.5 / radius;
 	end
 	calc.rotateVector = function(vector, xaxis, yaxis, zaxis)
 		if (xaxis == nil) then xaxis = 0; end
@@ -135,7 +135,7 @@ turtlecraft.builder = {};
 			z = to.z - from.z
 		}
 		local length = calc.measure(vector.x, vector.y, vector.z);
-		for d = 0, length do
+		for d = 0, length, 0.5 do
 			table.insert(vectors, {
 				x = from.x + vector.x / length * d,
 				y = from.y + vector.y / length * d,
@@ -484,16 +484,16 @@ turtlecraft.builder = {};
 		turtlecraft.term.write(1, 5, "(y or n): ");
 		if (read() == "y") then
 			turtlecraft.term.write(1, 4, "Squish east-west...");
-			turtlecraft.term.write(1, 5, "(1 - 100): ");
-			squishX = math.max(1, math.min(100, tonumber(read() or 1))) / 100;
+			turtlecraft.term.write(1, 5, "(0 - 100): ");
+			squishX = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
 			
 			turtlecraft.term.write(1, 4, "Squish north-south...");
-			turtlecraft.term.write(1, 5, "(1 - 100): ");
-			squishY = math.max(1, math.min(100, tonumber(read() or 1))) / 100;
+			turtlecraft.term.write(1, 5, "(0 - 100): ");
+			squishY = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
 			
 			turtlecraft.term.write(1, 4, "Squish up-down...");
-			turtlecraft.term.write(1, 5, "(1 - 100): ");
-			squishZ = math.max(1, math.min(100, tonumber(read() or 1))) / 100;
+			turtlecraft.term.write(1, 5, "(0 - 100): ");
+			squishZ = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
 		end
 		
 		local rotX = 0; local rotY = 0; local rotZ = 0;

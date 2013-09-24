@@ -440,28 +440,28 @@ turtlecraft.builder = {};
 		local maxNorth, maxSouth, maxEast, maxWest, maxUp, maxDown = calc.bounds(project.data);
 		
 		turtlecraft.term.write(1, 6, "How much from the north?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxNorth .."): ");
-		local north = maxNorth - math.max(0, math.min(maxNorth, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxNorth) .."): ");
+		local north = maxNorth - math.max(0, math.min(math.abs(maxNorth), tonumber(read() or 0)));
 		
 		turtlecraft.term.write(1, 6, "How much from the south?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxSouth .."): ");
-		local south = maxSouth - math.max(0, math.min(maxSouth, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxSouth) .."): ");
+		local south = maxSouth + math.max(0, math.min(math.abs(maxSouth), tonumber(read() or 0)));
 		
 		turtlecraft.term.write(1, 6, "How much from the east?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxEast .."): ");
-		local east = maxEast - math.max(0, math.min(maxEast, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxEast) .."): ");
+		local east = maxEast - math.max(0, math.min(math.abs(maxEast), tonumber(read() or 0)));
 		
 		turtlecraft.term.write(1, 6, "How much from the west?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxWest .."): ");
-		local west = maxWest - math.max(0, math.min(maxWest, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxWest) .."): ");
+		local west = maxWest + math.max(0, math.min(math.abs(maxWest), tonumber(read() or 0)));
 		
 		turtlecraft.term.write(1, 6, "How much from the up?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxUp .."): ");
-		local up = maxUp - math.max(0, math.min(maxUp, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxUp) .."): ");
+		local up = maxUp - math.max(0, math.min(math.abs(maxUp), tonumber(read() or 0)));
 		
 		turtlecraft.term.write(1, 6, "How much from the down?");
-		turtlecraft.term.write(1, 7, "(0-" .. maxDown .."): ");
-		local down = maxDown - math.max(0, math.min(maxDown, tonumber(read() or 0)));
+		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxDown) .."): ");
+		local down = maxDown + math.max(0, math.min(math.abs(maxDown), tonumber(read() or 0)));
 
 		turtlecraft.term.clear("Trim");
 		turtlecraft.term.write(1, 4, "Calculating...");

@@ -22,7 +22,10 @@ turtlecraft.builder = {};
 		for i, v in ipairs(project.data) do
 			file = file .. v.x .. "," .. v.y .. "," .. v.z .. ",";
 		end
+		print(projectPath);
+		print(string.len(file));
 		local handle = fs.open(projectPath, "w");
+		print(handle);
 		handle.write(file);
 		handle.close();
 	end

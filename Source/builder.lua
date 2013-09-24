@@ -401,7 +401,7 @@ turtlecraft.builder = {};
 	end
 	
 	turtlecraft.builder.start = function()
-		if (table.getn(project.data)) then
+		if (table.getn(project.data) == 0) then
 			turtlecraft.term.write(1, 4, "Your project is empty");
 			sleep(5);
 			return;

@@ -37,12 +37,10 @@ turtlecraft.builder = {};
 	recover.isEnabled = function()
 		return fs.exists(builderPath);
 	end
-	recover.set = function()
-		local x, y, z, d = turtlecraft.position.get();
+	recover.set = function(offset)
 		local file = fs.open(builderPath, "w");
-		file.write(x .. "," .. y .. "," .. z);
+		file.write(offset.x .. "," .. offset.y .. "," .. offset.z);
 		file.close();
-		return {x = x, y = y, z = z};
 	end
 	recover.get = function()
 		local file = fs.open(builderPath, "r");
@@ -343,7 +341,7 @@ turtlecraft.builder = {};
 		end
 	end
 	
-	local resume = function(start)
+	local resume = function(offset)
 		turtlecraft.term.clear("Build Project");
 		turtlecraft.term.write(1, 4, "Press Q to cancel");
 		turtlecraft.input.escapeOnKey(16, function() 
@@ -351,9 +349,9 @@ turtlecraft.builder = {};
 			local x, y, z, d = turtlecraft.position.get();
 			for i, v in ipairs(project.data) do
 				local target = {
-					x = v.x + start.x,
-					y = v.y + start.y,
-					z = v.z + start.z
+					x = v.x + offset.x,
+					y = v.y + offset.y,
+					z = v.z + offset.z
 				};
 				if (not startFound) then
 					startFound = target.x == x and target.y == y and target.z == z;
@@ -425,12 +423,10 @@ turtlecraft.builder = {};
 		
 		local start = project.data[1];
 		local x, y, z, d = turtlecraft.position.get();
-		print(x .. "," .. y .. "," .. z);
-		print(start.x + x .. "," .. start.y + y .. "," .. start.z + z);
-		read();
-		turtlecraft.move.digTo(start.x + x, start.y + y, start.z + z);
-		local start = recover.set();
-		resume(start);
+		local offset = {x = x, y = y, z = z};
+		recover.set(offset);
+		turtlecraft.move.digTo(start.x + offset.x, start.y + offset.y, start.z + offset.z);
+		resume(offset);
 	end
 
 	turtlecraft.builder.add = function()
@@ -558,7 +554,7 @@ turtlecraft.builder = {};
 	end
 	
 	if (recover.isEnabled()) then
-		local start = resume.get();
-		resume(start);
+		local offset = recover.get();
+		resume(offset);
 	end
 end)();

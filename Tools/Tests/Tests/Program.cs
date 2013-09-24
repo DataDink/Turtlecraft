@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using LuaInterface;
 using Tests.Framework;
@@ -19,14 +20,18 @@ namespace Tests
         [STAThread]
         static void Main(string[] args)
         {
-            string[] files;
-            using (var dlg = new OpenFileDialog {Title = "Please select Manifest file"}) {
-                if (dlg.ShowDialog() != DialogResult.OK) return;
-                var path = Path.GetDirectoryName(dlg.FileName);
-                files = File.ReadAllLines(dlg.FileName).Select(n => Path.Combine(path, n))
-                        .Where(f => !f.EndsWith("menu.lua"))
-                        .ToArray();
-            }
+            var myPath = typeof(Program).Assembly.Location;
+            var appDirectory = Path.GetDirectoryName(myPath);
+            var projectDirectory = Path.GetFullPath(Path.Combine(appDirectory, "..\\..\\..\\..\\.."));
+            var sourceDirectory = Path.GetFullPath(Path.Combine(projectDirectory, "Source"));
+            EnsureFileExists("source", sourceDirectory);
+
+            var manifestPath = Path.Combine(sourceDirectory, "manifest");
+            EnsureFileExists("manifest", manifestPath);
+
+            var files = File.ReadAllLines(manifestPath)
+                .Select(f => Path.Combine(sourceDirectory, f))
+                .ToArray();
 
             var assembly = typeof(Program).Assembly;
             var tests = assembly.GetTypes().SelectMany(t => t.GetMethods(BindingFlags.Static | BindingFlags.Public))
@@ -61,6 +66,15 @@ namespace Tests
             using (var dlg = new SaveFileDialog {AddExtension = true, DefaultExt = ".txt", Title = "Save Results", FileName = "test-results.txt", Filter = "Text Files|*.txt"}) {
                 if (dlg.ShowDialog() != DialogResult.OK) return;
                 File.WriteAllLines(dlg.FileName, Results.ToArray());
+            }
+        }
+
+        static void EnsureFileExists(string name, string path)
+        {
+            if (!Directory.Exists(path) && !File.Exists(path)) {
+                Console.Write("Could not locate {0}: {1}", name, path);
+                Console.ReadKey();
+                Thread.CurrentThread.Abort();
             }
         }
 

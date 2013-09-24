@@ -13,17 +13,18 @@ namespace Minifier
         static void Main(string[] args)
         {
             var myPath = typeof (Program).Assembly.Location;
-            var solutionPath = Path.GetDirectoryName(myPath);
-            var projectPath = Path.GetFullPath(Path.Combine(solutionPath, "..\\..\\..\\..\\..\\..\\Source"));
-            EnsureFileExists("source", projectPath);
+            var appDirectory = Path.GetDirectoryName(myPath);
+            var projectDirectory = Path.GetFullPath(Path.Combine(appDirectory, "..\\..\\..\\..\\..\\.."));
+            var sourceDirectory = Path.GetFullPath(Path.Combine(projectDirectory, "Source"));
+            EnsureFileExists("source", sourceDirectory);
 
-            var manifestPath = Path.Combine(projectPath, "manifest");
+            var manifestPath = Path.Combine(sourceDirectory, "manifest");
             EnsureFileExists("manifest", manifestPath);
 
             var files = File.ReadAllLines(manifestPath);
             var raw = new StringBuilder();
             foreach (var file in files) {
-                var filePath = Path.Combine(projectPath, file);
+                var filePath = Path.Combine(sourceDirectory, file);
                 EnsureFileExists("file", filePath);
                 raw.AppendLine(File.ReadAllText(filePath));
             }
@@ -32,12 +33,16 @@ namespace Minifier
             engine.ExecuteFile("luaparse.js");
             engine.ExecuteFile("luamin.js");
             engine.Execute("var MINIFY = luamin.minify;"); // hack because I didn't spend time finding the right way to do this in the documentation
-            var result = engine.CallGlobalFunction("MINIFY", raw.ToString());
+            var result = ((ConcatenatedString)engine.CallGlobalFunction("MINIFY", raw.ToString())).ToString();
 
             var copyIndex = 2;
-            var targetPath = Path.Combine(projectPath, "Compressed");
+            var targetDirectory = Path.Combine(projectDirectory, "Compressed");
             var targetName = string.Format("MINIFIED_{0}.lua", DateTime.UtcNow.ToString("yyyy_MM_dd"));
-            while (File.Exists(Path.Combine(targetPath, targetName))) targetName = string.J
+            while (File.Exists(Path.Combine(targetDirectory, targetName))) {
+                targetName = string.Format("MINIFIED_{0}_{1}.lua", DateTime.UtcNow.ToString("yyyy_MM_dd"), copyIndex++);
+            }
+            var targetPath = Path.Combine(targetDirectory, targetName);
+            File.WriteAllText(targetPath, result.ToString());
         }
 
         static void EnsureFileExists(string name, string path)

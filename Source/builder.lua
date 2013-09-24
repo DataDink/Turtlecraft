@@ -22,10 +22,7 @@ turtlecraft.builder = {};
 		for i, v in ipairs(project.data) do
 			file = file .. v.x .. "," .. v.y .. "," .. v.z .. ",";
 		end
-		print(projectPath);
-		print(string.len(file));
 		local handle = fs.open(projectPath, "w");
-		print(handle);
 		handle.write(file);
 		handle.close();
 		read();
@@ -34,6 +31,7 @@ turtlecraft.builder = {};
 		project.data = {};
 		fs.delete(projectPath);
 	end
+	project.load();
 	
 	local recover = {};
 	recover.isEnabled = function()
@@ -539,7 +537,6 @@ turtlecraft.builder = {};
 	end
 	
 	if (recover.isEnabled()) then
-		project.load();
 		resume();
 	end
 end)();

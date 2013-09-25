@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Minifier", "Minifier\Minifier.csproj", "{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 turtlecraft.builder = {};
 
-(function()
+turtlecraft.scope = function()
 	local projectPath = turtlecraft.directory .. "project.data";
 	local builderPath = turtlecraft.directory .. "builder.data";
 	
@@ -613,4 +613,5 @@ turtlecraft.builder = {};
 		local offset = recover.get();
 		resume(offset);
 	end
-end)();
+end
+turtlecraft.scope();

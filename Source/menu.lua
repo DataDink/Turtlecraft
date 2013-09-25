@@ -64,7 +64,7 @@ turtlecraft.menu[3] = {
 	action = turtlecraft.help.general
 }
 
-(function()
+turtlecraft.scope = function()
 	local terminal = turtlecraft.term;
 	local selectedIndex = 1;
 	local history = {};
@@ -138,4 +138,5 @@ turtlecraft.menu[3] = {
 		if (key == 208) then downArrow(); end
 		if (key == 203) then goBack(); end
 	end
-end)();
+end
+turtlecraft.scope();

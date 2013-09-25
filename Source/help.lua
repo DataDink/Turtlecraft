@@ -1,6 +1,6 @@
 turtlecraft.help = {}
 
-(function()
+turtlecraft.scope = function()
 	local continue = function()
 		print("Press any key to read more...");
 		turtlecraft.input.readKey();
@@ -95,4 +95,5 @@ turtlecraft.help = {}
 		.. "resumes building that it could get offset a square.";
 		show(text);
 	end
-end)();
+end
+turtlecraft.scope();

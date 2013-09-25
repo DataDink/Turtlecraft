@@ -1,6 +1,6 @@
 turtlecraft.seeker = {};
 
-(function() 
+turtlecraft.scope = function() 
 
 	local path = turtlecraft.directory .. "seeker.data";
 	local turtleBack = function(action) turtle.turnRight(); turtle.turnRight(); local result = action(); turtle.turnRight(); turtle.turnRight(); return result; end
@@ -212,4 +212,5 @@ turtlecraft.seeker = {};
 	if (recover ~= nil) then
 		turtlecraft.seeker[recover](dir);
 	end
-end)();
+end
+turtlecraft.scope();

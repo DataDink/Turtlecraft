@@ -2,7 +2,7 @@
 
 turtlecraft.position = {};
 
-(function() 
+turtlecraft.scope = function() 
 
 	local directions = {
 		north = 270,
@@ -251,4 +251,5 @@ turtlecraft.position = {};
 	end
 	
 
-end)();
+end
+turtlecraft.scope();

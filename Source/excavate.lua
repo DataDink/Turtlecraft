@@ -1,6 +1,6 @@
 turtlecraft.excavate = {};
 
-(function() 
+turtlecraft.scope = function() 
 
 	local position = turtlecraft.position;
 	local directions = position.directions;
@@ -257,4 +257,5 @@ turtlecraft.excavate = {};
 	turtlecraft.excavate.debug.start = function(forward, left, right, up, down)
 		move.start(forward, left, right, up, down);
 	end
-end)();	
+end
+turtlecraft.scope();	

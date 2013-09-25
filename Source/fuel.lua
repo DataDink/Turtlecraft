@@ -1,6 +1,6 @@
 turtlecraft.fuel = {};
 
-(function()
+turtlecraft.scope = function()
 	local internal = {
 		fuelSlot = 1,
 		fuelPerBurn = 0,
@@ -38,4 +38,5 @@ turtlecraft.fuel = {};
 			end
 		end
 	end
-end)();
+end
+turtlecraft.scope();

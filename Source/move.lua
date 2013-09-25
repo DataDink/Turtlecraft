@@ -1,6 +1,6 @@
 turtlecraft.move = {};
 
-(function()
+turtlecraft.scope = function()
 	local internal = {};
 	local directions = turtlecraft.position.directions;
 	
@@ -111,4 +111,5 @@ turtlecraft.move = {};
 		end
 		return internal.moveTo(x, y, z, dig, action, dig);
 	end
-end)();
+end
+turtlecraft.scope();

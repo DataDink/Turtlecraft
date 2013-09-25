@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Jurassic;
+using LuaInterface;
 
 namespace Minifier
 {
@@ -21,19 +22,21 @@ namespace Minifier
             var manifestPath = Path.Combine(sourceDirectory, "manifest");
             EnsureFileExists("manifest", manifestPath);
 
-            var files = File.ReadAllLines(manifestPath);
-            var raw = new StringBuilder();
-            foreach (var file in files) {
-                var filePath = Path.Combine(sourceDirectory, file);
-                EnsureFileExists("file", filePath);
-                raw.AppendLine(File.ReadAllText(filePath));
-            }
-
             var engine = new ScriptEngine();
             engine.ExecuteFile("luaparse.js");
             engine.ExecuteFile("luamin.js");
             engine.Execute("var MINIFY = luamin.minify;"); // hack because I didn't spend time finding the right way to do this in the documentation
-            var result = ((ConcatenatedString)engine.CallGlobalFunction("MINIFY", raw.ToString())).ToString();
+
+            var files = File.ReadAllLines(manifestPath);
+            var result = new StringBuilder();
+            foreach (var file in files) {
+                var filePath = Path.Combine(sourceDirectory, file);
+                EnsureFileExists("file", filePath);
+                var minified = engine.CallGlobalFunction("MINIFY", File.ReadAllText(filePath)).ToString();
+                result.AppendLine("--" + filePath);
+                result.AppendLine(minified);
+            }
+            EnsureLuaParses(result.ToString());
 
             var copyIndex = 2;
             var targetDirectory = Path.Combine(projectDirectory, "Compressed");
@@ -49,6 +52,19 @@ namespace Minifier
         {
             if (!Directory.Exists(path) && !File.Exists(path)) {
                 Console.Write("Could not locate {0}: {1}", name, path);
+                Console.ReadKey();
+                Thread.CurrentThread.Abort();
+            }
+        }
+
+        static void EnsureLuaParses(string lua)
+        {
+            var environment = new Lua();
+            try {
+                environment.LoadString(lua, "chunk");
+            } catch (Exception ex) {
+                Console.WriteLine("Failed to parse");
+                Console.WriteLine(ex.Message);
                 Console.ReadKey();
                 Thread.CurrentThread.Abort();
             }

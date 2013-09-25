@@ -33,7 +33,7 @@ namespace Minifier
                 var filePath = Path.Combine(sourceDirectory, file);
                 EnsureFileExists("file", filePath);
                 var minified = engine.CallGlobalFunction("MINIFY", File.ReadAllText(filePath)).ToString();
-                result.AppendLine("--" + filePath);
+                result.AppendLine("--" + file);
                 result.AppendLine(minified);
             }
             EnsureLuaParses(result.ToString());

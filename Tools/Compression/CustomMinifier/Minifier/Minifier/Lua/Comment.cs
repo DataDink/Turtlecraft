@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Minifier.Lua
 {
-    public class NumberValue : Value
+    public class Comment : Value
     {
         public string Content { get; set; }
     }

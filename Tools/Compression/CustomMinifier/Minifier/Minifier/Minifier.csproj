@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lua\Block.cs" />
+    <Compile Include="Lua\Comment.cs" />
     <Compile Include="Lua\JoinStatement.cs" />
     <Compile Include="Lua\NumberValue.cs" />
     <Compile Include="Lua\ParenBlock.cs" />

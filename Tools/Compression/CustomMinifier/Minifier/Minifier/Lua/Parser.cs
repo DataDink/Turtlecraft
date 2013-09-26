@@ -96,7 +96,16 @@ namespace Minifier.Lua
 
         private NumberValue ParseNumber(string lua, out string remainder)
         {
-            
+            var content = Regex.Match(lua, @"^-?\d+(\.\d+)?").Value;
+            remainder = lua.Substring(content.Length);
+            return new NumberValue {Content = content};
+        }
+
+        private Comment ParseComment(string lua, out string remainder)
+        {
+            var content = Regex.Match(lua, "^--.*?[\r\n]+").Value;
+            remainder = lua.Substring(content.Length);
+            return new Comment {Content = content};
         }
     }
 }

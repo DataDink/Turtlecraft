@@ -7,6 +7,5 @@ namespace Minifier.Lua
 {
     public class Value : Statement
     {
-        public bool IsLocal { get; set; }
     }
 }

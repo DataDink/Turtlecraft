@@ -7,8 +7,8 @@ namespace Minifier.Lua
 {
     public class JoinStatement : Statement
     {
-        public Value Left { get; set; }
+        public Statement Left { get; set; }
         public string Operator { get; set; }
-        public Value Right { get; set; }
+        public Statement Right { get; set; }
     }
 }

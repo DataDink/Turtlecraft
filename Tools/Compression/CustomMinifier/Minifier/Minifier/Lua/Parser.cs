@@ -9,7 +9,7 @@ namespace Minifier.Lua
     {
         private static readonly string[] Reserved = new[] {"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"};
         private static readonly string[] Tokens = new[] {"+", "-", "*", "/", "%", "^", "#", "==", "~=", "<=", ">=", "<", ">", "=", "(", ")", "{", "}", "[", "]", ";", ":", ",", ".", "..", "..."};
-        private static readonly string ReferencePattern = @"[A-Za-z_][A-Za-z0-9_]*";
+        private const string ReferencePattern = @"[A-Za-z_][A-Za-z0-9_]*";
         private static readonly string TableReferencePattern = string.Format(@"({0}*\.?)+", ReferencePattern);
 
         private readonly Parser _parentScope;
@@ -62,6 +62,11 @@ namespace Minifier.Lua
             return lua;
         }
 
+        private bool IsKeyword(string lua, string keyword)
+        {
+            return Regex.IsMatch(string.Format(@"^{0}(?!\S)", keyword));
+        }
+
         public List<Statement> Parse(string lua)
         {
             string discard;
@@ -80,17 +85,17 @@ namespace Minifier.Lua
 
         private Statement ParseNext(string lua, out string remainder)
         {
-            lua = lua.TrimStart();
-            if (string.IsNullOrWhiteSpace(lua) || lua.StartsWith("end")) return ParseComment(lua, out remainder);
-            if (lua.StartsWith("if")) return ParseIf(lua, out remainder);
-            if (lua.StartsWith("else")) return ParseElse(lua, out remainder);
-            if (lua.StartsWith("elseif")) return ParseElseIf(lua, out remainder);
-            if (lua.StartsWith("for")) return ParseFor(lua, out remainder);
-            if (lua.StartsWith("while")) return ParseWhile(lua, out remainder);
-            if (lua.StartsWith("repeat")) return ParseRepeat(lua, out remainder);
-            if (lua.StartsWith("return")) return ParseReturn(lua, out remainder);
-            if (lua.StartsWith("--")) return ParseComment(lua, out remainder);
-            return ParseStatement(lua, out remainder);
+            remainder = lua.TrimStart();
+            if (string.IsNullOrWhiteSpace(remainder) || remainder.StartsWith("end")) return null;
+            if (IsKeyword(remainder, "if")) return ParseIf(remainder, out remainder);
+            if (IsKeyword(remainder, "else")) return ParseElse(remainder, out remainder);
+            if (IsKeyword(remainder, "elseif")) return ParseElseIf(remainder, out remainder);
+            if (IsKeyword(remainder, "for")) return ParseFor(remainder, out remainder);
+            if (IsKeyword(remainder, "while")) return ParseWhile(remainder, out remainder);
+            if (IsKeyword(remainder, "repeat")) return ParseRepeat(remainder, out remainder);
+            if (IsKeyword(remainder, "return")) return ParseReturn(remainder, out remainder);
+            if (remainder.StartsWith("--")) return ParseComment(remainder, out remainder);
+            return ParseStatement(remainder, out remainder);
         }
 
         private Value ParseValue(string lua, out string remainder)
@@ -197,19 +202,22 @@ namespace Minifier.Lua
         private ParenValue ParseParens(string lua, out string remainder)
         {
             remainder = lua.Substring(1).TrimStart();
-            var result = new ParenValue {
-                Statement = ParseStatement(remainder, out remainder)
-            };
-            remainder = remainder.TrimStart();
+            var result = new ParenValue();
+            if (remainder.StartsWith(")")) return result;
+            do {
+                result.Statements.Add(ParseStatement(remainder, out remainder));
+                remainder = remainder.TrimStart();
+            } while (!remainder.StartsWith(","));
+
             if (!remainder.StartsWith(")")) throw new Exception("Unterminated Parens");
             remainder = remainder.Substring(1);
             return result;
         }
 
-        private List<Statement> ParseBlock(string lua, out string remainder, params string[] terminators)
+        private List<Statement> ParseBlock(string lua, out string remainder, Parser scope, params string[] terminators)
         {
             var result = new List<Statement>();
-            var scope = new Parser(this);
+            scope = scope ?? new Parser(this);
             terminators = terminators.Select(t => string.Format(@"^{0}(?![a-zA-Z0-9_])", t)).ToArray();
             while (!terminators.Any(t => Regex.IsMatch(lua, t))) {
                 result.Add(scope.ParseNext(lua, out lua));
@@ -223,7 +231,7 @@ namespace Minifier.Lua
         {
             lua = lua.Substring(2).TrimStart();
             var result = new IfBlock();
-            result.Statements.AddRange(ParseBlock(lua, out lua, "end", "else", "elseif"));
+            result.Statements.AddRange(ParseBlock(lua, out lua, null, "end", "else", "elseif"));
 
             if (lua.StartsWith("end")) lua = lua.Substring(3).TrimStart();
             remainder = lua;
@@ -234,7 +242,7 @@ namespace Minifier.Lua
         {
             lua = lua.Substring(6).TrimStart();
             var result = new ElseIfBlock();
-            result.Statements.AddRange(ParseBlock(lua, out lua, "end", "else", "elseif"));
+            result.Statements.AddRange(ParseBlock(lua, out lua, null, "end", "else", "elseif"));
 
             if (lua.StartsWith("end")) lua = lua.Substring(3).TrimStart();
             remainder = lua;
@@ -245,25 +253,78 @@ namespace Minifier.Lua
         {
             lua = lua.Substring(4).TrimStart();
             var result = new ElseBlock();
-            result.Statements.AddRange(ParseBlock(lua, out lua, "end"));
+            result.Statements.AddRange(ParseBlock(lua, out lua, null, "end"));
 
             lua = lua.Substring(3).TrimStart();
             remainder = lua;
             return result;
         }
 
+        private List<Statement> ParseConditions(string lua, out string remainder)
+        {
+            var result = new List<Statement>();
+            remainder = lua.TrimStart();
+            do {
+                result.Add(ParseStatement(remainder, out remainder));
+                remainder = remainder.TrimStart();
+            } while (!Regex.IsMatch(remainder, @"^do\s"));
+            remainder = remainder.Substring(2).TrimStart();
+            return result;
+        } 
+
         private ForBlock ParseFor(string lua, out string remainder)
         {
-            lua = lua.Substring(3).TrimStart();
+            remainder = lua.Substring(3).TrimStart();
             var result = new ForBlock();
-            var declareEnd = Regex.Match(lua, string.Format(@"(=|\s+in\s+)")).Index;
-            var declareStatement = lua.Substring(0, declareEnd);
+            var declareEnd = Regex.Match(remainder, string.Format(@"(=|\s+in\s+)")).Index;
+            var declareStatement = remainder.Substring(0, declareEnd);
             var referenceNames = declareStatement.Split(',').Select(s => s.Trim()).ToArray();
             var scope = new Parser(this);
             result.LoopVariables.AddRange(referenceNames.Select(scope.AddToLocal).ToArray());
-            lua = lua.Substring(declareEnd);
-            result.Join = lua.StartsWith("=") ? "=" : "in";
+            remainder = remainder.Substring(declareEnd);
+            result.Join = remainder.StartsWith("=") ? "=" : "in";
+            remainder = remainder.Substring(result.Join.Length).TrimStart();
 
+            result.ConditionStatements.AddRange(ParseConditions(remainder, out remainder));
+            result.Statements.AddRange(ParseBlock(remainder, out remainder, scope, "end"));
+
+            remainder = remainder.Substring(3).TrimStart();
+            return result;
+        }
+
+        private WhileBlock ParseWhile(string lua, out string remainder)
+        {
+            remainder = lua.Substring(5).TrimStart();
+            var result = new WhileBlock();
+            result.ConditionStatements.AddRange(ParseConditions(remainder, out remainder));
+            result.Statements.AddRange(ParseBlock(remainder, out remainder, null, "end"));
+
+            remainder = remainder.Substring(3).TrimStart();
+            return result;
+        }
+
+        private RepeatBlock ParseRepeat(string lua, out string remainder)
+        {
+            remainder = lua.Substring(6).TrimStart();
+            var result = new RepeatBlock();
+            result.Statements.AddRange(ParseBlock(remainder, out remainder, null, "until"));
+
+            do {
+                result.ConditionStatements.Add(ParseStatement(remainder, out remainder));
+                remainder = remainder.TrimStart();
+            } while (remainder.StartsWith("(")); // hack - can fail - but I am okay with it because this is ONLY being written for me
+
+            return result;
+        }
+
+        private ReturnStatement ParseReturn(string lua, out string remainder)
+        {
+            remainder = lua.Substring(6).TrimStart();
+            var result = new ReturnStatement();
+            do {
+                result.Statements.Add(ParseStatement(remainder, out remainder));
+                remainder = remainder.TrimStart();
+            } while (remainder.StartsWith("(")); 
         }
     }
 }

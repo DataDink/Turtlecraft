@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Minifier.Lua
 {
-    public class ParenValue : Value
+    public class ReturnStatement : Statement
     {
         public readonly List<Statement> Statements = new List<Statement>();
     }

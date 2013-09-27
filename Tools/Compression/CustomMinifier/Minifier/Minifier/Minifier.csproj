@@ -53,10 +53,13 @@
     <Compile Include="Lua\ParenValue.cs" />
     <Compile Include="Lua\Parser.cs" />
     <Compile Include="Lua\ReferenceValue.cs" />
+    <Compile Include="Lua\RepeatBlock.cs" />
+    <Compile Include="Lua\ReturnStatement.cs" />
     <Compile Include="Lua\Statement.cs" />
     <Compile Include="Lua\StringValue.cs" />
     <Compile Include="Lua\TableValue.cs" />
     <Compile Include="Lua\Value.cs" />
+    <Compile Include="Lua\WhileBlock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

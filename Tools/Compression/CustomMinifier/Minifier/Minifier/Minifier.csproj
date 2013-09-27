@@ -43,9 +43,14 @@
   <ItemGroup>
     <Compile Include="Lua\Block.cs" />
     <Compile Include="Lua\Comment.cs" />
+    <Compile Include="Lua\ElseBlock.cs" />
+    <Compile Include="Lua\ElseIfBlock.cs" />
+    <Compile Include="Lua\ForBlock.cs" />
     <Compile Include="Lua\FunctionValue.cs" />
+    <Compile Include="Lua\IfBlock.cs" />
     <Compile Include="Lua\JoinStatement.cs" />
     <Compile Include="Lua\NumberValue.cs" />
+    <Compile Include="Lua\ParenValue.cs" />
     <Compile Include="Lua\Parser.cs" />
     <Compile Include="Lua\ReferenceValue.cs" />
     <Compile Include="Lua\Statement.cs" />

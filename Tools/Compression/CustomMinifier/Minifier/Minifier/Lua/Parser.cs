@@ -9,7 +9,8 @@ namespace Minifier.Lua
     {
         private static readonly string[] Reserved = new[] {"and", "break", "do", "else", "elseif", "end", "false", "for", "function", "if", "in", "local", "nil", "not", "or", "repeat", "return", "then", "true", "until", "while"};
         private static readonly string[] Tokens = new[] {"+", "-", "*", "/", "%", "^", "#", "==", "~=", "<=", ">=", "<", ">", "=", "(", ")", "{", "}", "[", "]", ";", ":", ",", ".", "..", "..."};
-        private static readonly string ReferencePattern = @"([A-Za-z_][A-Za-z0-9_]*\s*\.?\s*)+";
+        private static readonly string ReferencePattern = @"[A-Za-z_][A-Za-z0-9_]*";
+        private static readonly string TableReferencePattern = string.Format(@"({0}*\.?)+", ReferencePattern);
 
         private readonly Parser _parentScope;
         private readonly List<ReferenceValue> _scopeValues = new List<ReferenceValue>();
@@ -36,7 +37,7 @@ namespace Minifier.Lua
         {
             var scope = this;
             while (scope._parentScope != null) scope = scope._parentScope;
-            var value = scope._scopeValues.FirstOrDefault(v => v.Name == name);
+            var value = AllScope().FirstOrDefault(v => v.Name == name);
             if (value == null) {
                 value = new ReferenceValue(name);
                 scope._scopeValues.Add(value);
@@ -145,6 +146,7 @@ namespace Minifier.Lua
 
         private Comment ParseComment(string lua, out string remainder)
         {
+            lua += "\r\n";
             var content = Regex.Match(lua, "^--.*?[\r\n]+").Value;
             remainder = lua.Substring(content.Length);
             return new Comment {Content = content};
@@ -154,7 +156,7 @@ namespace Minifier.Lua
         {
             var isLocal = lua.StartsWith("local ");
             if (isLocal) lua = lua.Substring("local".Length).TrimStart();
-            var referenceName = Regex.Match(lua, "^" + ReferencePattern).Value;
+            var referenceName = Regex.Match(lua, "^" + TableReferencePattern).Value;
             remainder = lua.Substring(referenceName.Length).TrimStart();
             if (isLocal) return AddToLocal(referenceName);
             return AddToGlobal(referenceName);
@@ -190,6 +192,78 @@ namespace Minifier.Lua
                 result.Members.Add(key.Name, statement);
             }
             return result;
+        }
+
+        private ParenValue ParseParens(string lua, out string remainder)
+        {
+            remainder = lua.Substring(1).TrimStart();
+            var result = new ParenValue {
+                Statement = ParseStatement(remainder, out remainder)
+            };
+            remainder = remainder.TrimStart();
+            if (!remainder.StartsWith(")")) throw new Exception("Unterminated Parens");
+            remainder = remainder.Substring(1);
+            return result;
+        }
+
+        private List<Statement> ParseBlock(string lua, out string remainder, params string[] terminators)
+        {
+            var result = new List<Statement>();
+            var scope = new Parser(this);
+            terminators = terminators.Select(t => string.Format(@"^{0}(?![a-zA-Z0-9_])", t)).ToArray();
+            while (!terminators.Any(t => Regex.IsMatch(lua, t))) {
+                result.Add(scope.ParseNext(lua, out lua));
+                lua = lua.TrimStart();
+            }
+            remainder = lua;
+            return result;
+        }
+
+        private IfBlock ParseIf(string lua, out string remainder)
+        {
+            lua = lua.Substring(2).TrimStart();
+            var result = new IfBlock();
+            result.Statements.AddRange(ParseBlock(lua, out lua, "end", "else", "elseif"));
+
+            if (lua.StartsWith("end")) lua = lua.Substring(3).TrimStart();
+            remainder = lua;
+            return result;
+        }
+
+        private ElseIfBlock ParseElseIf(string lua, out string remainder)
+        {
+            lua = lua.Substring(6).TrimStart();
+            var result = new ElseIfBlock();
+            result.Statements.AddRange(ParseBlock(lua, out lua, "end", "else", "elseif"));
+
+            if (lua.StartsWith("end")) lua = lua.Substring(3).TrimStart();
+            remainder = lua;
+            return result;
+        }
+
+        private ElseBlock ParseElse(string lua, out string remainder)
+        {
+            lua = lua.Substring(4).TrimStart();
+            var result = new ElseBlock();
+            result.Statements.AddRange(ParseBlock(lua, out lua, "end"));
+
+            lua = lua.Substring(3).TrimStart();
+            remainder = lua;
+            return result;
+        }
+
+        private ForBlock ParseFor(string lua, out string remainder)
+        {
+            lua = lua.Substring(3).TrimStart();
+            var result = new ForBlock();
+            var declareEnd = Regex.Match(lua, string.Format(@"(=|\s+in\s+)")).Index;
+            var declareStatement = lua.Substring(0, declareEnd);
+            var referenceNames = declareStatement.Split(',').Select(s => s.Trim()).ToArray();
+            var scope = new Parser(this);
+            result.LoopVariables.AddRange(referenceNames.Select(scope.AddToLocal).ToArray());
+            lua = lua.Substring(declareEnd);
+            result.Join = lua.StartsWith("=") ? "=" : "in";
+
         }
     }
 }

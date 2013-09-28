@@ -7,6 +7,6 @@ namespace Minifier.Lua
 {
     public class ReturnStatement : Statement
     {
-        public readonly List<Statement> Statements = new List<Statement>();
+        public Statement Statement { get; set; }
     }
 }

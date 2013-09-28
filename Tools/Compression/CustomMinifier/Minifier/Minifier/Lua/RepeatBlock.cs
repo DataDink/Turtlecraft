@@ -7,6 +7,6 @@ namespace Minifier.Lua
 {
     public class RepeatBlock : Block
     {
-        public readonly List<Statement> ConditionStatements = new List<Statement>();
+        public Statement ConditionStatement { get; set; }
     }
 }

@@ -7,5 +7,6 @@ namespace Minifier.Lua
 {
     public class ElseIfBlock : Block
     {
+        public Statement Condition { get; set; }
     }
 }

@@ -9,6 +9,6 @@ namespace Minifier.Lua
     {
         public readonly List<ReferenceValue> LoopVariables = new List<ReferenceValue>();
         public string Join { get; set; }
-        public readonly List<Statement> ConditionStatements = new List<Statement>();
+        public Statement Condition { get; set; }
     }
 }

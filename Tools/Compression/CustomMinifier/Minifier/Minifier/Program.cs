@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Minifier.Lua;
 
 namespace Minifier
@@ -11,10 +12,10 @@ namespace Minifier
     {
         static void Main(string[] args)
         {
-            var path = @"C:\Users\Mark\Documents\GitHub\Turtlecraft\Source\builder.lua";
+            var path = @"..\..\..\..\..\..\..\Source\builder.lua";
             var raw = File.ReadAllText(path);
-            var parser = new Parser(raw);
-            parser.Parse();
+            var parser = new Parser();
+            var result = parser.Parse(raw);
         }
     }
 }

@@ -7,6 +7,6 @@ namespace Minifier.Lua
 {
     public class WhileBlock : Block
     {
-        public readonly List<Statement> ConditionStatements = new List<Statement>();
+        public Statement Condition { get; set; }
     }
 }

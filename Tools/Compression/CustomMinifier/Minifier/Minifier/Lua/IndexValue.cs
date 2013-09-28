@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Minifier.Lua
 {
-    public class IfBlock : Block
+    public class IndexValue : Value
     {
-        public Statement Condition { get; set; }
+        public Statement Indexer { get; set; }
     }
 }

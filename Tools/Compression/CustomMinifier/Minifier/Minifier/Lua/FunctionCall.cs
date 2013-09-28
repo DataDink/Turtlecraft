@@ -5,9 +5,8 @@ using System.Text;
 
 namespace Minifier.Lua
 {
-    public class FunctionCall : Value
+    public class FunctionCall : ChainValue
     {
-        public Value Name { get; set; }
-        public List<ParenValue> Calls { get; set; }
+        public ParenValue Arguments { get; set; }
     }
 }

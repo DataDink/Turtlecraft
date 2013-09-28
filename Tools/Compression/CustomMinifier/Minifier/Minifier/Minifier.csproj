@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lua\Block.cs" />
+    <Compile Include="Lua\ChainValue.cs" />
     <Compile Include="Lua\Comment.cs" />
     <Compile Include="Lua\ElseBlock.cs" />
     <Compile Include="Lua\ElseIfBlock.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Lua\Parser.cs" />
     <Compile Include="Lua\ReferenceValue.cs" />
     <Compile Include="Lua\RepeatBlock.cs" />
+    <Compile Include="Lua\ReservedValue.cs" />
     <Compile Include="Lua\ReturnStatement.cs" />
     <Compile Include="Lua\Statement.cs" />
     <Compile Include="Lua\StringValue.cs" />

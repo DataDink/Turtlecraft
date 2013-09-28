@@ -5,7 +5,9 @@ using System.Text;
 
 namespace Minifier.Lua
 {
-    public class MemberValue : ChainValue
+    public abstract class ChainValue : Value
     {
+        public Value Owner { get; set; }
+        public Value Next { get; set; }
     }
 }

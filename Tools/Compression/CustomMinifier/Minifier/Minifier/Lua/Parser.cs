@@ -21,6 +21,11 @@ namespace Minifier.Lua
             _parentScope = parent;
         }
 
+        public bool IsGlobal(ReferenceValue value)
+        {
+            return _scopeValues.Contains(value);
+        }
+
         private List<ReferenceValue> AllScope()
         {
             var scope = this;
@@ -109,7 +114,6 @@ namespace Minifier.Lua
             if (lua.StartsWith("{")) return ParseTable(lua, out remainder);
             if (lua.StartsWith("[")) return ParseIndex(lua, out remainder);
             if (lua.StartsWith("\"") || lua.StartsWith("'")) return ParseString(lua, out remainder);
-            if (lua.StartsWith(".")) return ParseMember(lua, out remainder);
             if (Regex.IsMatch(lua, "^-?\\d")) return ParseNumber(lua, out remainder);
             if (Regex.IsMatch(lua, "^function\\s*\\(")) return ParseFunction(lua, out remainder);
             if (lua.StartsWith("--")) return ParseComment(lua, out remainder);
@@ -122,12 +126,12 @@ namespace Minifier.Lua
             var value = ParseValue(lua, out lua);
             lua = Trim(lua);
 
-            var oper = new[] {"or", "and", "<", ">", "<=", ">=", "~=", "==", "..", "+", "-", "*", "/", "%", "^", "="}
+            var oper = new[] {"or", "and", "<", ">", "<=", ">=", "~=", "==", "..", "+", "-", "*", "/", "%", "^", "=", ",", "."}
                 .FirstOrDefault(lua.StartsWith);
             if (oper != null) {
                 lua = Trim(lua.Substring(oper.Length));
                 return new JoinStatement {
-                    Left = value,
+                    Left = value, 
                     Operator = oper,
                     Right = ParseStatement(lua, out remainder)
                 };
@@ -166,16 +170,22 @@ namespace Minifier.Lua
 
         private Value ParseCallChain(string lua, out string remainder, Value name)
         {
-            remainder = lua;
-            if (!remainder.StartsWith("(")) return null;
-
-            var result = new FunctionCall{Name = name};
-            while (remainder.StartsWith("(")) {
-                result.Calls.Add((ParenValue)ParseParens(remainder, out remainder));
-                remainder = Trim(remainder);
+            remainder = Trim(lua);
+            ChainValue result = null;
+            if (remainder.StartsWith("(")) {
+                result = new FunctionCall {
+                    Owner = name,
+                    Arguments = (ParenValue)ParseParens(lua, out remainder)
+                };
+            } else if (remainder.StartsWith(".")) {
+                result = new MemberValue {
+                    Owner = name,
+                };
             }
-            if (!remainder.StartsWith(")")) throw new Exception("Unterminated parenthesis");
-            remainder = Trim(remainder.Substring(1));
+            var next = Trim(remainder);
+            if (new[] {"(", "."}.Any(d => Trim(next).StartsWith(d))) {
+                result.Next = ParseCallChain(next, out remainder, result);
+            }
             return result;
         } 
 
@@ -186,22 +196,21 @@ namespace Minifier.Lua
             return ParseCallChain(remainder, out remainder, index) ?? index;
         }
 
-        private Value ParseMember(string lua, out string remainder)
-        {
-            remainder = Trim(lua.Substring(1));
-            var referenceName = Regex.Match(remainder, "^" + ReferencePattern).Value;
-            remainder = Trim(remainder.Substring(referenceName.Length));
-            var member = new MemberValue(referenceName);
-            return ParseCallChain(remainder, out remainder, member) ?? member;
-        }
-
         private Value ParseReference(string lua, out string remainder)
         {
             var isLocal = lua.StartsWith("local ");
-            if (isLocal) lua = Trim(lua.Substring(5));
-            var referenceName = Regex.Match(lua, "^" + ReferencePattern).Value;
-            remainder = Trim(lua.Substring(referenceName.Length));
+            remainder = lua;
+            if (isLocal) remainder = Trim(remainder.Substring(5));
+            var referenceName = Regex.Match(remainder, "^" + ReferencePattern).Value;
+            remainder = Trim(remainder.Substring(referenceName.Length));
+            var modifier = "";
+            if (Reserved.Any(r => r == referenceName)) {
+                modifier = referenceName;
+                referenceName = Regex.Match(remainder, "^" + ReferencePattern).Value;
+                remainder = Trim(remainder.Substring(referenceName.Length));
+            };
             var reference = isLocal ? AddToLocal(referenceName) : AddToGlobal(referenceName);
+            reference.Modifier = modifier;
             return ParseCallChain(remainder, out remainder, reference) ?? reference;
         }
 
@@ -258,7 +267,7 @@ namespace Minifier.Lua
                 remainder = remainder.Substring(1);
                 result.Statements.Add(ParseStatement(remainder, out remainder));
                 remainder = Trim(remainder);
-            } while (remainder.StartsWith(","));
+            } while (!remainder.StartsWith(")"));
 
             if (!remainder.StartsWith(")")) throw new Exception("Unterminated Parens");
             remainder = Trim(remainder.Substring(1));

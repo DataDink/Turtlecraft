@@ -7,6 +7,7 @@ namespace Minifier.Lua
 {
     public class ReferenceValue : Value
     {
+        public string Modifier { get; set; }
         public string Name { get; set; }
         public string OriginalName { get; private set; }
 

@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2F2CA5A6-5C08-472F-B92B-DAF88637EFDD}</ProjectGuid>
+    <ProjectGuid>{0E454B37-3B5F-4906-BA40-8131E0973D9B}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Minifier</RootNamespace>
     <AssemblyName>Minifier</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -32,8 +33,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LuaInterface, Version=2.0.0.16708, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\LuaInterface.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -41,32 +47,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Lua\Block.cs" />
-    <Compile Include="Lua\ChainValue.cs" />
-    <Compile Include="Lua\Comment.cs" />
-    <Compile Include="Lua\ElseBlock.cs" />
-    <Compile Include="Lua\ElseIfBlock.cs" />
-    <Compile Include="Lua\ForBlock.cs" />
-    <Compile Include="Lua\FunctionCall.cs" />
-    <Compile Include="Lua\FunctionValue.cs" />
-    <Compile Include="Lua\IfBlock.cs" />
-    <Compile Include="Lua\IndexValue.cs" />
-    <Compile Include="Lua\MemberValue.cs" />
-    <Compile Include="Lua\JoinStatement.cs" />
-    <Compile Include="Lua\NumberValue.cs" />
-    <Compile Include="Lua\ParenValue.cs" />
-    <Compile Include="Lua\Parser.cs" />
-    <Compile Include="Lua\ReferenceValue.cs" />
-    <Compile Include="Lua\RepeatBlock.cs" />
-    <Compile Include="Lua\ReservedValue.cs" />
-    <Compile Include="Lua\ReturnStatement.cs" />
-    <Compile Include="Lua\Statement.cs" />
-    <Compile Include="Lua\StringValue.cs" />
-    <Compile Include="Lua\TableValue.cs" />
-    <Compile Include="Lua\Value.cs" />
-    <Compile Include="Lua\WhileBlock.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="minify.lua">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="lua51.dll" />
+    <Content Include="LuaInterface.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

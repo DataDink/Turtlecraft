@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Minifier")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Blizzard Entertainment")]
+[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Minifier")]
-[assembly: AssemblyCopyright("Copyright © Blizzard Entertainment 2013")]
+[assembly: AssemblyCopyright("Copyright ©  2013")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("473b18f2-6a9c-464b-b915-cc737cff8ef7")]
+[assembly: Guid("9e2a22d8-ed06-46ad-8b5a-763a2e3d336d")]
 
 // Version information for an assembly consists of the following four values:
 //

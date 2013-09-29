@@ -494,7 +494,7 @@ turtlecraft.scope = function()
 		local sides = tonumber(read() or 0);
 		local shapeMethod = shape.circle;
 		if (sides == 1) then shapeMethod = shape.line; end
-		if (sides > 1) then
+		if (sides ~= nil and sides > 1) then
 			shapeMethod = function(radius) return shape.polygon(radius, sides); end;
 		end
 		

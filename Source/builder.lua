@@ -283,7 +283,7 @@ turtlecraft.scope = function()
 	extrude.cone = function(radius, crossSection)
 		local result = {};
 		for z = -radius, radius do
-			local scale = 1 / radius * 2 * math.abs(z - radius);
+			local scale = 1 / (radius * 2) * math.abs(z + radius);
 			for i, v in ipairs(crossSection) do
 				table.insert(result, {
 					x = v.x * scale,
@@ -494,7 +494,7 @@ turtlecraft.scope = function()
 		local sides = tonumber(read() or 0);
 		local shapeMethod = shape.circle;
 		if (sides == 1) then shapeMethod = shape.line; end
-		if (sides ~= nil and sides > 1) then
+		if (sides > 1) then
 			shapeMethod = function(radius) return shape.polygon(radius, sides); end;
 		end
 		

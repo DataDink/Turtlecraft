@@ -11,6 +11,7 @@ namespace Tests.Framework
         private readonly string[] _files;
 
         public Lua Api { get; private set; }
+        public Os Os { get; private set; }
         public FileSystem FS { get; private set; }
         public Turtle Turtle { get; private set; }
         public Peripheral Peripheral { get; private set; }
@@ -30,6 +31,7 @@ namespace Tests.Framework
             RegisterFunction("print", this, () => Print(""));
             RegisterFunction("sleep", this, () => Sleep(0));
 
+            Os = new Os(this);
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
             Peripheral = new Peripheral(this);

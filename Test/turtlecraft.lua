@@ -339,9 +339,237 @@ turtlecraft.term.write(1,5,"I got stuck!")
 turtlecraft.term.write(1,6,"Press any key to continue")turtlecraft.input.readKey()return end;cb.move()ba()cb.place()end end end)_a.complete()end;local da,_b=_a.read()if(da~=nil)then
 turtlecraft.seeker[da](_b)end end;turtlecraft.scope()
 -- File: builder --
->> :383:24: `then` expected.
->> `        if (response == nil) return 0;`
-                                 ^---
+turtlecraft.builder={}
+turtlecraft.scope=function()
+local a=turtlecraft.directory.."project.data"local b=turtlecraft.directory.."builder.data"local c={}
+c.data={}
+c.load=function()if(not fs.exists(a))then return false end;local bb=
+fs.open(a,"r").readAll()or""c.data={}
+local cb=string.gmatch(bb,"[^,]+")
+for db in cb do
+local _c={x=tonumber(db),y=tonumber(cb()),z=tonumber(cb())}table.insert(c.data,_c)end;return true end
+c.save=function()local bb=""for db,_c in ipairs(c.data)do bb=bb..
+_c.x..",".._c.y..",".._c.z..","end
+local cb=fs.open(a,"w")cb.write(bb)cb.close()end;c.clear=function()c.data={}fs.delete(a)end
+c.load()local d={}d.isEnabled=function()return fs.exists(b)end
+d.set=function(bb)
+local cb=fs.open(b,"w")
+cb.write(bb.x..","..bb.y..","..bb.z)cb.close()end
+d.get=function()local bb=fs.open(b,"r")
+local cb=string.gmatch(bb.readAll(),"[^,]+")bb.close()return
+{x=tonumber(cb()),y=tonumber(cb()),z=tonumber(cb())}end;d.disable=function()fs.delete(b)end;local _a={}
+_a.round=function(bb)
+if
+(bb%1 >=0.5)then return math.ceil(bb)else return math.floor(bb)end end
+_a.plot=function(bb,cb)return{h=math.cos(math.rad(bb))*cb,v=
+math.sin(math.rad(bb))*cb}end
+_a.measure=function(bb,cb,db)if(bb==nil)then bb=0 end;if(cb==nil)then cb=0 end;if(db==nil)then db=0 end;return math.sqrt(
+bb*bb+cb*cb+db*db)end;_a.angleStep=function(bb)return(45 /bb)/2 end
+_a.rotateVector=function(bb,cb,db,_c)if(cb==
+nil)then cb=0 end;if(db==nil)then db=0 end;if(_c==nil)then _c=0 end;if(
+cb==0 and db==0 and _c==0)then return end
+if(cb~=0)then
+local ac=math.cos(math.rad(cb))local bc=math.sin(math.rad(cb))
+local cc=ac*bb.z-bc*bb.y;local dc=bc*bb.z+ac*bb.y;bb.z=cc;bb.y=dc end
+if(db~=0)then local ac=math.cos(math.rad(db))
+local bc=math.sin(math.rad(db))local cc=ac*bb.x-bc*bb.z;local dc=bc*bb.x+ac*bb.z
+bb.x=cc;bb.z=dc end
+if(_c~=0)then local ac=math.cos(math.rad(_c))
+local bc=math.sin(math.rad(_c))local cc=ac*bb.x-bc*bb.y;local dc=bc*bb.x+ac*bb.y
+bb.x=cc;bb.y=dc end end
+_a.scaleVector=function(bb,cb,db,_c)if(cb==nil)then cb=1 end;if(db==nil)then db=1 end
+if(_c==nil)then _c=1 end;if(cb==1 and db==1 and _c==1)then return end;bb.x=bb.x*cb;bb.y=
+bb.y*db;bb.z=bb.z*_c end
+_a.roundVector=function(bb)bb.x=_a.round(bb.x)bb.y=_a.round(bb.y)
+bb.z=_a.round(bb.z)end
+_a.line=function(bb,cb)local db={}
+local _c={x=cb.x-bb.x,y=cb.y-bb.y,z=cb.z-bb.z}local ac=_a.measure(_c.x,_c.y,_c.z)for d=0,ac,0.5 do
+table.insert(db,{x=bb.x+_c.x/ac*d,y=
+bb.y+_c.y/ac*d,z=bb.z+_c.z/ac*d})end;return db end
+_a.bounds=function(bb)local cb=0;local db=0;local _c=0;local ac=0;local bc=0;local cc=0
+for dc,_d in ipairs(bb)do
+if(_d.x<cb)then cb=_d.x end;if(_d.x>db)then db=_d.x end;if(_d.y>_c)then _c=_d.y end
+if(_d.y<ac)then ac=_d.y end;if(_d.z>bc)then bc=_d.z end;if(_d.z<cc)then cc=_d.z end end;return _c,ac,db,cb,bc,cc end;local aa={}
+aa.concat=function(bb,cb)local db={}
+for _c,ac in ipairs(bb)do table.insert(db,ac)end;for _c,ac in ipairs(cb)do table.insert(db,ac)end;return db end
+aa.group=function(bb,cb)local db={}local _c={}for bc,cc in ipairs(bb)do if(bc%1000 ==0)then sleep(0.01)end
+local dc=cb(cc)if(_c[dc]==nil)then _c[dc]={}end
+table.insert(_c[dc],cc)end;local ac={}for bc in
+pairs(_c)do table.insert(ac,bc)end;table.sort(ac)for bc,cc in
+ipairs(ac)do table.insert(db,_c[cc])end;return db end
+aa.extractNearestVector=function(bb,cb)
+if(bb==nill or cb==nil or bb[1]==nil)then return nil end;local db=0;local _c=nil
+for ac,bc in ipairs(bb)do
+local cc=_a.measure(bc.x-cb.x,bc.y-cb.y,bc.z-cb.z)if(_c==nil or cc<_c)then _c=cc;db=ac end end;return table.remove(bb,db)end
+aa.sortVectors=function(bb)local cb={}
+local db=aa.group(bb,function(_c)return _c.z end)
+for _c,ac in ipairs(db)do local bc={}
+local cc=aa.group(ac,function(dc)return dc.y end)
+for dc,_d in ipairs(cc)do
+local ad=aa.group(_d,function(bd)return bd.x end)for bd,cd in ipairs(ad)do table.insert(bc,cd[1])end end
+if(bc[1]~=nil)then local dc=table.remove(bc,1)table.insert(cb,dc)while(
+bc[1]~=nil)do dc=aa.extractNearestVector(bc,dc)
+table.insert(cb,dc)end end end;return cb end;local ba={}ba.line=function(bb)
+return _a.line({x=-bb,y=0,z=0},{x=bb,y=0,z=0})end
+ba.circle=function(bb)
+local cb={}local db=_a.angleStep(bb)for angle=0,360,db do local _c=_a.plot(angle,bb)
+table.insert(cb,{x=_c.h,y=_c.v,z=0})end;return cb end
+ba.polygon=function(bb,cb)if(cb<3)then return nil end;local db={}local _c=360 /cb;local ac=nil
+for angle=0,360,_c do
+corner=_a.plot(angle,bb)if(ac~=nil)then
+db=aa.concat(db,_a.line({x=ac.h,y=ac.v,z=0},{x=corner.h,y=corner.v,z=0}))end;ac=corner end;return db end;local ca={}
+ca.tube=function(bb,cb)local db={}for z=-bb,bb do for _c,ac in ipairs(cb)do
+table.insert(db,{x=ac.x,y=ac.y,z=z})end end;return
+db end
+ca.cone=function(bb,cb)local db={}for z=-bb,bb do local _c=1 / (bb*2)* (bb*2 -z)
+for ac,bc in ipairs(cb)do table.insert(db,{x=
+bc.x*_c,y=bc.y*_c,z=z})end end;return db end
+ca.sphere=function(bb,cb)local db={}local _c=_a.angleStep(bb)
+for angle=0,180,_c do local ac=_a.plot(angle,bb)
+local bc=ac.h;local cc=ac.v/bb;for dc,_d in ipairs(cb)do
+table.insert(db,{x=_d.x*cc,y=_d.y*cc,z=bc})end end;return db end
+ca.torus=function(bb,cb)local db={}local _c=_a.angleStep(bb)local ac=0;for cc,dc in ipairs(cb)do
+if(dc.x<ac)then ac=dc.x end end;local bc=bb-ac;for cc,dc in ipairs(cb)do dc.x=dc.x-bc
+table.insert(db,dc)end;for angle=0,360,_c do
+for cc,dc in ipairs(cb)do
+local _d={x=dc.x,y=dc.y,z=dc.z}_a.rotateVector(_d,0,angle,0)table.insert(db,_d)end end;return db end
+local da=function()local bb=0
+while true do
+for i=2,16 do if(turtle.getItemCount(i)>0)then sleep(bb)
+if(
+turtle.getItemCount(i)>0)then turtle.select(i)return i end end end;bb=15;turtlecraft.term.clear("Inventory")
+turtlecraft.term.write(1,5,"Please add more inventory...")sleep(1)end end
+local _b=function(bb)turtlecraft.term.clear("Build Project")
+turtlecraft.term.write(1,4,"Press Q to cancel")
+turtlecraft.input.escapeOnKey(16,function()local cb=false
+local db,_c,ac,bc=turtlecraft.position.get()
+for cc,dc in ipairs(c.data)do
+local _d={x=dc.x+bb.x,y=dc.y+bb.y,z=dc.z+bb.z}
+if(not cb)then
+cb=_d.x==db and _d.y==_c and _d.z==ac else turtlecraft.move.digTo(_d.x,_d.y,_d.z)if
+(turtle.detectDown())then turtle.digDown()end;da()
+turtle.placeDown()end end end)d.disable()end
+local ab=function()local bb=read()if(bb==nil)then return 0 end;bb=tonumber(bb)
+if(bb==nil)then return 0 end;return bb end
+turtlecraft.builder.clear=function()
+turtlecraft.term.clear("Delete Project")
+turtlecraft.term.write(1,4,"You will lose all stored data.")
+turtlecraft.term.write(1,5,"Are you sure? (y, n): ")
+if(read()=="y")then c.data={}c.save()
+turtlecraft.term.clear("Delete Project")
+turtlecraft.term.write(1,4,"Project erased!")turtlecraft.input.readKey(5)else
+turtlecraft.term.clear("Delete Project")
+turtlecraft.term.write(1,4,"Erase cancelled!")turtlecraft.input.readKey(5)end end
+turtlecraft.builder.stats=function()
+turtlecraft.term.clear("Project Info")local bb=table.getn(c.data)
+if(bb==0)then
+turtlecraft.term.write(1,4,"Your project is empty")turtlecraft.input.readKey(5)return end;local cb,db,_c,ac,bc,cc=_a.bounds(c.data)
+turtlecraft.term.write(1,4,"Block Count: "..bb)
+turtlecraft.term.write(1,5,math.abs(cb).." blocks north.")
+turtlecraft.term.write(1,6,math.abs(db).." blocks south.")
+turtlecraft.term.write(1,7,math.abs(_c).." blocks east.")
+turtlecraft.term.write(1,8,math.abs(ac).." blocks west.")
+turtlecraft.term.write(1,9,math.abs(bc).." blocks up.")
+turtlecraft.term.write(1,10,math.abs(cc).." blocks down.")turtlecraft.input.readKey(15)end
+turtlecraft.builder.start=function()if(table.getn(c.data)==0)then
+turtlecraft.term.write(1,4,"Your project is empty")sleep(5)return end
+local bb=c.data[1]local cb,db,_c,ac=turtlecraft.position.get()
+local bc={x=cb,y=db,z=_c}d.set(bc)
+turtlecraft.move.digTo(bb.x+bc.x,bb.y+bc.y,bb.z+bc.z)_b(bc)end
+turtlecraft.builder.trim=function()
+turtlecraft.term.clear("Trim")
+turtlecraft.term.write(1,4,"This will allow you to trim off")
+turtlecraft.term.write(1,5,"blocks from the sides of your project.")local bb,cb,db,_c,ac,bc=_a.bounds(c.data)
+turtlecraft.term.write(1,6,"How much from the north?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(bb).."): ")
+local cc=bb-math.max(0,math.min(math.abs(bb),ab()))
+turtlecraft.term.write(1,6,"How much from the south?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(cb).."): ")
+local dc=cb+math.max(0,math.min(math.abs(cb),ab()))
+turtlecraft.term.write(1,6,"How much from the east?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(db).."): ")
+local _d=db-math.max(0,math.min(math.abs(db),ab()))
+turtlecraft.term.write(1,6,"How much from the west?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(_c).."): ")
+local ad=_c+math.max(0,math.min(math.abs(_c),ab()))
+turtlecraft.term.write(1,6,"How much from the up?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(ac).."): ")
+local bd=ac-math.max(0,math.min(math.abs(ac),ab()))
+turtlecraft.term.write(1,6,"How much from the down?")
+turtlecraft.term.write(1,7,"(0-"..math.abs(bc).."): ")
+local cd=bc+math.max(0,math.min(math.abs(bc),ab()))turtlecraft.term.clear("Trim")
+turtlecraft.term.write(1,4,"Calculating...")local dd={}
+for __a,a_a in ipairs(c.data)do if(
+
+a_a.y<=cc and a_a.y>=dc and a_a.x<=_d and a_a.x>=ad and a_a.z<=bd and a_a.z>=cd)then
+table.insert(dd,a_a)end end;c.data=dd;c.save()
+turtlecraft.term.clear("Trim")
+turtlecraft.term.write(1,4,"Trim complete!")turtlecraft.input.readKey(5)end
+turtlecraft.builder.add=function()
+turtlecraft.term.clear("Add Shape")
+turtlecraft.term.write(1,4,"To create a shape you must select")
+turtlecraft.term.write(1,5,"how many sides you want your base")
+turtlecraft.term.write(1,6,"2D shape to be: (0 = circle, 1 = line)")turtlecraft.term.write(1,7,"Sides: ")
+local bb=ab()local cb=ba.circle;if(bb==1)then cb=ba.line end;if(bb>1)then cb=function(_aa)
+return ba.polygon(_aa,bb)end end
+turtlecraft.term.clear("Radius")
+turtlecraft.term.write(1,4,"Now choose the radius of your base")
+turtlecraft.term.write(1,5,"shape. (Radius is from center to edge)")turtlecraft.term.write(1,6,"Radius: ")
+local db=math.abs(ab())if(db==0)then return end
+turtlecraft.term.clear("Extrude Shape")
+turtlecraft.term.write(1,4,"Now you must choose how to extrude your")
+turtlecraft.term.write(1,5,"2D shape into a 3D shape: ")
+turtlecraft.term.write(1,7,"1 = tube, 2 = cone, ")
+turtlecraft.term.write(1,8,"3 = sphere, 4 = torus")
+turtlecraft.term.write(1,9,"Enter nothing to keep this a 2D shape.")turtlecraft.term.write(1,10,"Extrusion: ")
+local _c={"tube","cone","sphere","torus"}local ac=read()or""local bc=ab()for _aa,aaa in ipairs(_c)do if(bc==_aa)then ac=aaa;break end;if
+(ac==aaa)then break end end
+local cc=function(_aa,aaa)return aaa end;if(ca[ac]~=nil)then cc=ca[ac]end;local dc={}
+if(ac=="torus")then
+turtlecraft.term.clear("Extrude Shape")
+turtlecraft.term.write(1,4,"I need a radius for your torus.")turtlecraft.term.write(1,5,"Radius: ")
+local _aa=math.abs(ab())if(_aa==0)then return end;dc=cc(_aa,cb(db))else dc=cc(db,cb(db))end;local _d=1;local ad=1;local bd=1
+turtlecraft.term.clear("Scale Shape")
+turtlecraft.term.write(1,4,"Would you like to squish your shape?")turtlecraft.term.write(1,5,"(y or n): ")
+if(
+read()=="y")then
+turtlecraft.term.write(1,4,"Squish east-west...")turtlecraft.term.write(1,5,"(0 - 100): ")
+_d=math.max(0,math.min(100,
+100 -ab()))/100
+turtlecraft.term.write(1,4,"Squish north-south...")turtlecraft.term.write(1,5,"(0 - 100): ")
+ad=math.max(0,math.min(100,
+100 -ab()))/100
+turtlecraft.term.write(1,4,"Squish up-down...")turtlecraft.term.write(1,5,"(0 - 100): ")
+bd=math.max(0,math.min(100,
+100 -ab()))/100 end;local cd=0;local dd=0;local __a=0
+turtlecraft.term.clear("Rotate Shape")
+turtlecraft.term.write(1,4,"Would you like to turn your shape?")turtlecraft.term.write(1,5,"(y or n): ")
+if(
+read()=="y")then
+turtlecraft.term.write(1,4,"Rotate east-west axis...")turtlecraft.term.write(1,5,"(0 - 360): ")
+cd=math.max(0,math.min(360,ab()))
+turtlecraft.term.write(1,4,"Rotate north-south axis...")turtlecraft.term.write(1,5,"(0 - 360): ")
+dd=math.max(0,math.min(360,ab()))
+turtlecraft.term.write(1,4,"Rotate up-down axis...")turtlecraft.term.write(1,5,"(0 - 360): ")
+__a=math.max(0,math.min(360,ab()))end;local a_a=0;local b_a=0;local c_a=0
+turtlecraft.term.clear("Offset Shape")
+turtlecraft.term.write(1,4,"Would you like to offset your shape?")turtlecraft.term.write(1,5,"(y or n): ")
+if(
+read()=="y")then
+turtlecraft.term.write(1,4,"Offset east-west...")
+turtlecraft.term.write(1,5,"(-500 to 500): ")a_a=math.max(-500,math.min(500,ab()))
+turtlecraft.term.write(1,4,"Offset north-south...")
+turtlecraft.term.write(1,5,"(-500 to 500): ")b_a=math.max(-500,math.min(500,ab()))
+turtlecraft.term.write(1,4,"Offset up-down...")
+turtlecraft.term.write(1,5,"(-500 to 500): ")c_a=math.max(-500,math.min(500,ab()))end
+turtlecraft.term.clear("Generating Shape")
+turtlecraft.term.write(1,4,"Generating your shape...")local d_a=0
+for _aa,aaa in ipairs(dc)do _a.scaleVector(aaa,_d,ad,bd)
+_a.rotateVector(aaa,cd,dd,__a)aaa.x=aaa.x+a_a;aaa.y=aaa.y+b_a;aaa.z=aaa.z+c_a
+_a.roundVector(aaa)table.insert(c.data,aaa)
+if(d_a>1000)then sleep(0.01)d_a=0 end end;c.data=aa.sortVectors(c.data)c.save()
+turtlecraft.term.clear("Add Shape")turtlecraft.term.write(1,4,"All done!")
+turtlecraft.input.readKey(5)end;if(d.isEnabled())then local bb=d.get()_b(bb)end end;turtlecraft.scope()
 -- File: help --
 turtlecraft.help={}
 turtlecraft.scope=function()

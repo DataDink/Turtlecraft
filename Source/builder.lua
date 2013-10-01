@@ -380,9 +380,9 @@ turtlecraft.scope = function()
 	
 	local readNumber = function()
 		local response = read();
-		if (response == nil) return 0;
+		if (response == nil) then return 0; end
 		response = tonumber(response);
-		if (response == nil) return 0;
+		if (response == nil) then return 0; end
 		return response;
 	end
 	

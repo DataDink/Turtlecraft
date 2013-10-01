@@ -31,7 +31,8 @@ turtlecraft.scope = function()
 		if (count == nil) then count = 1; end
 		while (turtle.getFuelLevel() < count) do
 			if (not internal.burn()) then
-				print("Turtle ran out of fuel! Please put more in slot 1");
+				turtlecraft.term.clear();
+				turtlecraft.term.write(1, 4, "Turtle ran out of fuel! Please put more in slot 1");
 				while (not internal.burn()) do
 					sleep(5);
 				end

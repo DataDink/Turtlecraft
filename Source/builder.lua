@@ -170,6 +170,7 @@ turtlecraft.scope = function()
 		local indexed = {};
 		
 		for i, object in ipairs(objects) do
+			if (i % 1000 == 0) then sleep(0.01); end
 			local key = indexer(object);
 			if (indexed[key] == nil) then indexed[key] = {}; end
 			table.insert(indexed[key], object);
@@ -377,6 +378,14 @@ turtlecraft.scope = function()
 		recover.disable();
 	end
 	
+	local readNumber = function()
+		local response = read();
+		if (response == nil) return 0;
+		response = tonumber(response);
+		if (response == nil) return 0;
+		return response;
+	end
+	
 	turtlecraft.builder.clear = function()
 		turtlecraft.term.clear("Delete Project");
 		turtlecraft.term.write(1, 4, "You will lose all stored data.");
@@ -441,27 +450,27 @@ turtlecraft.scope = function()
 		
 		turtlecraft.term.write(1, 6, "How much from the north?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxNorth) .."): ");
-		local north = maxNorth - math.max(0, math.min(math.abs(maxNorth), tonumber(read() or 0)));
+		local north = maxNorth - math.max(0, math.min(math.abs(maxNorth), readNumber()));
 		
 		turtlecraft.term.write(1, 6, "How much from the south?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxSouth) .."): ");
-		local south = maxSouth + math.max(0, math.min(math.abs(maxSouth), tonumber(read() or 0)));
+		local south = maxSouth + math.max(0, math.min(math.abs(maxSouth), readNumber()));
 		
 		turtlecraft.term.write(1, 6, "How much from the east?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxEast) .."): ");
-		local east = maxEast - math.max(0, math.min(math.abs(maxEast), tonumber(read() or 0)));
+		local east = maxEast - math.max(0, math.min(math.abs(maxEast), readNumber()));
 		
 		turtlecraft.term.write(1, 6, "How much from the west?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxWest) .."): ");
-		local west = maxWest + math.max(0, math.min(math.abs(maxWest), tonumber(read() or 0)));
+		local west = maxWest + math.max(0, math.min(math.abs(maxWest), readNumber()));
 		
 		turtlecraft.term.write(1, 6, "How much from the up?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxUp) .."): ");
-		local up = maxUp - math.max(0, math.min(math.abs(maxUp), tonumber(read() or 0)));
+		local up = maxUp - math.max(0, math.min(math.abs(maxUp), readNumber()));
 		
 		turtlecraft.term.write(1, 6, "How much from the down?");
 		turtlecraft.term.write(1, 7, "(0-" .. math.abs(maxDown) .."): ");
-		local down = maxDown + math.max(0, math.min(math.abs(maxDown), tonumber(read() or 0)));
+		local down = maxDown + math.max(0, math.min(math.abs(maxDown), readNumber()));
 
 		turtlecraft.term.clear("Trim");
 		turtlecraft.term.write(1, 4, "Calculating...");
@@ -491,7 +500,7 @@ turtlecraft.scope = function()
 		turtlecraft.term.write(1, 5, "how many sides you want your base");
 		turtlecraft.term.write(1, 6, "2D shape to be: (0 = circle, 1 = line)");
 		turtlecraft.term.write(1, 7, "Sides: ");
-		local sides = tonumber(read() or 0);
+		local sides = readNumber();
 		local shapeMethod = shape.circle;
 		if (sides == 1) then shapeMethod = shape.line; end
 		if (sides > 1) then
@@ -502,7 +511,7 @@ turtlecraft.scope = function()
 		turtlecraft.term.write(1, 4, "Now choose the radius of your base");
 		turtlecraft.term.write(1, 5, "shape. (Radius is from center to edge)");
 		turtlecraft.term.write(1, 6, "Radius: ");
-		local radius = math.abs(tonumber(read() or 0));
+		local radius = math.abs(readNumber());
 		
 		if (radius == 0) then return; end
 		
@@ -515,7 +524,7 @@ turtlecraft.scope = function()
 		turtlecraft.term.write(1, 10, "Extrusion: ");
 		local availableExtrusions = {"tube", "cone", "sphere", "torus"};
 		local extrusion = read() or "";
-		local index = tonumber(extrusion or 0);
+		local index = readNumber();
 		for i, v in ipairs(availableExtrusions) do
 			if (index == i) then extrusion = v; break; end
 			if (extrusion == v) then break; end
@@ -528,7 +537,7 @@ turtlecraft.scope = function()
 			turtlecraft.term.clear("Extrude Shape");
 			turtlecraft.term.write(1, 4, "I need a radius for your torus.");
 			turtlecraft.term.write(1, 5, "Radius: ");
-			local tradius = math.abs(tonumber(read() or 0));
+			local tradius = math.abs(readNumber());
 			if (tradius == 0) then return; end
 			shape = extrudeMethod(tradius, shapeMethod(radius));
 		else
@@ -542,15 +551,15 @@ turtlecraft.scope = function()
 		if (read() == "y") then
 			turtlecraft.term.write(1, 4, "Squish east-west...");
 			turtlecraft.term.write(1, 5, "(0 - 100): ");
-			squishX = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
+			squishX = math.max(0, math.min(100, 100 - readNumber())) / 100;
 			
 			turtlecraft.term.write(1, 4, "Squish north-south...");
 			turtlecraft.term.write(1, 5, "(0 - 100): ");
-			squishY = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
+			squishY = math.max(0, math.min(100, 100 - readNumber())) / 100;
 			
 			turtlecraft.term.write(1, 4, "Squish up-down...");
 			turtlecraft.term.write(1, 5, "(0 - 100): ");
-			squishZ = math.max(0, math.min(100, tonumber(read() or 0))) / 100;
+			squishZ = math.max(0, math.min(100, 100 - readNumber())) / 100;
 		end
 		
 		local rotX = 0; local rotY = 0; local rotZ = 0;
@@ -560,15 +569,15 @@ turtlecraft.scope = function()
 		if (read() == "y") then
 			turtlecraft.term.write(1, 4, "Rotate east-west axis...");
 			turtlecraft.term.write(1, 5, "(0 - 360): ");
-			rotX = math.max(0, math.min(360, tonumber(read() or 0)));
+			rotX = math.max(0, math.min(360, readNumber()));
 			
 			turtlecraft.term.write(1, 4, "Rotate north-south axis...");
 			turtlecraft.term.write(1, 5, "(0 - 360): ");
-			rotY = math.max(0, math.min(360, tonumber(read() or 0)));
+			rotY = math.max(0, math.min(360, readNumber()));
 			
 			turtlecraft.term.write(1, 4, "Rotate up-down axis...");
 			turtlecraft.term.write(1, 5, "(0 - 360): ");
-			rotZ = math.max(0, math.min(360, tonumber(read() or 0)));
+			rotZ = math.max(0, math.min(360, readNumber()));
 		end
 		
 		local offX = 0; local offY = 0; local offZ = 0;
@@ -578,20 +587,21 @@ turtlecraft.scope = function()
 		if (read() == "y") then
 			turtlecraft.term.write(1, 4, "Offset east-west...");
 			turtlecraft.term.write(1, 5, "(-500 to 500): ");
-			offX = math.max(-500, math.min(500, tonumber(read() or 0)));
+			offX = math.max(-500, math.min(500, readNumber()));
 			
 			turtlecraft.term.write(1, 4, "Offset north-south...");
 			turtlecraft.term.write(1, 5, "(-500 to 500): ");
-			offY = math.max(-500, math.min(500, tonumber(read() or 0)));
+			offY = math.max(-500, math.min(500, readNumber()));
 			
 			turtlecraft.term.write(1, 4, "Offset up-down...");
 			turtlecraft.term.write(1, 5, "(-500 to 500): ");
-			offZ = math.max(-500, math.min(500, tonumber(read() or 0)));
+			offZ = math.max(-500, math.min(500, readNumber()));
 		end
 		
 		turtlecraft.term.clear("Generating Shape");
 		turtlecraft.term.write(1, 4, "Generating your shape...");
 		
+		local sleepCount = 0;
 		for i, v in ipairs(shape) do
 			calc.scaleVector(v, squishX, squishY, squishZ);
 			calc.rotateVector(v, rotX, rotY, rotZ);
@@ -600,6 +610,7 @@ turtlecraft.scope = function()
 			v.z = v.z + offZ;
 			calc.roundVector(v);
 			table.insert(project.data, v);
+			if (sleepCount > 1000) then sleep(0.01); sleepCount = 0; end
 		end
 		project.data = collection.sortVectors(project.data);
 		project.save();

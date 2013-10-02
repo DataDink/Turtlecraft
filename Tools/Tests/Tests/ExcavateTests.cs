@@ -23,6 +23,7 @@ namespace Tests
         public static void MovementTest(LuaEnvironment environment)
         {
             environment.Startup();
+            environment.Os.OnPullEvent += (s, e) => { while (true) {} };
             Setup(environment);
             environment.Execute("turtlecraft.excavate.debug.start(1, 1, 1, 3, 3);");
             var careAbout = new[] {

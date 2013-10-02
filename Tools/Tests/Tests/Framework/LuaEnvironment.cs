@@ -8,10 +8,12 @@ namespace Tests.Framework
 {
     public class LuaEnvironment : IDisposable
     {
+        private static readonly string[] Excludes = new[] {"menu.lua"};
         private readonly string[] _files;
 
         public Lua Api { get; private set; }
         public Os Os { get; private set; }
+        public Parallel Parallel { get; private set; }
         public FileSystem FS { get; private set; }
         public Turtle Turtle { get; private set; }
         public Peripheral Peripheral { get; private set; }
@@ -32,6 +34,7 @@ namespace Tests.Framework
             RegisterFunction("sleep", this, () => Sleep(0));
 
             Os = new Os(this);
+            Parallel = new Parallel(this);
             FS = new FileSystem(this);
             Turtle = new Turtle(this);
             Peripheral = new Peripheral(this);
@@ -59,6 +62,7 @@ namespace Tests.Framework
         public void Startup()
         {
             foreach (var file in _files) {
+                if (Excludes.Any(f => file.EndsWith(f))) continue;
                 Api.DoFile(file);
             }
         }

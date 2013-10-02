@@ -53,6 +53,7 @@
     <Compile Include="Framework\Gps.cs" />
     <Compile Include="Framework\Modem.cs" />
     <Compile Include="Framework\Os.cs" />
+    <Compile Include="Framework\Parallel.cs" />
     <Compile Include="Framework\Rednet.cs" />
     <Compile Include="Framework\TableInfo.cs" />
     <Compile Include="Framework\FileHandle.cs" />

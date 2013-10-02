@@ -13,11 +13,13 @@ namespace Tests.Framework
             environment.RegisterFunction(os, "pullEvent", this, () => PullEvent(""));
         }
 
+        public EventHandler<LuaResultEventArgs<string>> OnPullEvent;
+
         private string PullEvent(string evt = null)
         {
-            Program.Write(evt, "");
-            if (!string.IsNullOrEmpty(evt)) return evt;
-            return "timer";
+            var result = new LuaResultEventArgs<string> {Result = evt ?? "timer"};
+            if (OnPullEvent != null) OnPullEvent(this, result);
+            return result.Result;
         }
     }
 }

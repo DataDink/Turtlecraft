@@ -524,7 +524,7 @@ turtlecraft.scope = function()
 		turtlecraft.term.write(1, 10, "Extrusion: ");
 		local availableExtrusions = {"tube", "cone", "sphere", "torus"};
 		local extrusion = read() or "";
-		local index = readNumber();
+		local index = tonumber(extrusion) or 0;
 		for i, v in ipairs(availableExtrusions) do
 			if (index == i) then extrusion = v; break; end
 			if (extrusion == v) then break; end

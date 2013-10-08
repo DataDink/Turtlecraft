@@ -421,9 +421,9 @@ db=aa.concat(db,_a.line({x=ac.h,y=ac.v,z=0},{x=corner.h,y=corner.v,z=0}))end;ac=
 ca.tube=function(bb,cb)local db={}for z=-bb,bb do for _c,ac in ipairs(cb)do
 table.insert(db,{x=ac.x,y=ac.y,z=z})end end;return
 db end
-ca.cone=function(bb,cb)local db={}for z=-bb,bb do local _c=1 / (bb*2)* (bb*2 -z)
-for ac,bc in ipairs(cb)do table.insert(db,{x=
-bc.x*_c,y=bc.y*_c,z=z})end end;return db end
+ca.cone=function(bb,cb)local db={}for z=-bb,bb do local _c=bb- (z+bb)/2;local ac=1 /bb*_c
+for bc,cc in ipairs(cb)do table.insert(db,{x=
+cc.x*ac,y=cc.y*ac,z=z})end end;return db end
 ca.sphere=function(bb,cb)local db={}local _c=_a.angleStep(bb)
 for angle=0,180,_c do local ac=_a.plot(angle,bb)
 local bc=ac.h;local cc=ac.v/bb;for dc,_d in ipairs(cb)do

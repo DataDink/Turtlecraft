@@ -11,29 +11,33 @@ turtlecraft.scope = function()
 	local move = {};
 	
 	plot.path = turtlecraft.directory .. "excavate.data";
-	plot.init = function(forward, left, right, up, down)
+	plot.init = function(forward, left, right, up, down, forwardOffset, sidewayOffset, verticalOffset)
+		forwardOffset = math.max(0, forwardOffset or 0);	
+		sidewayOffset = (sidewayOffset or 0);	
+		verticalOffset = (verticalOffset or 0);	
+
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
 		plot.step = {x = 1, y = 1, z = -3};
-		plot.min = {x = x, y = y, z = z - math.abs(down) + 1};
-		plot.max = {x = x, y = y, z = z + math.abs(up) - 1};
-
+		plot.min = {x = x, y = y, z = z - math.abs(down) + 1 + verticalOffset};
+		plot.max = {x = x, y = y, z = z + math.abs(up) - 1 + verticalOffset};
+		
 		if (d == directions.north) then
-			plot.max.y = plot.max.y + math.abs(forward);
-			plot.min.x =  plot.min.x - math.abs(left);
-			plot.max.x = plot.max.x + math.abs(right);
+			plot.max.y = plot.max.y + math.abs(forward) + forwardOffset;
+			plot.min.x =  plot.min.x - math.abs(left) + sidewayOffset;
+			plot.max.x = plot.max.x + math.abs(right) + sidewayOffset;
 		elseif (d == directions.south) then
-			plot.min.y = plot.min.y - math.abs(forward);
-			plot.min.x =  plot.min.x - math.abs(right);
-			plot.max.x = plot.max.x + math.abs(left);
+			plot.min.y = plot.min.y - math.abs(forward) + forwardOffset;
+			plot.min.x =  plot.min.x - math.abs(right) + sidewayOffset;
+			plot.max.x = plot.max.x + math.abs(left) + sidewayOffset;
 		elseif (d == directions.east) then
-			plot.max.x = plot.max.x + math.abs(forward);
-			plot.min.y = plot.min.y - math.abs(right);
-			plot.max.y = plot.max.y + math.abs(left);
+			plot.max.x = plot.max.x + math.abs(forward) + forwardOffset;
+			plot.min.y = plot.min.y - math.abs(right) + sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(left) + sidewayOffset;
 		else
-			plot.min.x = plot.min.x - math.abs(forward);
-			plot.min.y = plot.min.y - math.abs(left);
-			plot.max.y = plot.max.y + math.abs(right);
+			plot.min.x = plot.min.x - math.abs(forward) + forwardOffset;
+			plot.min.y = plot.min.y - math.abs(left) + sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(right) + sidewayOffset;
 		end
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end
@@ -119,7 +123,12 @@ turtlecraft.scope = function()
 			if (turtle.getItemCount(i) > 0) then
 				turtle.select(i);
 				if (not turtle.drop()) then
-					error("Fatal Error: Can't unload inventory.");
+					terminal.clear('Excavate', '(Press Q to cancel)');
+					terminal.write(1, 5, 'Unable to unload inventory.');
+					terminal.write(1, 6, 'Will resume when issue is resolved.');
+					while(not turtle.drop()) do
+						sleep(1);
+					end
 				end
 			end				
 		end
@@ -194,8 +203,8 @@ turtlecraft.scope = function()
 		plot.update();
 		return true;
 	end
-	move.start = function(forward, left, right, up, down)
-		plot.init(forward, left, right, up, down);
+	move.start = function(forward, left, right, up, down, forwardOffset, sidewayOffset, verticalOffset)
+		plot.init(forward, left, right, up, down, forwardOffset, sidewayOffset, verticalOffset);
 		turtlecraft.term.write(1, 5, "Press Q to cancel");
 		turtlecraft.input.escapeOnKey(16, function()
 			while (move.next()) do
@@ -244,8 +253,22 @@ turtlecraft.scope = function()
 		local down = readNumber(15, 4);
 		if (up == 0 and down == 0) then return false; end
 		
+		local offsetForward = 0;
+		local offsetHorz = 0;
+		local offsetVert = 0;
+		terminal.write(1, 4, "Would you like to offset the dig? (y, n)");
+		if (read() == 'y') then
+			terminal.clear("Excavate");
+			terminal.write(1, 4, "Forward offset: ");
+			offsetForward = readNumber(16, 4);
+			terminal.write(1, 4, "Sideway offset: ");
+			offsetHorz = readNumber(19, 4);
+			terminal.write(1, 4, "Vertical offset: ");
+			offsetVert = readNumber(17, 4);
+		end
+		
 		terminal.clear("Excavate");
-		move.start(forward, left, right, up, down);
+		move.start(forward, left, right, up, down, offsetForward, offsetHorz, offsetVert);
 		terminal.clear("Excavate");
 		terminal.write(1, 4, "Digging is complete.");
 		terminal.write(1, 5, "Press any key to continue.");

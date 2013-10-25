@@ -431,9 +431,9 @@ db=aa.concat(db,_a.line({x=ac.h,y=ac.v,z=0},{x=corner.h,y=corner.v,z=0}))end;ac=
 ca.tube=function(bb,cb)local db={}for z=-bb,bb do for _c,ac in ipairs(cb)do
 table.insert(db,{x=ac.x,y=ac.y,z=z})end end;return
 db end
-ca.cone=function(bb,cb)local db={}for z=-bb,bb do local _c=bb- (z+bb)/2;local ac=1 /bb*_c
-for bc,cc in ipairs(cb)do table.insert(db,{x=
-cc.x*ac,y=cc.y*ac,z=z})end end;return db end
+ca.cone=function(bb,cb)local db={}for z=-bb,bb do local _c=1 / (bb*2)* (bb*2 -z)
+for ac,bc in ipairs(cb)do table.insert(db,{x=
+bc.x*_c,y=bc.y*_c,z=z})end end;return db end
 ca.sphere=function(bb,cb)local db={}local _c=_a.angleStep(bb)
 for angle=0,180,_c do local ac=_a.plot(angle,bb)
 local bc=ac.h;local cc=ac.v/bb;for dc,_d in ipairs(cb)do
@@ -532,10 +532,9 @@ turtlecraft.term.write(1,5,"2D shape into a 3D shape: ")
 turtlecraft.term.write(1,7,"1 = tube, 2 = cone, ")
 turtlecraft.term.write(1,8,"3 = sphere, 4 = torus")
 turtlecraft.term.write(1,9,"Enter nothing to keep this a 2D shape.")turtlecraft.term.write(1,10,"Extrusion: ")
-local _c={"tube","cone","sphere","torus"}local ac=read()or""local bc=tonumber(ac)or 0
-for _aa,aaa in ipairs(_c)do if(bc==_aa)then ac=aaa
-break end;if(ac==aaa)then break end end;local cc=function(_aa,aaa)return aaa end
-if(ca[ac]~=nil)then cc=ca[ac]end;local dc={}
+local _c={"tube","cone","sphere","torus"}local ac=read()or""local bc=ab()for _aa,aaa in ipairs(_c)do if(bc==_aa)then ac=aaa;break end;if
+(ac==aaa)then break end end
+local cc=function(_aa,aaa)return aaa end;if(ca[ac]~=nil)then cc=ca[ac]end;local dc={}
 if(ac=="torus")then
 turtlecraft.term.clear("Extrude Shape")
 turtlecraft.term.write(1,4,"I need a radius for your torus.")turtlecraft.term.write(1,5,"Radius: ")

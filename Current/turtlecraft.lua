@@ -162,19 +162,22 @@ turtlecraft.excavate={}
 turtlecraft.scope=function()local a=turtlecraft.position
 local b=a.directions;local c=turtlecraft.term;local d={}local _a={}local aa={}
 _a.path=turtlecraft.directory.."excavate.data"
-_a.init=function(ca,da,_b,ab,bb)local cb,db,_c,ac=a.get()
-_a.home={x=cb,y=db,z=_c,d=(ac+180)%360}_a.step={x=1,y=1,z=-3}
-_a.min={x=cb,y=db,z=_c-math.abs(bb)+1}_a.max={x=cb,y=db,z=_c+math.abs(ab)-1}
-if(ac==
-b.north)then _a.max.y=_a.max.y+math.abs(ca)_a.min.x=
-_a.min.x-math.abs(da)
-_a.max.x=_a.max.x+math.abs(_b)elseif(ac==b.south)then _a.min.y=_a.min.y-math.abs(ca)_a.min.x=
-_a.min.x-math.abs(_b)
-_a.max.x=_a.max.x+math.abs(da)elseif(ac==b.east)then _a.max.x=_a.max.x+math.abs(ca)_a.min.y=
-_a.min.y-math.abs(_b)
-_a.max.y=_a.max.y+math.abs(da)else _a.min.x=_a.min.x-math.abs(ca)_a.min.y=_a.min.y-
-math.abs(da)
-_a.max.y=_a.max.y+math.abs(_b)end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
+_a.init=function(ca,da,_b,ab,bb,cb,db,_c)cb=math.max(0,cb or 0)db=(db or 0)_c=(_c or 0)
+local ac,bc,cc,dc=a.get()_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}
+_a.step={x=1,y=1,z=-3}
+_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1 +_c}
+_a.max={x=ac,y=bc,z=cc+math.abs(ab)-1 +_c}
+if(dc==b.north)then
+_a.max.y=_a.max.y+math.abs(ca)+cb;_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=
+_a.max.x+math.abs(_b)+db elseif(dc==b.south)then _a.min.y=
+_a.min.y-math.abs(ca)+cb;_a.min.x=_a.min.x-
+math.abs(_b)+db;_a.max.x=
+_a.max.x+math.abs(da)+db elseif(dc==b.east)then _a.max.x=
+_a.max.x+math.abs(ca)+cb
+_a.min.y=_a.min.y-math.abs(_b)+db;_a.max.y=_a.max.y+math.abs(da)+db else _a.min.x=
+_a.min.x-math.abs(ca)+cb;_a.min.y=_a.min.y-
+math.abs(da)+db;_a.max.y=
+_a.max.y+math.abs(_b)+db end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
 _a.update=function()local ca,da,_b,ab=a.get()_a.progress={x=ca,y=da,z=_b}
 local bb=fs.open(_a.path,"w")
 bb.writeLine(_a.home.x..",".._a.home.y..
@@ -204,10 +207,13 @@ d.calcRemainingSlots=function()
 local ca=0
 for i=2,16 do if(turtle.getItemCount(i)==0)then ca=ca+1 end end;return ca end
 d.needsUnload=function()return d.calcRemainingSlots()==0 end
-d.unload=function()turtlecraft.move.face(_a.home.d)for i=2,16 do
+d.unload=function()turtlecraft.move.face(_a.home.d)
+for i=2,16 do
 if(
-turtle.getItemCount(i)>0)then turtle.select(i)if(not turtle.drop())then
-error("Fatal Error: Can't unload inventory.")end end end end
+turtle.getItemCount(i)>0)then turtle.select(i)
+if(not turtle.drop())then
+c.clear('Excavate','(Press Q to cancel)')c.write(1,5,'Unable to unload inventory.')
+c.write(1,6,'Will resume when issue is resolved.')while(not turtle.drop())do sleep(1)end end end end end
 aa.home=function(ca)
 turtlecraft.move.digTo(_a.home.x,_a.home.y,_a.home.z)ca()
 turtlecraft.move.face((_a.home.d+180)%360)
@@ -240,7 +246,7 @@ local cb,db,_c,ac=turtlecraft.position.get()
 if(cb==_a.progress.x and db==_a.progress.y and _c==
 _a.progress.z)then
 print("Unable to dig further")aa.finish()return false end end;_a.update()return true end
-aa.start=function(ca,da,_b,ab,bb)_a.init(ca,da,_b,ab,bb)
+aa.start=function(ca,da,_b,ab,bb,cb,db,_c)_a.init(ca,da,_b,ab,bb,cb,db,_c)
 turtlecraft.term.write(1,5,"Press Q to cancel")
 turtlecraft.input.escapeOnKey(16,function()while(aa.next())do sleep(0.001)end end)_a.reset()end
 local ba=function(ca,da)term.setCursorPos(ca,da)
@@ -255,10 +261,14 @@ c.write(1,4,"How far forward?")local ca=ba(18,4)if(ca==0)then return false end
 c.write(1,4,"How far left?")local da=ba(15,4)c.write(1,4,"How far right?")local _b=ba(16,4)if(
 da==0 and _b==0)then return false end
 c.write(1,4,"How far up?")local ab=ba(13,4)c.write(1,4,"How far down?")local bb=ba(15,4)if(ab==0 and
-bb==0)then return false end;c.clear("Excavate")
-aa.start(ca,da,_b,ab,bb)c.clear("Excavate")
-c.write(1,4,"Digging is complete.")c.write(1,5,"Press any key to continue.")
-term.setCursorPos(0,0)turtlecraft.input.readKey(10)end;turtlecraft.excavate.debug={}turtlecraft.excavate.debug.start=function(ca,da,_b,ab,bb)
+bb==0)then return false end;local cb=0;local db=0;local _c=0
+c.write(1,4,"Would you like to offset the dig? (y, n)")
+if(read()=='y')then c.clear("Excavate")
+c.write(1,4,"Forward offset: ")cb=ba(16,4)c.write(1,4,"Sideway offset: ")db=ba(19,4)
+c.write(1,4,"Vertical offset: ")_c=ba(17,4)end;c.clear("Excavate")aa.start(ca,da,_b,ab,bb,cb,db,_c)
+c.clear("Excavate")c.write(1,4,"Digging is complete.")
+c.write(1,5,"Press any key to continue.")term.setCursorPos(0,0)
+turtlecraft.input.readKey(10)end;turtlecraft.excavate.debug={}turtlecraft.excavate.debug.start=function(ca,da,_b,ab,bb)
 aa.start(ca,da,_b,ab,bb)end end;turtlecraft.scope()
 -- File: seeker --
 turtlecraft.seeker={}

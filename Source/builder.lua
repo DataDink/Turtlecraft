@@ -366,13 +366,17 @@ turtlecraft.scope = function()
 					y = v.y + offset.y,
 					z = v.z + offset.z
 				};
+				
 				if (not startFound) then
 					startFound = target.x == x and target.y == y and target.z == z;
 				else
 					turtlecraft.move.digTo(target.x, target.y, target.z);
-					if (turtle.detectDown()) then turtle.digDown(); end
-					selectSlot();
-					if (not turtle.compareDown()) then turtle.placeDown(); end
+				end
+				
+				selectSlot();
+				if (not turtle.compareDown()) then 
+					turtle.digDown(); 
+					if (not turtle.detectDown()) then turtle.placeDown(); end
 				end
 			end
 		end);

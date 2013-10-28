@@ -23,21 +23,25 @@ turtlecraft.scope = function()
 		plot.max = {x = x, y = y, z = z + math.abs(up) - 1 + verticalOffset};
 		
 		if (d == directions.north) then
+			plot.min.y = plot.min.y + forwardOffset;
 			plot.max.y = plot.max.y + math.abs(forward) + forwardOffset;
 			plot.min.x =  plot.min.x - math.abs(left) + sidewayOffset;
 			plot.max.x = plot.max.x + math.abs(right) + sidewayOffset;
 		elseif (d == directions.south) then
-			plot.min.y = plot.min.y - math.abs(forward) + forwardOffset;
-			plot.min.x =  plot.min.x - math.abs(right) + sidewayOffset;
-			plot.max.x = plot.max.x + math.abs(left) + sidewayOffset;
+			plot.min.y = plot.min.y - forwardOffset;
+			plot.min.y = plot.min.y - math.abs(forward) - forwardOffset;
+			plot.min.x =  plot.min.x - math.abs(right) - sidewayOffset;
+			plot.max.x = plot.max.x + math.abs(left) - sidewayOffset;
 		elseif (d == directions.east) then
+			plot.min.x = plot.min.x + forwardOffset;
 			plot.max.x = plot.max.x + math.abs(forward) + forwardOffset;
 			plot.min.y = plot.min.y - math.abs(right) + sidewayOffset;
 			plot.max.y = plot.max.y + math.abs(left) + sidewayOffset;
 		else
-			plot.min.x = plot.min.x - math.abs(forward) + forwardOffset;
-			plot.min.y = plot.min.y - math.abs(left) + sidewayOffset;
-			plot.max.y = plot.max.y + math.abs(right) + sidewayOffset;
+			plot.min.x = plot.min.x - forwardOffset;
+			plot.min.x = plot.min.x - math.abs(forward) - forwardOffset;
+			plot.min.y = plot.min.y - math.abs(left) - sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(right) - sidewayOffset;
 		end
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end
@@ -256,15 +260,15 @@ turtlecraft.scope = function()
 		local offsetForward = 0;
 		local offsetHorz = 0;
 		local offsetVert = 0;
-		terminal.write(1, 4, "Would you like to offset the dig? (y, n)");
+		terminal.write(1, 4, "Offset the dig? (y/n) ");
 		if (read() == 'y') then
 			terminal.clear("Excavate");
-			terminal.write(1, 4, "Forward offset: ");
-			offsetForward = readNumber(16, 4);
-			terminal.write(1, 4, "Sideway offset: ");
-			offsetHorz = readNumber(19, 4);
-			terminal.write(1, 4, "Vertical offset: ");
-			offsetVert = readNumber(17, 4);
+			terminal.write(1, 4, "Forward offset: (+) ");
+			offsetForward = readNumber(23, 4);
+			terminal.write(1, 4, "Sideway offset: (+-) ");
+			offsetHorz = readNumber(23, 4);
+			terminal.write(1, 4, "Vertical offset: (+-) ");
+			offsetVert = readNumber(23, 4);
 		end
 		
 		terminal.clear("Excavate");

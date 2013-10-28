@@ -263,10 +263,10 @@ c.write(1,4,"How far left?")local da=ba(15,4)c.write(1,4,"How far right?")local 
 da==0 and _b==0)then return false end
 c.write(1,4,"How far up?")local ab=ba(13,4)c.write(1,4,"How far down?")local bb=ba(15,4)if(ab==0 and
 bb==0)then return false end;local cb=0;local db=0;local _c=0
-c.write(1,4,"Offset the dig? (y/n) ")
+c.write(1,4,"Would you like to offset the dig? (y, n)")
 if(read()=='y')then c.clear("Excavate")
-c.write(1,4,"Forward offset: (+) ")cb=ba(23,4)c.write(1,4,"Sideway offset: (+-) ")
-db=ba(23,4)c.write(1,4,"Vertical offset: (+-) ")_c=ba(23,4)end;c.clear("Excavate")aa.start(ca,da,_b,ab,bb,cb,db,_c)
+c.write(1,4,"Forward offset: ")cb=ba(16,4)c.write(1,4,"Sideway offset: ")db=ba(19,4)
+c.write(1,4,"Vertical offset: ")_c=ba(17,4)end;c.clear("Excavate")aa.start(ca,da,_b,ab,bb,cb,db,_c)
 c.clear("Excavate")c.write(1,4,"Digging is complete.")
 c.write(1,5,"Press any key to continue.")term.setCursorPos(0,0)
 turtlecraft.input.readKey(10)end;turtlecraft.excavate.debug={}turtlecraft.excavate.debug.start=function(ca,da,_b,ab,bb)

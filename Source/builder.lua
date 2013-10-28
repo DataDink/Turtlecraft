@@ -339,9 +339,9 @@ turtlecraft.scope = function()
 		local wait = 0;
 		while true do
 			for i = 2, 16 do
-				if (turtle.getItemCount(i) > 0) then 
+				if (turtle.getItemCount(i) > 1) then 
 					sleep(wait);
-					if (turtle.getItemCount(i) > 0) then 
+					if (turtle.getItemCount(i) > 1) then 
 						turtle.select(i);
 						return i; 
 					end
@@ -372,7 +372,7 @@ turtlecraft.scope = function()
 					turtlecraft.move.digTo(target.x, target.y, target.z);
 					if (turtle.detectDown()) then turtle.digDown(); end
 					selectSlot();
-					turtle.placeDown();
+					if (not turtle.compareDown()) then turtle.placeDown(); end
 				end
 			end
 		end);

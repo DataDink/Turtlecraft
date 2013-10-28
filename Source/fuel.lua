@@ -23,7 +23,7 @@ turtlecraft.scope = function()
 	turtlecraft.fuel.estimateRemaining = function() 
 		local current = turtle.getFuelLevel();
 		local refuels = internal.getRefuelCount();
-		local unburned = refuels * internal.fuelPerBurn;
+		local unburned = refuels / internal.itemsPerBurn * internal.fuelPerBurn;
 		return current + unburned;
 	end
 	

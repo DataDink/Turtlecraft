@@ -35,13 +35,13 @@ turtlecraft.scope = function()
 		elseif (d == directions.east) then
 			plot.min.x = plot.min.x + forwardOffset;
 			plot.max.x = plot.max.x + math.abs(forward) + forwardOffset;
-			plot.min.y = plot.min.y - math.abs(right) + sidewayOffset;
-			plot.max.y = plot.max.y + math.abs(left) + sidewayOffset;
+			plot.min.y = plot.min.y - math.abs(right) - sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(left) - sidewayOffset;
 		else
 			plot.min.x = plot.min.x - forwardOffset;
 			plot.min.x = plot.min.x - math.abs(forward) - forwardOffset;
-			plot.min.y = plot.min.y - math.abs(left) - sidewayOffset;
-			plot.max.y = plot.max.y + math.abs(right) - sidewayOffset;
+			plot.min.y = plot.min.y - math.abs(left) + sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(right) + sidewayOffset;
 		end
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end

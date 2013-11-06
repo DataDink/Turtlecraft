@@ -106,7 +106,7 @@ a.burn=function()turtle.select(a.fuelSlot)
 local b=turtle.getFuelLevel()
 if(not turtle.refuel(a.itemsPerBurn))then return false end;local c=turtle.getFuelLevel()a.fuelPerBurn=c-b;return true end
 turtlecraft.fuel.estimateRemaining=function()local b=turtle.getFuelLevel()
-local c=a.getRefuelCount()local d=c*a.fuelPerBurn;return b+d end
+local c=a.getRefuelCount()local d=c/a.itemsPerBurn*a.fuelPerBurn;return b+d end
 turtlecraft.fuel.require=function(b)if(b==nil)then b=1 end
 while
 (turtle.getFuelLevel()<b)do
@@ -167,17 +167,18 @@ local ac,bc,cc,dc=a.get()_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}
 _a.step={x=1,y=1,z=-3}
 _a.min={x=ac,y=bc,z=cc-math.abs(bb)+1 +_c}
 _a.max={x=ac,y=bc,z=cc+math.abs(ab)-1 +_c}
-if(dc==b.north)then
-_a.max.y=_a.max.y+math.abs(ca)+cb;_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=
-_a.max.x+math.abs(_b)+db elseif(dc==b.south)then _a.min.y=
-_a.min.y-math.abs(ca)+cb;_a.min.x=_a.min.x-
-math.abs(_b)+db;_a.max.x=
-_a.max.x+math.abs(da)+db elseif(dc==b.east)then _a.max.x=
-_a.max.x+math.abs(ca)+cb
-_a.min.y=_a.min.y-math.abs(_b)+db;_a.max.y=_a.max.y+math.abs(da)+db else _a.min.x=
-_a.min.x-math.abs(ca)+cb;_a.min.y=_a.min.y-
-math.abs(da)+db;_a.max.y=
-_a.max.y+math.abs(_b)+db end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
+if(dc==b.north)then _a.min.y=_a.min.y+cb;_a.max.y=
+_a.max.y+math.abs(ca)+cb
+_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=_a.max.x+math.abs(_b)+db elseif
+(dc==b.south)then _a.min.y=_a.min.y-cb
+_a.min.y=_a.min.y-math.abs(ca)-cb;_a.min.x=_a.min.x-math.abs(_b)-db;_a.max.x=
+_a.max.x+math.abs(da)-db elseif(dc==b.east)then _a.min.x=
+_a.min.x+cb
+_a.max.x=_a.max.x+math.abs(ca)+cb;_a.min.y=_a.min.y-math.abs(_b)-db;_a.max.y=
+_a.max.y+math.abs(da)-db else
+_a.min.x=_a.min.x-cb;_a.min.x=_a.min.x-math.abs(ca)-cb;_a.min.y=
+_a.min.y-math.abs(da)+db;_a.max.y=_a.max.y+
+math.abs(_b)+db end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
 _a.update=function()local ca,da,_b,ab=a.get()_a.progress={x=ca,y=da,z=_b}
 local bb=fs.open(_a.path,"w")
 bb.writeLine(_a.home.x..",".._a.home.y..
@@ -262,10 +263,10 @@ c.write(1,4,"How far left?")local da=ba(15,4)c.write(1,4,"How far right?")local 
 da==0 and _b==0)then return false end
 c.write(1,4,"How far up?")local ab=ba(13,4)c.write(1,4,"How far down?")local bb=ba(15,4)if(ab==0 and
 bb==0)then return false end;local cb=0;local db=0;local _c=0
-c.write(1,4,"Would you like to offset the dig? (y, n)")
+c.write(1,4,"Offset the dig? (y/n) ")
 if(read()=='y')then c.clear("Excavate")
-c.write(1,4,"Forward offset: ")cb=ba(16,4)c.write(1,4,"Sideway offset: ")db=ba(19,4)
-c.write(1,4,"Vertical offset: ")_c=ba(17,4)end;c.clear("Excavate")aa.start(ca,da,_b,ab,bb,cb,db,_c)
+c.write(1,4,"Forward offset: (+) ")cb=ba(23,4)c.write(1,4,"Sideway offset: (+-) ")
+db=ba(23,4)c.write(1,4,"Vertical offset: (+-) ")_c=ba(23,4)end;c.clear("Excavate")aa.start(ca,da,_b,ab,bb,cb,db,_c)
 c.clear("Excavate")c.write(1,4,"Digging is complete.")
 c.write(1,5,"Press any key to continue.")term.setCursorPos(0,0)
 turtlecraft.input.readKey(10)end;turtlecraft.excavate.debug={}turtlecraft.excavate.debug.start=function(ca,da,_b,ab,bb)
@@ -445,9 +446,9 @@ for cc,dc in ipairs(cb)do
 local _d={x=dc.x,y=dc.y,z=dc.z}_a.rotateVector(_d,0,angle,0)table.insert(db,_d)end end;return db end
 local da=function()local bb=0
 while true do
-for i=2,16 do if(turtle.getItemCount(i)>0)then sleep(bb)
+for i=2,16 do if(turtle.getItemCount(i)>1)then sleep(bb)
 if(
-turtle.getItemCount(i)>0)then turtle.select(i)return i end end end;bb=15;turtlecraft.term.clear("Inventory")
+turtle.getItemCount(i)>1)then turtle.select(i)return i end end end;bb=15;turtlecraft.term.clear("Inventory")
 turtlecraft.term.write(1,5,"Please add more inventory...")sleep(1)end end
 local _b=function(bb)turtlecraft.term.clear("Build Project")
 turtlecraft.term.write(1,4,"Press Q to cancel")
@@ -456,9 +457,9 @@ local db,_c,ac,bc=turtlecraft.position.get()
 for cc,dc in ipairs(c.data)do
 local _d={x=dc.x+bb.x,y=dc.y+bb.y,z=dc.z+bb.z}
 if(not cb)then
-cb=_d.x==db and _d.y==_c and _d.z==ac else turtlecraft.move.digTo(_d.x,_d.y,_d.z)if
-(turtle.detectDown())then turtle.digDown()end;da()
-turtle.placeDown()end end end)d.disable()end
+cb=_d.x==db and _d.y==_c and _d.z==ac else turtlecraft.move.digTo(_d.x,_d.y,_d.z)end;da()
+if(not turtle.compareDown())then turtle.digDown()if(not
+turtle.detectDown())then turtle.placeDown()end end end end)d.disable()end
 local ab=function()local bb=read()if(bb==nil)then return 0 end;bb=tonumber(bb)
 if(bb==nil)then return 0 end;return bb end
 turtlecraft.builder.clear=function()

@@ -164,13 +164,13 @@ local b=a.directions;local c=turtlecraft.term;local d={}local _a={}local aa={}
 _a.path=turtlecraft.directory.."excavate.data"
 _a.init=function(ca,da,_b,ab,bb,cb,db,_c)cb=math.max(0,cb or 0)db=(db or 0)_c=(_c or 0)
 local ac,bc,cc,dc=a.get()_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}
-_a.step={x=1,y=1,z=-3}_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1}_a.max={x=ac,y=bc,z=
-cc+math.abs(ab)-1}
-if
-(dc==b.north)then _a.min.y=_a.min.y+cb
-_a.max.y=_a.max.y+math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=
-_a.max.x+math.abs(_b)+db elseif(dc==b.south)then _a.max.y=
-_a.max.y-cb
+_a.step={x=1,y=1,z=-3}
+_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1 +_c}
+_a.max={x=ac,y=bc,z=cc+math.abs(ab)-1 +_c}
+if(dc==b.north)then _a.min.y=_a.min.y+cb;_a.max.y=_a.max.y+
+math.abs(ca+cb)
+_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=_a.max.x+math.abs(_b)+db elseif
+(dc==b.south)then _a.max.y=_a.max.y-cb
 _a.min.y=_a.min.y-math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(_b)-db;_a.max.x=
 _a.max.x+math.abs(da)-db elseif(dc==b.east)then _a.min.x=
 _a.min.x+cb

@@ -15,33 +15,35 @@ turtlecraft.scope = function()
 		forwardOffset = math.max(0, forwardOffset or 0);	
 		sidewayOffset = (sidewayOffset or 0);	
 		verticalOffset = (verticalOffset or 0);	
+		
+		forward = forward + forwardOffset;
+		left = left - sidewayOffset;
+		right = right + sidewayOffset;
+		down = down - verticalOffset;
+		up = up + verticalOffset;
 
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
 		plot.step = {x = 1, y = 1, z = -3};
-		plot.min = {x = x, y = y, z = z - math.abs(down) + 1 + verticalOffset};
-		plot.max = {x = x, y = y, z = z + math.abs(up) - 1 + verticalOffset};
+		plot.min = {x = x, y = y, z = z - math.abs(down) + 1};
+		plot.max = {x = x, y = y, z = z + math.abs(up) - 1};
 		
 		if (d == directions.north) then
-			plot.min.y = plot.min.y + forwardOffset;
-			plot.max.y = plot.max.y + math.abs(forward) + forwardOffset;
-			plot.min.x =  plot.min.x - math.abs(left) + sidewayOffset;
-			plot.max.x = plot.max.x + math.abs(right) + sidewayOffset;
+			plot.max.y = plot.max.y + math.abs(forward);
+			plot.min.x =  plot.min.x - math.abs(left);
+			plot.max.x = plot.max.x + math.abs(right);
 		elseif (d == directions.south) then
-			plot.min.y = plot.min.y - forwardOffset;
-			plot.min.y = plot.min.y - math.abs(forward) - forwardOffset;
-			plot.min.x =  plot.min.x - math.abs(right) - sidewayOffset;
-			plot.max.x = plot.max.x + math.abs(left) - sidewayOffset;
+			plot.min.y = plot.min.y - math.abs(forward);
+			plot.min.x =  plot.min.x - math.abs(right);
+			plot.max.x = plot.max.x + math.abs(left);
 		elseif (d == directions.east) then
-			plot.min.x = plot.min.x + forwardOffset;
-			plot.max.x = plot.max.x + math.abs(forward) + forwardOffset;
-			plot.min.y = plot.min.y - math.abs(right) - sidewayOffset;
-			plot.max.y = plot.max.y + math.abs(left) - sidewayOffset;
+			plot.max.x = plot.max.x + math.abs(forward);
+			plot.min.y = plot.min.y - math.abs(right);
+			plot.max.y = plot.max.y + math.abs(left);
 		else
-			plot.min.x = plot.min.x - forwardOffset;
-			plot.min.x = plot.min.x - math.abs(forward) - forwardOffset;
-			plot.min.y = plot.min.y - math.abs(left) + sidewayOffset;
-			plot.max.y = plot.max.y + math.abs(right) + sidewayOffset;
+			plot.min.x = plot.min.x - math.abs(forward);
+			plot.min.y = plot.min.y - math.abs(left);
+			plot.max.y = plot.max.y + math.abs(right);
 		end
 		plot.progress = {x = plot.min.x, y = plot.min.y, z = plot.max.z};
 	end

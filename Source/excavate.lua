@@ -18,9 +18,9 @@ turtlecraft.scope = function()
 		
 		forward = forward + forwardOffset;
 		left = left - sidewayOffset;
-		right = right + sidewayOffset;
+		right = right - sidewayOffset;
 		down = down - verticalOffset;
-		up = up + verticalOffset;
+		up = up - verticalOffset;
 
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
@@ -29,18 +29,22 @@ turtlecraft.scope = function()
 		plot.max = {x = x, y = y, z = z + math.abs(up) - 1};
 		
 		if (d == directions.north) then
+			plot.min.y = plot.min.y + forwardOffset;
 			plot.max.y = plot.max.y + math.abs(forward);
 			plot.min.x =  plot.min.x - math.abs(left);
 			plot.max.x = plot.max.x + math.abs(right);
 		elseif (d == directions.south) then
+			plot.max.y = plot.max.y - forwardOffset;
 			plot.min.y = plot.min.y - math.abs(forward);
 			plot.min.x =  plot.min.x - math.abs(right);
 			plot.max.x = plot.max.x + math.abs(left);
 		elseif (d == directions.east) then
+			plot.min.x = plot.min.x + forwardOffset;
 			plot.max.x = plot.max.x + math.abs(forward);
 			plot.min.y = plot.min.y - math.abs(right);
 			plot.max.y = plot.max.y + math.abs(left);
 		else
+			plot.max.x = plot.max.x - forwardOffset;
 			plot.min.x = plot.min.x - math.abs(forward);
 			plot.min.y = plot.min.y - math.abs(left);
 			plot.max.y = plot.max.y + math.abs(right);

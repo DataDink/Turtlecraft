@@ -139,4 +139,15 @@ turtlecraft.scope = function()
 		if (key == 203) then goBack(); end
 	end
 end
-turtlecraft.scope();
+
+local appStatus, appError pcall(turtlecraft.scope);
+if (appStatus) then
+	shell.run('clear');
+	print('Turtlecraft needs to reboot');
+	print('Error:');
+	print(appError);
+	print();
+	print('Rebooting in 30 seconds');
+	sleep(30);
+	shell.run('reboot');
+end

@@ -162,23 +162,21 @@ turtlecraft.excavate={}
 turtlecraft.scope=function()local a=turtlecraft.position
 local b=a.directions;local c=turtlecraft.term;local d={}local _a={}local aa={}
 _a.path=turtlecraft.directory.."excavate.data"
-_a.init=function(ca,da,_b,ab,bb,cb,db,_c)cb=math.max(0,cb or 0)db=(db or 0)_c=(_c or 0)
-local ac,bc,cc,dc=a.get()_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}
-_a.step={x=1,y=1,z=-3}_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1}_a.max={x=ac,y=bc,z=
-cc+math.abs(ab)-1}
-if
-(dc==b.north)then _a.min.y=_a.min.y+cb
-_a.max.y=_a.max.y+math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(da+db)_a.max.x=
-_a.max.x+math.abs(_b+db)elseif(dc==b.south)then _a.max.y=_a.max.y-
-cb
-_a.min.y=_a.min.y-math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(_b+db)_a.max.x=
-_a.max.x+math.abs(da+db)elseif(dc==b.east)then
-_a.min.x=_a.min.x+cb;_a.max.x=_a.max.x+math.abs(ca+cb)_a.min.y=
-_a.min.y-math.abs(_b+db)_a.max.y=_a.max.y+
-math.abs(da+db)else _a.max.x=_a.max.x-cb;_a.min.x=
-_a.min.x-math.abs(ca+cb)_a.min.y=_a.min.y-
-math.abs(da+db)
-_a.max.y=_a.max.y+math.abs(_b+db)end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
+_a.init=function(ca,da,_b,ab,bb,cb,db,_c)cb=math.max(0,cb or 0)db=(db or 0)_c=(_c or 0)ca=ca+cb;da=da-
+db;_b=_b-db;bb=bb-_c;ab=ab-_c;local ac,bc,cc,dc=a.get()
+_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}_a.step={x=1,y=1,z=-3}
+_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1}_a.max={x=ac,y=bc,z=cc+math.abs(ab)-1}
+if(dc==
+b.north)then _a.min.y=_a.min.y+cb
+_a.max.y=_a.max.y+math.abs(ca)_a.min.x=_a.min.x-math.abs(da)_a.max.x=_a.max.x+
+math.abs(_b)elseif(dc==b.south)then _a.max.y=_a.max.y-cb;_a.min.y=
+_a.min.y-math.abs(ca)
+_a.min.x=_a.min.x-math.abs(_b)_a.max.x=_a.max.x+math.abs(da)elseif(dc==b.east)then _a.min.x=
+_a.min.x+cb;_a.max.x=_a.max.x+math.abs(ca)_a.min.y=
+_a.min.y-math.abs(_b)
+_a.max.y=_a.max.y+math.abs(da)else _a.max.x=_a.max.x-cb
+_a.min.x=_a.min.x-math.abs(ca)_a.min.y=_a.min.y-math.abs(da)_a.max.y=_a.max.y+
+math.abs(_b)end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
 _a.update=function()local ca,da,_b,ab=a.get()_a.progress={x=ca,y=da,z=_b}
 local bb=fs.open(_a.path,"w")
 bb.writeLine(_a.home.x..",".._a.home.y..

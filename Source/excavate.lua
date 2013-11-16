@@ -19,8 +19,8 @@ turtlecraft.scope = function()
 		local x, y, z, d = position.get();
 		plot.home = {x = x, y = y, z = z, d = (d + 180) % 360};
 		plot.step = {x = 1, y = 1, z = -3};
-		plot.min = {x = x, y = y, z = z - math.abs(down) + 1};
-		plot.max = {x = x, y = y, z = z + math.abs(up) - 1};
+		plot.min = {x = x, y = y, z = z - math.abs(down) + 1 + verticalOffset};
+		plot.max = {x = x, y = y, z = z + math.abs(up) - 1 + verticalOffset};
 		
 		if (d == directions.north) then
 			plot.min.y = plot.min.y + forwardOffset;

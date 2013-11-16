@@ -164,19 +164,19 @@ local b=a.directions;local c=turtlecraft.term;local d={}local _a={}local aa={}
 _a.path=turtlecraft.directory.."excavate.data"
 _a.init=function(ca,da,_b,ab,bb,cb,db,_c)cb=math.max(0,cb or 0)db=(db or 0)_c=(_c or 0)
 local ac,bc,cc,dc=a.get()_a.home={x=ac,y=bc,z=cc,d=(dc+180)%360}
-_a.step={x=1,y=1,z=-3}
-_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1 +_c}
-_a.max={x=ac,y=bc,z=cc+math.abs(ab)-1 +_c}
-if(dc==b.north)then _a.min.y=_a.min.y+cb;_a.max.y=
-_a.max.y+math.abs(ca)+cb
-_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=_a.max.x+math.abs(_b)+db elseif
-(dc==b.south)then _a.min.y=_a.min.y-cb
-_a.min.y=_a.min.y-math.abs(ca)-cb;_a.min.x=_a.min.x-math.abs(_b)-db;_a.max.x=
+_a.step={x=1,y=1,z=-3}_a.min={x=ac,y=bc,z=cc-math.abs(bb)+1}_a.max={x=ac,y=bc,z=
+cc+math.abs(ab)-1}
+if
+(dc==b.north)then _a.min.y=_a.min.y+cb
+_a.max.y=_a.max.y+math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(da)+db;_a.max.x=
+_a.max.x+math.abs(_b)+db elseif(dc==b.south)then _a.max.y=
+_a.max.y-cb
+_a.min.y=_a.min.y-math.abs(ca+cb)_a.min.x=_a.min.x-math.abs(_b)-db;_a.max.x=
 _a.max.x+math.abs(da)-db elseif(dc==b.east)then _a.min.x=
 _a.min.x+cb
-_a.max.x=_a.max.x+math.abs(ca)+cb;_a.min.y=_a.min.y-math.abs(_b)-db;_a.max.y=
+_a.max.x=_a.max.x+math.abs(ca+cb)_a.min.y=_a.min.y-math.abs(_b)-db;_a.max.y=
 _a.max.y+math.abs(da)-db else
-_a.min.x=_a.min.x-cb;_a.min.x=_a.min.x-math.abs(ca)-cb;_a.min.y=
+_a.max.x=_a.max.x-cb;_a.min.x=_a.min.x-math.abs(ca+cb)_a.min.y=
 _a.min.y-math.abs(da)+db;_a.max.y=_a.max.y+
 math.abs(_b)+db end;_a.progress={x=_a.min.x,y=_a.min.y,z=_a.max.z}end
 _a.update=function()local ca,da,_b,ab=a.get()_a.progress={x=ca,y=da,z=_b}
@@ -669,23 +669,27 @@ term.clear()print("Not Yet Implemented")read()end}
 turtlecraft.menu[2].action[6]={title="Start building",action=turtlecraft.builder.start}
 turtlecraft.menu[2].action[7]={title="Halp meh!",action=turtlecraft.help.build}
 turtlecraft.menu[3]={title="Halp meh!",action=turtlecraft.help.general}
-turtlecraft.scope=function()local a=turtlecraft.term;local b=1;local c={}
-table.insert(c,turtlecraft.menu)local d=a.write
-local _a=function()local ab=c[table.getn(c)]return ab end
-local aa=function()
-a.clear("Menu","** Use up/down and left/enter keys **")local ab=_a()
-for bb,cb in ipairs(ab)do local db=cb.title
-if(bb==b)then db=">"..db.."<"else db=" "..db end;a.scrolled(1,bb,b,db)end end
-local ba=function()local ab=_a()local bb=ab[b].action;if(type(bb)=="function")then bb()else
-table.insert(c,bb)end end
-local ca=function()if(table.getn(c)>1)then b=1;table.remove(c)end end
-local da=function()local ab=_a()if(b<table.getn(ab))then b=b+1 end end;local _b=function()if(b>1)then b=b-1 end end
+turtlecraft.scope=function()local _a=turtlecraft.term;local aa=1;local ba={}
+table.insert(ba,turtlecraft.menu)local ca=_a.write
+local da=function()local _c=ba[table.getn(ba)]return _c end
+local _b=function()
+_a.clear("Menu","** Use up/down and left/enter keys **")local _c=da()
+for ac,bc in ipairs(_c)do local cc=bc.title
+if(ac==aa)then cc=">"..cc.."<"else cc=" "..cc end;_a.scrolled(1,ac,aa,cc)end end
+local ab=function()local _c=da()local ac=_c[aa].action;if(type(ac)=="function")then ac()else
+table.insert(ba,ac)end end;local bb=function()
+if(table.getn(ba)>1)then aa=1;table.remove(ba)end end
+local cb=function()
+local _c=da()if(aa<table.getn(_c))then aa=aa+1 end end;local db=function()if(aa>1)then aa=aa-1 end end
 if(not
 turtlecraft.position.isInSync())then term.clear()
-d(1,1,"The turtle's position has gotten out of sync.")
-d(1,2,"If there was a function in progress it has likely been cancelled.")d(1,3,"Press any key to continue")
-local ab,bb,cb,db=turtlecraft.position.get()turtlecraft.position.set(0,0,0,db)
+ca(1,1,"The turtle's position has gotten out of sync.")
+ca(1,2,"If there was a function in progress it has likely been cancelled.")ca(1,3,"Press any key to continue")
+local _c,ac,bc,cc=turtlecraft.position.get()turtlecraft.position.set(0,0,0,cc)
 turtlecraft.input.readKey()end
-while(true)do aa()sleep(0.01)
-local ab=turtlecraft.input.readKey()if(ab==28)then ba()end;if(ab==200)then _b()end;if(ab==208)then da()end;if
-(ab==203)then ca()end end end;turtlecraft.scope()
+while(true)do _b()sleep(0.01)
+local _c=turtlecraft.input.readKey()if(_c==28)then ab()end;if(_c==200)then db()end;if(_c==208)then cb()end;if
+(_c==203)then bb()end end end;local c,d;pcall(turtlecraft.scope)
+if(c)then shell.run('clear')
+print('Turtlecraft needs to reboot')print('Error:')print(d)print()
+print('Rebooting in 30 seconds')sleep(30)shell.run('reboot')end

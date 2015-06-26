@@ -1,16 +1,14 @@
 function turtlecraft:input()
-   local shift = false;
-   local caps = false;
-   local ctrl = false;
-   local alt = false;
 
-   function self.readKey()
-      local _, key = os.pullEvent('key');
-      return key;
+   function self.read()
+      local code, char = false, false;
+      parallel.waitForAll(
+        function() _, code =
+      );
    end
 
    function self.readChar()
-      
+      local _,
    end
 
    function self.readText(filter)

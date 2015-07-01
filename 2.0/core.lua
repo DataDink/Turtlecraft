@@ -56,13 +56,13 @@ turtlecraft = {};
 
    local function indexes(obj)
       local result = {};
-      for (name in ipairs) do
+      for name in ipairs do
          result[name] = true;
       end
       return result;
    end
 
-   local function args(items, fields, index) -- Lua Demo is missing "unpack" so I wrote this just in case
+   unpack = unpack or function(items, fields, index)
       if (fields == nil) then
          index = 1;
          fields = indexes(items);
@@ -70,7 +70,7 @@ turtlecraft = {};
       if (fields[index] == true) then
          return items[index], args(items, fields, index + 1);
       end
-   end;
+   end
 
    turtlecraft.register = {
       instance =  function(name, instance)   instances[name] = instance; end,

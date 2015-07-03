@@ -7,11 +7,11 @@ function turtlecraft:input(utils)
       return code, char;
    end
 
-   local function input(min, max, width, strokeFilter, textFilter, textCleanup)
+   local function input(min, max, width, strokeFilter, textFilter)
       min = min or 0;
       max = max or 1000; -- Srsly if you even allow 100 it will be a bad user experience.
-      width = width or 1000; -- This would mean there is a screen in computercraft available that displays 1000+ characters wide
-      filter = filter or '.*';
+      width = width or 1000;
+      textFilter = textFilter or '.*';
 
       local w, h = term.getSize();
       local x, y = term.getCursorPos();
@@ -43,12 +43,11 @@ function turtlecraft:input(utils)
             end
          end elseif (code == keys.delete) then
             buffer = buffer:sub(1, pos) .. buffer:sub(pos + 1);
-         end elseif (strokeFilter(char)) then
+         end elseif (strokeFilter(buffer, char, pos)) then
             buffer = buffer:sub(1, pos) .. char .. buffer:sub(pos + 1);
             pos = pos + 1;
          end
 
-         buffer = textCleanup(buffer);
          local offset = pos - scroll;
          if (offset < 0) then scroll = scroll + offset; end
          if (offset > width) then scroll = scroll - (offset - width); end
@@ -72,10 +71,12 @@ function turtlecraft:input(utils)
    end
 
    function self.number(min, max, width)
-      local function checkStroke() return utils.contains({'-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'}, c); end
-      local function checkText(t) return t:find('^%-?%d+%.?%d*$'); end -- If this language ever supports full regex change to ^%-?%d+(%.%d*)?$
-      local function cleanText(t)
-         
+      local function checkText(t) return t:find('^%-?%d+%.?%d*$'); end -- If this language ever supports full regex change to ^%-?%d+(%.%d*)?$ end
+      local function checkStroke(t, c, p)
+         if (c == '-' and p == 0) then return true; end
+         if (c == '.' and p > 0 and t:find('.') == nil)) then return true; end
+         if (utils.contains({'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'}, c)) then return true; end
+         return false;
       end
    end
 

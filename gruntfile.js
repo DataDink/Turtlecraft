@@ -3,11 +3,13 @@ module.exports = function(grunt) {
 
    grunt.initConfig({
       concat: {
-         options: { separator: ';\r\n\r\n' },
+         options: { separator: '\r\n\r\n--\r\n\r\n' },
          turtlecraft: {
             src: [
                // core
                '../ModCraft/lua/Builds/modcraft.lua',
+               'Source/*.lua',
+               'bootstrap.lua'
             ],
             dest: 'Builds/turtlecraft.lua'
          }

@@ -1,19 +1,16 @@
 (function()
-   local longtext = string.rep('asdf asdfasdf asdfasdfasdf asdfasdfasdf     ', 10);
-   function class :TurtleCraft(menu)
-      self.menu = menu;
-      local index = 0;
-      function add()
-         menu:add('Item ' .. tostring(index), function()
-            index = index + 1;
-            add();
-         end, tostring(index) .. longtext);
+   function class :TurtleCraft(menu, injector, items)
+      local function add(item)
+         if (type(item.name) ~= 'string') then error('menu item missing name'); end
+         if (type(item.action) ~= 'function') then error('menu item missing action'); end
+         menu.add(item.name, item.action, tostring(item.help or 'No help available'));
       end
-      add();
-
       function self:start()
+         if (not items) then items = {};
+         elseif (#items == 0) then items = {items}; end
+         for _, item in ipairs(items) do add(item); end
          menu:show();
       end
    end
-   ModCraft.register.module('turtlecraft', {'menu', class.TurtleCraft});
+   ModCraft.register.module('turtlecraft', {'menu', 'dependencies', 'menu-items', class.TurtleCraft});
 end)();

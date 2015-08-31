@@ -1,1 +1,1 @@
-ModCraft.start();
+TurtleCraft = ModCraft.start().resolve('turtlecraft');

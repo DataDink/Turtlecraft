@@ -1,5 +1,5 @@
 (function()
-   function class:Menu(view, scroll)
+   function class .Views.Layout:Menu(view, scroll)
       local options = {};
       local index = 1;
 
@@ -45,5 +45,5 @@
          end
       end
    end
-   ModCraft.register.dependency.transient('menu', {'text-view', 'scroll-view', class.Menu});
+   ModCraft.register.dependency.transient('views.layout.menu', {'views.layout.text', 'views.layout.scroll', class.Views.Layout.Menu});
 end)();

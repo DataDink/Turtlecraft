@@ -3,7 +3,7 @@
    display.width, display.height = term.getSize();
    local hr = string.rep('=', display.width);
 
-   function class:TextView()
+   function class .Views.Layout:TextView()
       self.width = display.width;
       self.height = display.height;
       self.top = 4;
@@ -31,7 +31,10 @@
          for block in blocks do
             local word = block:match('%w+') or '';
             local space = block:match('%W+') or '';
-            if (#line + #space > width) then
+            local isBreak = space:find('\n')
+                        or space:find('\r')
+                        or #line + #space > width;
+            if (isBreak) then
                table.insert(lines, line);
                line = '';
             else line = line .. space; end
@@ -62,5 +65,5 @@
          self:renderFooter(footer);
       end
    end
-   ModCraft.register.dependency.transient('text-view', class.TextView);
+   ModCraft.register.dependency.transient('views.layout.text', class.Views.Layout.TextView);
 end)();

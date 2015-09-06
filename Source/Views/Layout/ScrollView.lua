@@ -1,5 +1,5 @@
 (function()
-   function class:ScrollView(view)
+   function class .Views.Layout:ScrollView(view)
       function self:show(text, title)
          local lines = view:wrap(text or '');
          local scroll = 0;
@@ -19,5 +19,5 @@
          term.clear();
       end
    end
-   ModCraft.register.service('scroll-view', {'text-view', class.ScrollView});
+   ModCraft.register.service('views.layout.scroll', {'views.layout.text', class.Views.Layout.ScrollView});
 end)();

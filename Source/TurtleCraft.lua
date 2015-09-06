@@ -2,8 +2,8 @@
    function class :TurtleCraft(menu, injector, items)
       local function add(item)
          if (type(item.name) ~= 'string') then error('menu item missing name'); end
-         if (type(item.action) ~= 'function') then error('menu item missing action'); end
-         menu.add(item.name, item.action, tostring(item.help or 'No help available'));
+         if (type(item.start) ~= 'function') then error('menu item missing action'); end
+         menu.add(item.name, item.start, tostring(item.help or 'No help available'));
       end
       function self:start()
          if (not items) then items = {};
@@ -12,5 +12,5 @@
          menu:show();
       end
    end
-   ModCraft.register.module('turtlecraft', {'menu', 'dependencies', 'menu-items', class.TurtleCraft});
+   ModCraft.register.module('turtlecraft', {'views.menu', 'dependencies', 'menu-items', class.TurtleCraft});
 end)();

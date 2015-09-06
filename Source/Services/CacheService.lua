@@ -1,14 +1,9 @@
 (function()
    local root = 'turtlecraft/cache/';
 
-   function class:Persist()
-      local path = root .. '.default';
+   function class .Services:Cache(name)
+      local path = root .. name;
       local data = '';
-
-      function self:key(key)
-         path = root .. key .. '.cache';
-         return read();
-      end
 
       function self:get() return data; end
 
@@ -28,10 +23,9 @@
       end
       read();
    end
-   ModCraft.register.dependency.transient('persist', class.Persist);
 
    local pre = '';
-   for part in cachepath:gmatch('[^/]') do
+   for part in root:gmatch('[^/]') do
       pre = pre .. '/' .. part;
       if (fs.exists(pre) and not fs.isDir(pre)) then fs.delete(pre); end
       if (not fs.exists(pre)) then fs.makeDir(pre); end

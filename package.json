@@ -1,0 +1,24 @@
+{
+  "name": "turtlecraft",
+  "version": "2.0.0",
+  "description": "A tiny framework for turtle users in MineCraft.",
+  "main": "turtlecraft.lua",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DataDink/Turtlecraft.git"
+  },
+  "author": "DataDink",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/DataDink/Turtlecraft/issues"
+  },
+  "homepage": "https://github.com/DataDink/Turtlecraft#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-luaminify": "0.0.1"
+  }
+}

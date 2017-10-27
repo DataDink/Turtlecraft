@@ -17,8 +17,11 @@
   },
   "homepage": "https://github.com/DataDink/Turtlecraft#readme",
   "devDependencies": {
+    "better-pastebin": "^0.4.1",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-luaminify": "0.0.1"
+    "gulp-insert": "^0.5.0",
+    "gulp-luaminify": "0.0.1",
+    "prompt": "^1.0.0"
   }
 }

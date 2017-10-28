@@ -14,6 +14,8 @@ config.build = (new Date()).valueOf().toString();
 var cfgjson = JSON.stringify(JSON.stringify(config));
 
 /*******************************GULP COMMANDS*******************************/
+gulp.task('default', ['build', 'deploy']);
+
 gulp.task('build', complete => {
   var stream = gulp.src([
     'src/init.lua',

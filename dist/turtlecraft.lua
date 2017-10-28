@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509164139100\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509194488112\"}";
 TurtleCraft = {};
 
 (function()
@@ -80,35 +80,35 @@ end);
 TurtleCraft.export('services/json', function()
   local Json = {};
 
-  Json.trim = function(remaining)
-    return remaining:gsub('^%s+', ''):gsub('%s+$', '');
+  Json.trim = function(content)
+    return content:gsub('^%s+', ''):gsub('%s+$', '');
   end
 
-  Json.parseNull = function(remaining)
-    if (not remaining:lower():find('^%s*null')) then return false, nil, remaining; end
-    remaining = remaining:gsub('^%s*null', '');
+  Json.parseNull = function(content)
+    if (not content:lower():find('^%s*null')) then return false, nil, content; end
+    local remaining = content:gsub('^%s*null', '');
     return true, nil, remaining;
   end
 
-  Json.parseNumber = function(remaining)
-    if (not remaining:find('^%s*-?%d+')) then return false, nil, remaining; end
-    remaining = Json.trim(remaining);
+  Json.parseNumber = function(content)
+    if (not content:find('^%s*-?%d+')) then return false, nil, content; end
+    local remaining = Json.trim(content);
     local value = remaining:match('^-?%d+') or remaining:match('^-?%d+%.%d+');
     remaining = remaining:sub(value:len() + 1);
     return true, tonumber(value), remaining;
   end
 
-  Json.parseBoolean = function(remaining)
-    remaining = Json.trim(remaining);
+  Json.parseBoolean = function(content)
+    local remaining = Json.trim(content);
     local value = remaining:lower():match('^true') or remaining:lower():match('^false');
     if (value == nil) then return false, nil, remaining; end
     remaining = remaining:sub(value:len() + 1);
     return true, value == 'true', remaining;
   end
 
-  Json.parseString = function(remaining)
-    if (not remaining:find('^%s*"')) then return false, nil, remaining; end
-    remaining = remaining:gsub('^%s*"', '');
+  Json.parseString = function(content)
+    if (not content:find('^%s*"')) then return false, nil, content; end
+    local remaining = content:gsub('^%s*"', '');
     local value = '';
     local chunk = remaining:match('^[^\\"]*[\\"]');
     while (chunk ~= nil) do
@@ -141,11 +141,10 @@ TurtleCraft.export('services/json', function()
     return false, remaining:len();
   end
 
-  Json.parseArray = function(remaining)
-    if (not remaining:find('^%s*%[')) then return false, nil, remaining; end
-    remaining = remaining:gsub('^%s*%[', '');
+  Json.parseArray = function(content)
+    if (not content:find('^%s*%[')) then return false, nil, content; end
     local result = {};
-    local valid, value, remaining = Json.parseNext(remaining);
+    local valid, value, remaining = Json.parseNext(content:gsub('^%s*%[', ''));
     while (valid) do
       table.insert(result, value);
       remaining = Json.trim(remaining);
@@ -158,16 +157,16 @@ TurtleCraft.export('services/json', function()
     return false, remaining:len();
   end
 
-  Json.parseObject = function(remaining)
-    if (not remaining:find('^%s*%{')) then return false, nil, remaining; end
-    remaining = remaining:gsub('^%s*%{', '');
+  Json.parseObject = function(content)
+    if (not content:find('^%s*%{')) then return false, nil, content; end
     local result = {};
-    local valid, key, remaining = Json.parseString(remaining);
+    local valid, key, remaining = Json.parseString(content:gsub('^%s*%{', ''));
     while (valid) do
       remaining = Json.trim(remaining);
       if (remaining:sub(1,1) ~= ':') then return false, remaining:len(); end
       remaining = remaining:sub(2);
-      local continue, value, remaining = Json.parseNext(remaining);
+      local continue, value, remaining2 = Json.parseNext(remaining);
+      remaining = remaining2;
       if (not continue) then return false; end
       result[key] = value;
       remaining = Json.trim(remaining);
@@ -180,16 +179,16 @@ TurtleCraft.export('services/json', function()
     return false, remaining:len();
   end
 
-  Json.parseNext = function(remaining)
+  Json.parseNext = function(content)
     for i, parser in ipairs({Json.parseNull, Json.parseNumber, Json.parseBoolean, Json.parseString, Json.parseArray, Json.parseObject}) do
-      local success, value, remaining = parser(remaining);
+      local success, value, remaining = parser(content);
       if (success) then return true, value, remaining; end
     end
-    return false, remaining:len();
+    return false, content:len();
   end
 
-  Json.parse = function(remaining)
-    local success, value = Json.parseNext(remaining);
+  Json.parse = function(content)
+    local success, value = Json.parseNext(content);
     if (success) then return value; else return nil; end
   end
 
@@ -598,5 +597,6 @@ end);
 
 (function()
   local JSON = TurtleCraft.import('services/json');
-  print(#JSON.parseArray('["a",1,false]'));
+  local config = TurtleCraft.import('services/config');
+  print(JSON.format(config));
 end)()

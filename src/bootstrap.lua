@@ -1,12 +1,13 @@
 (function()
-  local plugins = TurtleCraft.import('services/plugins');
-  plugins.register('first', function() end, 0);
-  plugins.register('second', function() end, -1);
-  plugins.register('third', function() end, 0);
-  plugins.register('fourth', function() end, -1);
+  local menu = TurtleCraft.import('services/menu');
 
-  local result = plugins.list();
-  for _, v in ipairs(result) do
-    print(v.title);
-  end
+  local item = menu.show({
+    {title = 'item 1'},
+    {title = 'item 2'},
+    {title = 'item 3'},
+    {title = 'item 4'},
+  }, function(i) return i.title; end);
+
+  term.setCursorPos(1,1);
+  term.write(item.title);
 end)()

@@ -1,4 +1,4 @@
-TurtleCraft = {};
+local TurtleCraft = {};
 
 (function()
   local modules = {};

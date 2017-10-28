@@ -1,5 +1,6 @@
 TurtleCraft.export('services/plugins', function()
   local register = {};
+  local callbacks = {};
 
   local function sort(array, by, next)
     local grouped = {};
@@ -54,6 +55,13 @@ TurtleCraft.export('services/plugins', function()
         if (title:lower() == v.title:lower()) then error('Plugin "' .. title .. '" already registered!'); end
       end
       table.insert(register, {title=title, start=start, order=order});
+      for _, v in ipairs(callbacks) do
+        pcall(v);
+      end
+    end,
+
+    onRegister = function(callback)
+      table.insert(callbacks, callback);
     end
   }
 end);

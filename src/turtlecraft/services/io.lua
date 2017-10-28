@@ -13,9 +13,8 @@ TurtleCraft.export('services/io', function()
 
   IO.setCancelKey = function(code, func)
     parallel.waitForAny(func, function()
-      local input;
       repeat
-        _, input = os.pullEvent('key');
+        local _, input = os.pullEvent('key');
       until (input == code);
     end);
   end
@@ -25,7 +24,7 @@ TurtleCraft.export('services/io', function()
       _, line = term.getCursorPos();
     end
     local width = term.getSize();
-    local inset = math.ceil(width/2 - text:len()/2);
+    local inset = math.ceil(width/2 - text:len()/2) + 1;
     if (inset < 0) then
       term.setCursorPos(1, line);
       term.write(text:sub(math.abs(inset) + 1, inset - 1));

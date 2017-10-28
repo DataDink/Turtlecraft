@@ -1,5 +1,5 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509210979504\",\"env\":\"debug\"}";
-TurtleCraft = {};
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509215857604\",\"env\":\"debug\"}";
+local TurtleCraft = {};
 
 (function()
   local modules = {};
@@ -40,9 +40,8 @@ TurtleCraft.export('services/io', function()
 
   IO.setCancelKey = function(code, func)
     parallel.waitForAny(func, function()
-      local input;
       repeat
-        _, input = os.pullEvent('key');
+        local _, input = os.pullEvent('key');
       until (input == code);
     end);
   end
@@ -52,7 +51,7 @@ TurtleCraft.export('services/io', function()
       _, line = term.getCursorPos();
     end
     local width = term.getSize();
-    local inset = math.ceil(width/2 - text:len()/2);
+    local inset = math.ceil(width/2 - text:len()/2) + 1;
     if (inset < 0) then
       term.setCursorPos(1, line);
       term.write(text:sub(math.abs(inset) + 1, inset - 1));
@@ -232,8 +231,34 @@ TurtleCraft.export('services/json', function()
   return Json;
 end);
 
+TurtleCraft.export('services/menu', function()
+  local view = TurtleCraft.import('views/menu');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function(items, transform)
+      local index = 1;
+      local transformed = {};
+      for _, v in ipairs(items) do
+        local display = transform and transform(v) or v;
+        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
+        table.insert(transformed, display);
+      end
+
+      repeat
+        view.show(transformed, index);
+        local key = IO.readKey();
+        if (key == keys.up) then index = math.max(1, index - 1); end
+        if (key == keys.down) then index = math.min(#transformed, index + 1) end
+      until (key == keys.enter or key == keys.numPadEnter)
+
+      return items[index];
+    end
+  };
+end);
+
 TurtleCraft.export('services/plugins', function()
   local register = {};
+  local callbacks = {};
 
   local function sort(array, by, next)
     local grouped = {};
@@ -288,6 +313,13 @@ TurtleCraft.export('services/plugins', function()
         if (title:lower() == v.title:lower()) then error('Plugin "' .. title .. '" already registered!'); end
       end
       table.insert(register, {title=title, start=start, order=order});
+      for _, v in ipairs(callbacks) do
+        pcall(v);
+      end
+    end,
+
+    onRegister = function(callback)
+      table.insert(callbacks, callback);
     end
   }
 end);
@@ -662,6 +694,34 @@ TurtleCraft.export('views/border', function()
   };
 end)
 
+TurtleCraft.export('views/menu', function()
+  local IO = TurtleCraft.import('services/io');
+  local border = TurtleCraft.import('views/border');
+  return {
+    show = function(items, index)
+      local w, h = term.getSize();
+      w = w - 2; h = h - 3; -- for border and footer
+
+      local itemStart = math.max(1, index - math.ceil(h/2));
+      itemStart = math.min(#items - h, itemStart);
+      itemStart = math.max(1, itemStart);
+
+      local lineCount = math.min(#items - itemStart, h);
+
+      term.clear();
+      for line = 2, lineCount + 2 do
+        term.setCursorPos(2, line);
+        local itemIndex = itemStart + (line - 2);
+        local item = items[itemIndex];
+        if (itemIndex == index) then term.write('>'); else term.write(' '); end
+        term.write(item);
+      end
+      border.show();
+      IO.centerLine('-use up/down/enter-', nil, h + 3);
+    end
+  }
+end)
+
 TurtleCraft.export('views/notification', function()
   local border = TurtleCraft.import('views/border');
   local IO = TurtleCraft.import('services/io');
@@ -675,14 +735,15 @@ TurtleCraft.export('views/notification', function()
 end);
 
 (function()
-  local plugins = TurtleCraft.import('services/plugins');
-  plugins.register('first', function() end, 0);
-  plugins.register('second', function() end, -1);
-  plugins.register('third', function() end, 0);
-  plugins.register('fourth', function() end, -1);
+  local menu = TurtleCraft.import('services/menu');
 
-  local result = plugins.list();
-  for _, v in ipairs(result) do
-    print(v.title);
-  end
+  local item = menu.show({
+    {title = 'item 1'},
+    {title = 'item 2'},
+    {title = 'item 3'},
+    {title = 'item 4'},
+  }, function(i) return i.title; end);
+
+  term.setCursorPos(1,1);
+  term.write(item.title);
 end)()

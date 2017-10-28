@@ -51,6 +51,34 @@ TurtleCraft.export('services/io', function()
     end
   end
 
+  IO.wordWrap = function(text, width)
+    local lines = {};
+    local line = '';
+    for block in text:gmatch('[^\n]*\n?') do
+      block = block:gsub('\n', '');
+      for part in block:gmatch('[^%s]+%s*') do
+        if ((line .. part):len() > width) then
+          table.insert(lines, line);
+          line = '';
+        end
+        line = line .. part;
+      end
+      if (line:len() > 0 or block:len() == 0) then
+        table.insert(lines, line);
+        line = '';
+      end
+    end
+    return table.concat(lines, '\n'), #lines;
+  end
+
+  IO.writeBlock = function(text, left, top)
+    for line in text:gmatch('[^\n]*\n?') do
+      term.setCursorPos(left, top);
+      term.write(line);
+      top = top + 1;
+    end
+  end
+
   return IO;
 
 end);

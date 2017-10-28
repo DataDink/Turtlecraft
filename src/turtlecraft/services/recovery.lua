@@ -79,11 +79,11 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
-      TurtleCraft.import('views/notification')
+      TurtleCraft.import('ui/views/notification')
         .show('Recovering...\nPress ESC to cancel');
       local code = IO.readKey(60);
       if (code == keys.esc) then return; end
-      TurtleCraft.import('views/notification')
+      TurtleCraft.import('ui/views/notification')
         .show('Recovering\nLast Session');
       pvt.recoverPosition();
       pvt.recoverTasks();

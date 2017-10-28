@@ -1,4 +1,4 @@
-TurtleCraft.export('views/border', function()
+TurtleCraft.export('ui/views/border', function()
   local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
   return {

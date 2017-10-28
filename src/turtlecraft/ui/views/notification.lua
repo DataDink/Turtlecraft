@@ -1,5 +1,5 @@
-TurtleCraft.export('views/notification', function()
-  local border = TurtleCraft.import('views/border');
+TurtleCraft.export('ui/views/notification', function()
+  local border = TurtleCraft.import('ui/views/border');
   local IO = TurtleCraft.import('services/io');
   return {
     show = function(message)

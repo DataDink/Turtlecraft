@@ -1,5 +1,5 @@
-TurtleCraft.export('services/menu', function()
-  local view = TurtleCraft.import('views/menu');
+TurtleCraft.export('ui/menu', function()
+  local view = TurtleCraft.import('ui/views/menu');
   local IO = TurtleCraft.import('services/io');
   return {
     show = function(items, transform)

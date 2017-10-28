@@ -1,12 +1,19 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509216923510\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509221967384\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
   local modules = {};
+  local startup = {};
   TurtleCraft.export = function(name, module)
     if (modules[name] ~= nil) then error('module ' .. name .. ' exists'); end
     local resolved = type(module) ~= 'function';
     modules[name] = {resolved = resolved, value = module};
+    return {
+      onready = function(callback)
+        if (type(callback) ~= 'function') then error('callback must be a function'); end
+        table.insert(startup, callback);
+      end
+    };
   end
   TurtleCraft.import = function(name)
     if (not modules[name]) then error('module ' .. name .. ' does not exist.'); end
@@ -16,65 +23,65 @@ local TurtleCraft = {};
     end
     return modules[name].value;
   end
+  TurtleCraft.start = function()
+    if (startup == false) then  error('TurtleCraft started twice!'); end
+    for _, callback in ipairs(startup) do
+      callback();
+    end
+    startup = false;
+  end
 end)();
 
-TurtleCraft.export('views/border', function()
-  local config = TurtleCraft.import('services/config');
-  local IO = TurtleCraft.import('services/io');
+TurtleCraft.export('ui/user-input', function()
+  local view = TurtleCraft.import('ui/views/input');
   return {
-    show = function()
-      local w, h = term.getSize();
-      IO.centerLine('TurtleCraft v' .. config.version .. ' ' .. config.env, '=', 1);
-      for l = 2, h do
-        term.setCursorPos(1, l);
-        term.write('|');
-        term.setCursorPos(w, l);
-        term.write('|');
-      end
-      term.setCursorPos(1, h);
-      term.write(('='):rep(w));
-    end
-  };
-end)
-
-TurtleCraft.export('views/menu', function()
-  local IO = TurtleCraft.import('services/io');
-  local border = TurtleCraft.import('views/border');
-  return {
-    show = function(items, index)
-      local w, h = term.getSize();
-      w = w - 2; h = h - 3; -- for border and footer
-
-      local itemStart = math.max(1, index - math.ceil(h/2));
-      itemStart = math.min(#items - h, itemStart);
-      itemStart = math.max(1, itemStart);
-
-      local lineCount = math.min(#items - itemStart, h);
-
-      term.clear();
-      for line = 2, lineCount + 2 do
-        term.setCursorPos(2, line);
-        local itemIndex = itemStart + (line - 2);
-        local item = items[itemIndex];
-        if (itemIndex == index) then term.write('>'); else term.write(' '); end
-        term.write(item);
-      end
-      border.show();
-      IO.centerLine('-use up/down/enter-', nil, h + 3);
+    show = function(text)
+      view.show(text);
+      return read();
     end
   }
 end)
 
-TurtleCraft.export('views/notification', function()
-  local border = TurtleCraft.import('views/border');
+TurtleCraft.export('ui/menu', function()
+  local view = TurtleCraft.import('ui/views/menu');
   local IO = TurtleCraft.import('services/io');
   return {
-    show = function(message)
-      term.clear();
-      IO.centerPage(message);
-      border.show();
+    show = function(items, transform)
+      local index = 1;
+      local transformed = {};
+      for _, v in ipairs(items) do
+        local display = transform and transform(v) or v;
+        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
+        table.insert(transformed, display);
+      end
+
+      repeat
+        view.show(transformed, index);
+        local key = IO.readKey();
+        if (key == keys.up) then index = math.max(1, index - 1); end
+        if (key == keys.down) then index = math.min(#transformed, index + 1) end
+      until (key == keys.enter or key == keys.numPadEnter)
+
+      return items[index];
     end
   };
+end);
+
+TurtleCraft.export('services/excavate', function()
+  return {
+    start = function()
+      local input = TurtleCraft.import('ui/user-input').show('bla bla bla bla bla bla bla bla bla bla bla bla bla');
+      TurtleCraft.import('ui/views/notification').show(input);
+      TurtleCraft.import('services/io').readKey();
+    end
+  }
+end).onready(function()
+  TurtleCraft.import('services/plugins').register(
+    'Excavate',
+    function()
+      TurtleCraft.import('services/excavate').start();
+    end
+  )
 end);
 
 TurtleCraft.export('services/config', function()
@@ -134,6 +141,34 @@ TurtleCraft.export('services/io', function()
     local start = math.floor(height/2-lineCount/2);
     for i = 1, lineCount do
       IO.centerLine(lines[i], fill, start + i);
+    end
+  end
+
+  IO.wordWrap = function(text, width)
+    local lines = {};
+    local line = '';
+    for block in text:gmatch('[^\n]*\n?') do
+      block = block:gsub('\n', '');
+      for part in block:gmatch('[^%s]+%s*') do
+        if ((line .. part):len() > width) then
+          table.insert(lines, line);
+          line = '';
+        end
+        line = line .. part;
+      end
+      if (line:len() > 0 or block:len() == 0) then
+        table.insert(lines, line);
+        line = '';
+      end
+    end
+    return table.concat(lines, '\n'), #lines;
+  end
+
+  IO.writeBlock = function(text, left, top)
+    for line in text:gmatch('[^\n]*\n?') do
+      term.setCursorPos(left, top);
+      term.write(line);
+      top = top + 1;
     end
   end
 
@@ -290,31 +325,6 @@ TurtleCraft.export('services/json', function()
   return Json;
 end);
 
-TurtleCraft.export('services/menu', function()
-  local view = TurtleCraft.import('views/menu');
-  local IO = TurtleCraft.import('services/io');
-  return {
-    show = function(items, transform)
-      local index = 1;
-      local transformed = {};
-      for _, v in ipairs(items) do
-        local display = transform and transform(v) or v;
-        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
-        table.insert(transformed, display);
-      end
-
-      repeat
-        view.show(transformed, index);
-        local key = IO.readKey();
-        if (key == keys.up) then index = math.max(1, index - 1); end
-        if (key == keys.down) then index = math.min(#transformed, index + 1) end
-      until (key == keys.enter or key == keys.numPadEnter)
-
-      return items[index];
-    end
-  };
-end);
-
 TurtleCraft.export('services/plugins', function()
   local register = {};
 
@@ -456,11 +466,11 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
-      TurtleCraft.import('views/notification')
+      TurtleCraft.import('ui/views/notification')
         .show('Recovering...\nPress ESC to cancel');
       local code = IO.readKey(60);
       if (code == keys.esc) then return; end
-      TurtleCraft.import('views/notification')
+      TurtleCraft.import('ui/views/notification')
         .show('Recovering\nLast Session');
       pvt.recoverPosition();
       pvt.recoverTasks();
@@ -726,9 +736,89 @@ TurtleCraft.export('services/recovery', function()
   return Recovery;
 end);
 
+TurtleCraft.export('ui/views/border', function()
+  local config = TurtleCraft.import('services/config');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function()
+      local w, h = term.getSize();
+      IO.centerLine('TurtleCraft v' .. config.version .. ' ' .. config.env, '=', 1);
+      for l = 2, h do
+        term.setCursorPos(1, l);
+        term.write('|');
+        term.setCursorPos(w, l);
+        term.write('|');
+      end
+      term.setCursorPos(1, h);
+      term.write(('='):rep(w));
+    end
+  };
+end)
+
+TurtleCraft.export('ui/views/input', function()
+  local IO = TurtleCraft.import('services/io');
+  local border = TurtleCraft.import('ui/views/border');
+
+  return {
+    show = function(text)
+      term.clear();
+      local w, h = term.getSize();
+      local wrapped = IO.wordWrap(text, w - 4);
+      IO.writeBlock(wrapped, 3, 3);
+      term.setCursorPos(1, h - 2);
+      term.clearLine();
+      term.setCursorPos(1, h - 1);
+      term.clearLine();
+      border.show();
+      term.setCursorPos(3, h - 2);
+    end
+  }
+end);
+
+TurtleCraft.export('ui/views/menu', function()
+  local IO = TurtleCraft.import('services/io');
+  local border = TurtleCraft.import('ui/views/border');
+  return {
+    show = function(items, index)
+      local w, h = term.getSize();
+      w = w - 2; h = h - 3; -- for border and footer
+
+      local itemStart = math.max(1, index - math.ceil(h/2));
+      itemStart = math.min(#items - h, itemStart);
+      itemStart = math.max(1, itemStart);
+
+      local lineCount = math.min(#items - itemStart, h);
+
+      term.clear();
+      for line = 2, lineCount + 2 do
+        term.setCursorPos(2, line);
+        local itemIndex = itemStart + (line - 2);
+        local item = items[itemIndex];
+        if (itemIndex == index) then term.write('>'); else term.write(' '); end
+        term.write(item);
+      end
+      border.show();
+      IO.centerLine('-use up/down/enter-', nil, h + 3);
+    end
+  }
+end)
+
+TurtleCraft.export('ui/views/notification', function()
+  local border = TurtleCraft.import('ui/views/border');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function(message)
+      term.clear();
+      IO.centerPage(message);
+      border.show();
+    end
+  };
+end);
+
 (function()
+  TurtleCraft.start();
   local plugins = TurtleCraft.import('services/plugins');
-  local menu = TurtleCraft.import('services/menu');
+  local menu = TurtleCraft.import('ui/menu');
 
   local exitItem = {title='Exit TurtleCraft'};
   local items = {exitItem};
@@ -741,4 +831,8 @@ end);
     local selection = menu.show(items, function(i) return i.title; end);
     if (type(selection.start) == 'function') then selection.start(); end
   until (selection == exitItem);
+
+  term.clear();
+  term.setCursorPos(1,1);
+  print('TurtleCraft exited');
 end)()

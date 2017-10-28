@@ -1,6 +1,6 @@
-TurtleCraft.export('views/menu', function()
+TurtleCraft.export('ui/views/menu', function()
   local IO = TurtleCraft.import('services/io');
-  local border = TurtleCraft.import('views/border');
+  local border = TurtleCraft.import('ui/views/border');
   return {
     show = function(items, index)
       local w, h = term.getSize();

@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509221967384\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509226394707\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
@@ -32,41 +32,6 @@ local TurtleCraft = {};
   end
 end)();
 
-TurtleCraft.export('ui/user-input', function()
-  local view = TurtleCraft.import('ui/views/input');
-  return {
-    show = function(text)
-      view.show(text);
-      return read();
-    end
-  }
-end)
-
-TurtleCraft.export('ui/menu', function()
-  local view = TurtleCraft.import('ui/views/menu');
-  local IO = TurtleCraft.import('services/io');
-  return {
-    show = function(items, transform)
-      local index = 1;
-      local transformed = {};
-      for _, v in ipairs(items) do
-        local display = transform and transform(v) or v;
-        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
-        table.insert(transformed, display);
-      end
-
-      repeat
-        view.show(transformed, index);
-        local key = IO.readKey();
-        if (key == keys.up) then index = math.max(1, index - 1); end
-        if (key == keys.down) then index = math.min(#transformed, index + 1) end
-      until (key == keys.enter or key == keys.numPadEnter)
-
-      return items[index];
-    end
-  };
-end);
-
 TurtleCraft.export('services/excavate', function()
   return {
     start = function()
@@ -82,6 +47,31 @@ end).onready(function()
       TurtleCraft.import('services/excavate').start();
     end
   )
+end);
+
+TurtleCraft.export('services/update', function()
+  return {
+    start = function()
+      local config = TurtleCraft.import('services/config');
+      local path = shell.getRunningProgram();
+      term.clear();
+      term.setCursorPos(1,1);
+      print('Downloading Latest Version...');
+      os.sleep(1);
+      fs.delete(path);
+      shell.run('pastebin', 'get', config.pastebin, path);
+      print('Rebooting...');
+      os.sleep(5);
+      os.reboot();
+    end;
+  };
+end).onready(function()
+  TurtleCraft.import('services/plugins').register(
+    'Update TurtleCraft',
+    function()
+      TurtleCraft.import('services/update').start();
+    end,
+    math.huge);
 end);
 
 TurtleCraft.export('services/config', function()
@@ -736,6 +726,53 @@ TurtleCraft.export('services/recovery', function()
   return Recovery;
 end);
 
+TurtleCraft.export('ui/dialog', function()
+  local IO = TurtleCraft.import('services/io');
+  local view = TurtleCraft.import('ui/views/notification');
+
+  return {
+    show = function(text)
+      view.show(text);
+      IO.readKey();
+    end
+  };
+end);
+
+TurtleCraft.export('ui/user-input', function()
+  local view = TurtleCraft.import('ui/views/input');
+  return {
+    show = function(text)
+      view.show(text);
+      return read();
+    end
+  }
+end)
+
+TurtleCraft.export('ui/menu', function()
+  local view = TurtleCraft.import('ui/views/menu');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function(items, transform)
+      local index = 1;
+      local transformed = {};
+      for _, v in ipairs(items) do
+        local display = transform and transform(v) or v;
+        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
+        table.insert(transformed, display);
+      end
+
+      repeat
+        view.show(transformed, index);
+        local key = IO.readKey();
+        if (key == keys.up) then index = math.max(1, index - 1); end
+        if (key == keys.down) then index = math.min(#transformed, index + 1) end
+      until (key == keys.enter or key == keys.numPadEnter)
+
+      return items[index];
+    end
+  };
+end);
+
 TurtleCraft.export('ui/views/border', function()
   local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
@@ -816,16 +853,19 @@ TurtleCraft.export('ui/views/notification', function()
 end);
 
 (function()
+  if (os.getComputerLabel() == nil) then os.setComputerLabel('TurtleCraft'); end
+
   TurtleCraft.start();
   local plugins = TurtleCraft.import('services/plugins');
   local menu = TurtleCraft.import('ui/menu');
 
   local exitItem = {title='Exit TurtleCraft'};
-  local items = {exitItem};
+  local items = {};
 
   for _, item in ipairs(plugins.list()) do
     table.insert(items, item);
   end
+  table.insert(items, exitItem);
 
   repeat
     local selection = menu.show(items, function(i) return i.title; end);

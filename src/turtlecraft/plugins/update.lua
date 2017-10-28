@@ -1,4 +1,4 @@
-TurtleCraft.export('services/update', function()
+TurtleCraft.export('plugins/update', function()
   return {
     start = function()
       local config = TurtleCraft.import('services/config');
@@ -18,7 +18,7 @@ end).onready(function()
   TurtleCraft.import('services/plugins').register(
     'Update TurtleCraft',
     function()
-      TurtleCraft.import('services/update').start();
+      TurtleCraft.import('plugins/update').start();
     end,
     math.huge);
 end);

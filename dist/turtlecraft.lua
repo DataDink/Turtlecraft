@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509226394707\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509233195826\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
@@ -31,48 +31,6 @@ local TurtleCraft = {};
     startup = false;
   end
 end)();
-
-TurtleCraft.export('services/excavate', function()
-  return {
-    start = function()
-      local input = TurtleCraft.import('ui/user-input').show('bla bla bla bla bla bla bla bla bla bla bla bla bla');
-      TurtleCraft.import('ui/views/notification').show(input);
-      TurtleCraft.import('services/io').readKey();
-    end
-  }
-end).onready(function()
-  TurtleCraft.import('services/plugins').register(
-    'Excavate',
-    function()
-      TurtleCraft.import('services/excavate').start();
-    end
-  )
-end);
-
-TurtleCraft.export('services/update', function()
-  return {
-    start = function()
-      local config = TurtleCraft.import('services/config');
-      local path = shell.getRunningProgram();
-      term.clear();
-      term.setCursorPos(1,1);
-      print('Downloading Latest Version...');
-      os.sleep(1);
-      fs.delete(path);
-      shell.run('pastebin', 'get', config.pastebin, path);
-      print('Rebooting...');
-      os.sleep(5);
-      os.reboot();
-    end;
-  };
-end).onready(function()
-  TurtleCraft.import('services/plugins').register(
-    'Update TurtleCraft',
-    function()
-      TurtleCraft.import('services/update').start();
-    end,
-    math.huge);
-end);
 
 TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
@@ -406,7 +364,7 @@ TurtleCraft.export('services/recovery', function()
     location = {},
 
     face = function(direction)
-      local turns = (direction%4) - location.facing;
+      local turns = (direction % 4) - location.f;
       if (turns == 0) then return true; end;
       if (turns > 2) then turns = -1; end
       if (turns < -2) then turns = 1; end
@@ -417,7 +375,7 @@ TurtleCraft.export('services/recovery', function()
         position.writeLine(name);
         position.flush();
       end
-      location.facing = (location.facing + turns)%4
+      location.f = (location.f + turns) % 4
       return true;
     end,
 
@@ -471,7 +429,9 @@ TurtleCraft.export('services/recovery', function()
       tasks = {};
       position = fs.open(positionFile, 'w');
       location = {x = 0, y = 0, z = 0, f = 0};
-    end
+    end,
+
+    onStep = function(callback) return pvt.onstep(callback); end
   };
 
   ----------------------> Location Stuff
@@ -481,10 +441,10 @@ TurtleCraft.export('services/recovery', function()
   });
 
   pvt.processForward = function()
-    if (location.facing == 0) then location.y = location.y + 1; end
-    if (location.facing == 1) then location.x = location.x + 1; end
-    if (location.facing == 2) then location.y = location.y - 1; end
-    if (location.facing == 3) then location.x = location.x - 1; end
+    if (location.f == 0) then location.y = location.y + 1; end
+    if (location.f == 1) then location.x = location.x + 1; end
+    if (location.f == 2) then location.y = location.y - 1; end
+    if (location.f == 3) then location.x = location.x - 1; end
   end
 
   pvt.processDown = function()
@@ -695,35 +655,189 @@ TurtleCraft.export('services/recovery', function()
 
   pvt.navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
     Recovery.start('services/recovery ' .. methodName .. ' ' .. x .. ' ' .. y .. ' ' .. z);
-    for i = 0, i < 3 do
+    for i = 1, 3 do
       while (location.x < x) do
         Recovery.face(1);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.x > x) do
         Recovery.face(3);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.y < y) do
         Recovery.face(0);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.y > y) do
         Recovery.face(2);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.z < z) do
         if (not upMethod()) then break; end
+        pvt.step();
       end
       while (location.z > z) do
         if (not downMethod()) then break; end
+        pvt.step();
       end
     end
     Recovery.finish();
     return (location.x == x and location.y == y and location.z == z);
   end
 
+  pvt.stepCallbacks = {};
+  pvt.step = function()
+    for _, callback in ipairs(pvt.stepCallbacks) do
+      callback();
+    end
+  end
+  pvt.onstep = function(callback)
+    table.insert(pvt.stepCallbacks, callback);
+    return (function() -- unassigner
+      for i, v in ipairs(pvt.stepCallbacks) do
+        if (v == callback) then
+          table.remove(pvt.stepCallbacks, i);
+          return true;
+        end
+      end
+      return false;
+    end);
+  end
+
   return Recovery;
+end);
+
+TurtleCraft.export('plugins/excavate', function()
+  local Recovery = TurtleCraft.import('services/recovery');
+  local UserInput = TurtleCraft.import('ui/user-input');
+  local Excavate = {};
+
+  Excavate = {
+    ask = function(question)
+      local value = UserInput.show(question .. '\n(nothing to cancel)');
+      while (not value:find('^%d+$')) do
+        if (value:len() == 0) then return nil; end
+        value = UserInput.show(question .. '\n(please enter positive a number)');
+      end
+      return tonumber(value);
+    end,
+
+    start = function()
+      local forward = Excavate.ask('How far forward should I dig?');
+      if (forward == nil) then return; end
+
+      local left = Excavate.ask('How far to the left should I dig?');
+      if (left == nil) then return; end
+
+      local right = Excavate.ask('How far to the right should I dig?');
+      if (right == nil) then return; end
+
+      local up = Excavate.ask('How far up should I dig?');
+      if (up == nil) then return; end
+
+      local down = Excavate.ask('How far down should I dig?');
+      if (down == nil) then return; end
+
+      Excavate.recover(forward, left, right, up, down);
+    end,
+
+    recover = function(forward, left, right, up, down, recovered)
+      forward = math.abs(forward);
+      left = -math.abs(left);
+      right = math.abs(right);
+      up = math.abs(up);
+      down = -math.abs(down);
+      local dispose = Recovery.onStep(Excavate.step);
+
+      if (not recovered) then
+        Recovery.reset();
+        Recovery.start('plugins/excavate recover ' .. forward .. ' ' .. -left .. ' ' .. right .. ' ' .. up .. ' ' .. -down .. ' true');
+        Recovery.digTo(left, 0, up - 1);
+      end
+
+      local function doRow()
+        if (Recovery.location.x < right) then
+          Recovery.excavateTo(right, Recovery.location.y, Recovery.location.z);
+        else
+          Recovery.excavateTo(left, Recovery.location.y, Recovery.location.z);
+        end
+      end
+
+      local function doLayer()
+        if (Recovery.location.y > 0) then
+          while (Recovery.location.y > 0) do
+            doRow();
+            Recovery.excavateTo(Recovery.location.x, Recovery.location.y - 1, Recovery.location.z);
+          end
+        else
+          while (Recovery.location.y < forward) do
+            doRow();
+            Recovery.excavateTo(Recovery.location.x, Recovery.location.y + 1, Recovery.location.z);
+          end
+        end
+      end
+
+      while (Recovery.location.z > down) do
+        doLayer();
+        Recovery.excavateTo(Recovery.location.x, Recovery.location.y, Recovery.location.z - 1);
+      end
+
+      Recovery.finish();
+      dispose();
+      Recovery.digTo(0,0,0);
+    end,
+
+    step = function()
+      Excavate.checkFuel();
+      Excavate.checkInventory();
+    end,
+
+    checkFuel = function()
+
+    end,
+
+    checkInventory = function()
+
+    end
+  };
+
+  return Excavate;
+end).onready(function()
+  TurtleCraft.import('services/plugins').register(
+    'Excavate',
+    function()
+      TurtleCraft.import('plugins/excavate').start();
+    end
+  )
+end);
+
+TurtleCraft.export('plugins/update', function()
+  return {
+    start = function()
+      local config = TurtleCraft.import('services/config');
+      local path = shell.getRunningProgram();
+      term.clear();
+      term.setCursorPos(1,1);
+      print('Downloading Latest Version...');
+      os.sleep(1);
+      fs.delete(path);
+      shell.run('pastebin', 'get', config.pastebin, path);
+      print('Rebooting...');
+      os.sleep(5);
+      os.reboot();
+    end;
+  };
+end).onready(function()
+  TurtleCraft.import('services/plugins').register(
+    'Update TurtleCraft',
+    function()
+      TurtleCraft.import('plugins/update').start();
+    end,
+    math.huge);
 end);
 
 TurtleCraft.export('ui/dialog', function()

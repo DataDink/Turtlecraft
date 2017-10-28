@@ -29,7 +29,7 @@ TurtleCraft.export('services/recovery', function()
     location = {},
 
     face = function(direction)
-      local turns = (direction%4) - location.facing;
+      local turns = (direction % 4) - location.f;
       if (turns == 0) then return true; end;
       if (turns > 2) then turns = -1; end
       if (turns < -2) then turns = 1; end
@@ -40,7 +40,7 @@ TurtleCraft.export('services/recovery', function()
         position.writeLine(name);
         position.flush();
       end
-      location.facing = (location.facing + turns)%4
+      location.f = (location.f + turns) % 4
       return true;
     end,
 
@@ -94,7 +94,9 @@ TurtleCraft.export('services/recovery', function()
       tasks = {};
       position = fs.open(positionFile, 'w');
       location = {x = 0, y = 0, z = 0, f = 0};
-    end
+    end,
+
+    onStep = function(callback) return pvt.onstep(callback); end
   };
 
   ----------------------> Location Stuff
@@ -104,10 +106,10 @@ TurtleCraft.export('services/recovery', function()
   });
 
   pvt.processForward = function()
-    if (location.facing == 0) then location.y = location.y + 1; end
-    if (location.facing == 1) then location.x = location.x + 1; end
-    if (location.facing == 2) then location.y = location.y - 1; end
-    if (location.facing == 3) then location.x = location.x - 1; end
+    if (location.f == 0) then location.y = location.y + 1; end
+    if (location.f == 1) then location.x = location.x + 1; end
+    if (location.f == 2) then location.y = location.y - 1; end
+    if (location.f == 3) then location.x = location.x - 1; end
   end
 
   pvt.processDown = function()
@@ -318,32 +320,57 @@ TurtleCraft.export('services/recovery', function()
 
   pvt.navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
     Recovery.start('services/recovery ' .. methodName .. ' ' .. x .. ' ' .. y .. ' ' .. z);
-    for i = 0, i < 3 do
+    for i = 1, 3 do
       while (location.x < x) do
         Recovery.face(1);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.x > x) do
         Recovery.face(3);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.y < y) do
         Recovery.face(0);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.y > y) do
         Recovery.face(2);
         if (not forwardMethod()) then break; end
+        pvt.step();
       end
       while (location.z < z) do
         if (not upMethod()) then break; end
+        pvt.step();
       end
       while (location.z > z) do
         if (not downMethod()) then break; end
+        pvt.step();
       end
     end
     Recovery.finish();
     return (location.x == x and location.y == y and location.z == z);
+  end
+
+  pvt.stepCallbacks = {};
+  pvt.step = function()
+    for _, callback in ipairs(pvt.stepCallbacks) do
+      callback();
+    end
+  end
+  pvt.onstep = function(callback)
+    table.insert(pvt.stepCallbacks, callback);
+    return (function() -- unassigner
+      for i, v in ipairs(pvt.stepCallbacks) do
+        if (v == callback) then
+          table.remove(pvt.stepCallbacks, i);
+          return true;
+        end
+      end
+      return false;
+    end);
   end
 
   return Recovery;

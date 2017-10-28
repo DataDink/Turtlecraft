@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509194488112\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509203215743\"}";
 TurtleCraft = {};
 
 (function()
@@ -9,14 +9,17 @@ TurtleCraft = {};
   end
   TurtleCraft.import = function(name)
     if (not modules[name]) then error('module ' .. name .. ' does not exist.'); end
-    if (not modules[name].resolved) then modules[name].value = modules[name].value(); end
+    if (not modules[name].resolved) then
+      modules[name].value = modules[name].value();
+      modules[name].resolved = true;
+    end
     return modules[name].value;
   end
 end)();
 
 TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
-  return TurtleCraft.require('services/json').parse(cfgjson or '{}');
+  return TurtleCraft.import('services/json').parse(cfgjson or '{}');
 end)
 
 TurtleCraft.export('services/io', function()
@@ -243,8 +246,8 @@ end);
 
 
 TurtleCraft.export('services/recovery', function()
-  local config = TurtleCraft.require('config');
-  local IO = TurtleCraft.require('services/io');
+  local config = TurtleCraft.import('config');
+  local IO = TurtleCraft.import('services/io');
   local location = {x=0,y=0,z=0,f=0};
   local positionFile = config.recoveryPath .. 'position.dat';
   local position = fs.open(positionFile, 'a');
@@ -311,11 +314,11 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
-      TurtleCraft.require('views/notification')
+      TurtleCraft.import('views/notification')
         .show('Recovering...\nPress ESC to cancel');
       local code = IO.readKey(60);
       if (code == keys.esc) then return; end
-      TurtleCraft.require('views/notification')
+      TurtleCraft.import('views/notification')
         .show('Recovering\nLast Session');
       pvt.recoverPosition();
       pvt.recoverTasks();
@@ -428,7 +431,7 @@ TurtleCraft.export('services/recovery', function()
       table.insert(values, value);
       value = parts();
     end
-    local lib = TurtleCraft.require(module);
+    local lib = TurtleCraft.import(module);
     local func = lib[method];
     func(table.unpack(values));
   end
@@ -582,8 +585,8 @@ TurtleCraft.export('services/recovery', function()
 end);
 
 TurtleCraft.export('views/border', function()
-  local config = TurtleCraft.require('config');
-  local IO = TurtleCraft.require('services/io');
+  local config = TurtleCraft.import('config');
+  local IO = TurtleCraft.import('services/io');
   return {
     show = function()
       IO.printCentered('TurtleCraft v' .. config.version)
@@ -598,5 +601,7 @@ end);
 (function()
   local JSON = TurtleCraft.import('services/json');
   local config = TurtleCraft.import('services/config');
+
+  JSON.parse(JSON.format(config));
   print(JSON.format(config));
 end)()

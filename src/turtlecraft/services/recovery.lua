@@ -15,8 +15,8 @@
 
 
 TurtleCraft.export('services/recovery', function()
-  local config = TurtleCraft.require('config');
-  local IO = TurtleCraft.require('services/io');
+  local config = TurtleCraft.import('config');
+  local IO = TurtleCraft.import('services/io');
   local location = {x=0,y=0,z=0,f=0};
   local positionFile = config.recoveryPath .. 'position.dat';
   local position = fs.open(positionFile, 'a');
@@ -83,11 +83,11 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
-      TurtleCraft.require('views/notification')
+      TurtleCraft.import('views/notification')
         .show('Recovering...\nPress ESC to cancel');
       local code = IO.readKey(60);
       if (code == keys.esc) then return; end
-      TurtleCraft.require('views/notification')
+      TurtleCraft.import('views/notification')
         .show('Recovering\nLast Session');
       pvt.recoverPosition();
       pvt.recoverTasks();
@@ -200,7 +200,7 @@ TurtleCraft.export('services/recovery', function()
       table.insert(values, value);
       value = parts();
     end
-    local lib = TurtleCraft.require(module);
+    local lib = TurtleCraft.import(module);
     local func = lib[method];
     func(table.unpack(values));
   end

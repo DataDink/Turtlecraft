@@ -1,6 +1,6 @@
 TurtleCraft.export('views/border', function()
-  local config = TurtleCraft.require('config');
-  local IO = TurtleCraft.require('services/io');
+  local config = TurtleCraft.import('config');
+  local IO = TurtleCraft.import('services/io');
   return {
     show = function()
       IO.printCentered('TurtleCraft v' .. config.version)

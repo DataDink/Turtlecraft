@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509215857604\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509216923510\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
@@ -17,6 +17,65 @@ local TurtleCraft = {};
     return modules[name].value;
   end
 end)();
+
+TurtleCraft.export('views/border', function()
+  local config = TurtleCraft.import('services/config');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function()
+      local w, h = term.getSize();
+      IO.centerLine('TurtleCraft v' .. config.version .. ' ' .. config.env, '=', 1);
+      for l = 2, h do
+        term.setCursorPos(1, l);
+        term.write('|');
+        term.setCursorPos(w, l);
+        term.write('|');
+      end
+      term.setCursorPos(1, h);
+      term.write(('='):rep(w));
+    end
+  };
+end)
+
+TurtleCraft.export('views/menu', function()
+  local IO = TurtleCraft.import('services/io');
+  local border = TurtleCraft.import('views/border');
+  return {
+    show = function(items, index)
+      local w, h = term.getSize();
+      w = w - 2; h = h - 3; -- for border and footer
+
+      local itemStart = math.max(1, index - math.ceil(h/2));
+      itemStart = math.min(#items - h, itemStart);
+      itemStart = math.max(1, itemStart);
+
+      local lineCount = math.min(#items - itemStart, h);
+
+      term.clear();
+      for line = 2, lineCount + 2 do
+        term.setCursorPos(2, line);
+        local itemIndex = itemStart + (line - 2);
+        local item = items[itemIndex];
+        if (itemIndex == index) then term.write('>'); else term.write(' '); end
+        term.write(item);
+      end
+      border.show();
+      IO.centerLine('-use up/down/enter-', nil, h + 3);
+    end
+  }
+end)
+
+TurtleCraft.export('views/notification', function()
+  local border = TurtleCraft.import('views/border');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function(message)
+      term.clear();
+      IO.centerPage(message);
+      border.show();
+    end
+  };
+end);
 
 TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
@@ -258,7 +317,6 @@ end);
 
 TurtleCraft.export('services/plugins', function()
   local register = {};
-  local callbacks = {};
 
   local function sort(array, by, next)
     local grouped = {};
@@ -313,14 +371,7 @@ TurtleCraft.export('services/plugins', function()
         if (title:lower() == v.title:lower()) then error('Plugin "' .. title .. '" already registered!'); end
       end
       table.insert(register, {title=title, start=start, order=order});
-      for _, v in ipairs(callbacks) do
-        pcall(v);
-      end
     end,
-
-    onRegister = function(callback)
-      table.insert(callbacks, callback);
-    end
   }
 end);
 
@@ -675,75 +726,19 @@ TurtleCraft.export('services/recovery', function()
   return Recovery;
 end);
 
-TurtleCraft.export('views/border', function()
-  local config = TurtleCraft.import('services/config');
-  local IO = TurtleCraft.import('services/io');
-  return {
-    show = function()
-      local w, h = term.getSize();
-      IO.centerLine('TurtleCraft v' .. config.version .. ' ' .. config.env, '=', 1);
-      for l = 2, h do
-        term.setCursorPos(1, l);
-        term.write('|');
-        term.setCursorPos(w, l);
-        term.write('|');
-      end
-      term.setCursorPos(1, h);
-      term.write(('='):rep(w));
-    end
-  };
-end)
-
-TurtleCraft.export('views/menu', function()
-  local IO = TurtleCraft.import('services/io');
-  local border = TurtleCraft.import('views/border');
-  return {
-    show = function(items, index)
-      local w, h = term.getSize();
-      w = w - 2; h = h - 3; -- for border and footer
-
-      local itemStart = math.max(1, index - math.ceil(h/2));
-      itemStart = math.min(#items - h, itemStart);
-      itemStart = math.max(1, itemStart);
-
-      local lineCount = math.min(#items - itemStart, h);
-
-      term.clear();
-      for line = 2, lineCount + 2 do
-        term.setCursorPos(2, line);
-        local itemIndex = itemStart + (line - 2);
-        local item = items[itemIndex];
-        if (itemIndex == index) then term.write('>'); else term.write(' '); end
-        term.write(item);
-      end
-      border.show();
-      IO.centerLine('-use up/down/enter-', nil, h + 3);
-    end
-  }
-end)
-
-TurtleCraft.export('views/notification', function()
-  local border = TurtleCraft.import('views/border');
-  local IO = TurtleCraft.import('services/io');
-  return {
-    show = function(message)
-      term.clear();
-      IO.centerPage(message);
-      border.show();
-    end
-  };
-end);
-
 (function()
+  local plugins = TurtleCraft.import('services/plugins');
   local menu = TurtleCraft.import('services/menu');
 
-  local item = menu.show({
-    {title = 'item 1'},
-    {title = 'item 2'},
-    {title = 'item 3'},
-    {title = 'item 4'},
-  }, function(i) return i.title; end);
+  local exitItem = {title='Exit TurtleCraft'};
+  local items = {exitItem};
 
-  term.setCursorPos(1,1);
-  term.write(item.title);
+  for _, item in ipairs(plugins.list()) do
+    table.insert(items, item);
+  end
+
+  repeat
+    local selection = menu.show(items, function(i) return i.title; end);
+    if (type(selection.start) == 'function') then selection.start(); end
+  until (selection == exitItem);
 end)()

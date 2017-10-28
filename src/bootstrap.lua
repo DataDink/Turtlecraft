@@ -1,13 +1,18 @@
 (function()
+  local plugins = TurtleCraft.import('services/plugins');
   local menu = TurtleCraft.import('services/menu');
 
-  local item = menu.show({
-    {title = 'item 1'},
-    {title = 'item 2'},
-    {title = 'item 3'},
-    {title = 'item 4'},
-  }, function(i) return i.title; end);
+  local exitItem = {title='Exit TurtleCraft'};
+  local items = {exitItem};
 
-  term.setCursorPos(1,1);
-  term.write(item.title);
+  for _, item in ipairs(plugins.list()) do
+    table.insert(items, item);
+  end
+
+  repeat
+    local selection = menu.show(items, function(i) return i.title; end);
+    if (type(selection.start) == 'function') then selection.start(); end
+  until (selection == exitItem);
+
+  term.clear();
 end)()

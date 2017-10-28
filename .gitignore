@@ -2,3 +2,4 @@ node_modules/*
 Crap/*
 package-lock.json
 pastebin.json
+dist/*

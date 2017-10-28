@@ -3,6 +3,7 @@ TurtleCraft = {};
 (function()
   local modules = {};
   TurtleCraft.export = function(name, module)
+    if (modules[name] ~= nil) then error('module ' .. name .. ' exists'); end
     local resolved = type(module) ~= 'function';
     modules[name] = {resolved = resolved, value = module};
   end

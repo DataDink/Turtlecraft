@@ -15,12 +15,12 @@
 
 
 TurtleCraft.export('services/recovery', function()
-  local config = TurtleCraft.import('config');
+  local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
   local location = {x=0,y=0,z=0,f=0};
-  local positionFile = config.recoveryPath .. 'position.dat';
+  local positionFile = config.recoveryPath .. '/position.dat';
   local position = fs.open(positionFile, 'a');
-  local taskFile = config.recoveryPath .. 'tasks.dat';
+  local taskFile = config.recoveryPath .. '/tasks.dat';
   local tasks = {};
   local pvt = {};
 
@@ -29,22 +29,18 @@ TurtleCraft.export('services/recovery', function()
     location = {},
 
     face = function(direction)
-      direction = direction % 4;
-      if (direction == location.facing) then return true; end
-      local method = (direction > location.facing) and turtle.turnRight or turtle.turnLeft;
-      local turns = math.abs(direction - location.facing);
-      if (turns > 2) then
-        turns = 1;
-        method = (method == turtle.turnRight) and turtle.turnLeft or turtle.turnRight;
-      end
-      local name = (method == turtle.turnRight) and 'right' or 'left';
-      for i=0, turns do
+      local turns = (direction%4) - location.facing;
+      if (turns == 0) then return true; end;
+      if (turns > 2) then turns = -1; end
+      if (turns < -2) then turns = 1; end
+      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
+      local name = (turns > 0) and 'right' or 'left';
+      for i=1, math.abs(turns) do
         method();
         position.writeLine(name);
         position.flush();
-        if (method == turtle.turnRight) then location.facing = location.facing + 1; end
-        if (method == turtle.turnLeft) then location.facing = location.facing - 1; end
       end
+      location.facing = (location.facing + turns)%4
       return true;
     end,
 

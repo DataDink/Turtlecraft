@@ -8,9 +8,10 @@ var args = Array.from(process.argv).slice(3);
 args.forEach((a, i) => { if (/^--\w+/gi.exec(a)) { args[a.replace(/^--/gi, '')] = args[i+1]; }});
 
 // Loads the requested (or default) config
-var env = args.env || 'default';
+var env = args.env || 'debug';
 var config = require('./src/configs/' + env + '.json');
 config.build = (new Date()).valueOf().toString();
+config.env = env;
 var cfgjson = JSON.stringify(JSON.stringify(config));
 
 /*******************************GULP COMMANDS*******************************/
@@ -52,7 +53,7 @@ gulp.task('deploy', complete => {
         expires: 'N',
         format: 'text',
         privacy: 1,
-        name: 'turtlecraft v' + config.version
+        name: 'turtlecraft v' + config.version + ' ' + env
       }, (s, e) => {
         if (!s) { throw e; }
         console.log('Deployed to: ' + config.pastebin);

@@ -1,7 +1,12 @@
 (function()
-  local JSON = TurtleCraft.import('services/json');
-  local config = TurtleCraft.import('services/config');
+  local plugins = TurtleCraft.import('services/plugins');
+  plugins.register('first', function() end, 0);
+  plugins.register('second', function() end, -1);
+  plugins.register('third', function() end, 0);
+  plugins.register('fourth', function() end, -1);
 
-  JSON.parse(JSON.format(config));
-  print(JSON.format(config));
+  local result = plugins.list();
+  for _, v in ipairs(result) do
+    print(v.title);
+  end
 end)()

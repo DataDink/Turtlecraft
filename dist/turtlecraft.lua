@@ -1,9 +1,10 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509203215743\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509210979504\",\"env\":\"debug\"}";
 TurtleCraft = {};
 
 (function()
   local modules = {};
   TurtleCraft.export = function(name, module)
+    if (modules[name] ~= nil) then error('module ' .. name .. ' exists'); end
     local resolved = type(module) ~= 'function';
     modules[name] = {resolved = resolved, value = module};
   end
@@ -19,7 +20,9 @@ end)();
 
 TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
-  return TurtleCraft.import('services/json').parse(cfgjson or '{}');
+  local config =  TurtleCraft.import('services/json').parse(cfgjson or '{}');
+  config.recoveryPath = config.recoveryPath:gsub('[%s/]+$', '');
+  return config;
 end)
 
 TurtleCraft.export('services/io', function()
@@ -49,7 +52,7 @@ TurtleCraft.export('services/io', function()
       _, line = term.getCursorPos();
     end
     local width = term.getSize();
-    local inset = math.floor(width/2 - text:len()/2);
+    local inset = math.ceil(width/2 - text:len()/2);
     if (inset < 0) then
       term.setCursorPos(1, line);
       term.write(text:sub(math.abs(inset) + 1, inset - 1));
@@ -229,6 +232,66 @@ TurtleCraft.export('services/json', function()
   return Json;
 end);
 
+TurtleCraft.export('services/plugins', function()
+  local register = {};
+
+  local function sort(array, by, next)
+    local grouped = {};
+    for _, v in ipairs(array) do
+      local key = by(v);
+      if (grouped[key] == nil) then grouped[key] = {}; end
+      table.insert(grouped[key], v);
+    end
+
+    local sorted = {};
+    for k in pairs(grouped) do
+      table.insert(sorted, k);
+    end
+    table.sort(sorted);
+
+    local result = {};
+    for _, k in ipairs(sorted) do
+      if (next and #grouped[k] > 0) then grouped[k] = next(grouped[k]); end
+      for _, v in ipairs(grouped[k]) do
+        table.insert(result, v);
+      end
+    end
+
+    return result;
+  end
+
+  return {
+    list = function()
+      local sorted = sort(
+        register,
+        function(r) return r.order; end,
+        function(grouped) return sort(
+          grouped,
+          function(i) return i.title; end
+        ); end
+      );
+      local items = {};
+      for _, v in ipairs(sorted) do
+        table.insert(items, {title=v.title,start=v.start});
+      end
+      return items;
+    end,
+
+    register = function(title, start, order)
+      local usage = 'Usage: TurtleCraft.import("services/plugins").register(<title>, <start function>, <optional order>);';
+      if (type(start) ~= 'function') then error(usage); end
+      if (type(title) ~= 'string') then error(usages); end
+      if (order ~= nil and type(order) ~= 'number') then error(usage); end
+      title = title:gsub('^%s+', ''):gsub('%s+$', '');
+      order = order or 0;
+      for _, v in ipairs(register) do
+        if (title:lower() == v.title:lower()) then error('Plugin "' .. title .. '" already registered!'); end
+      end
+      table.insert(register, {title=title, start=start, order=order});
+    end
+  }
+end);
+
 -- Recovery
 -- Provides simple recovery functionality
 -- Use in place of normal turtle movement functions
@@ -246,12 +309,12 @@ end);
 
 
 TurtleCraft.export('services/recovery', function()
-  local config = TurtleCraft.import('config');
+  local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
   local location = {x=0,y=0,z=0,f=0};
-  local positionFile = config.recoveryPath .. 'position.dat';
+  local positionFile = config.recoveryPath .. '/position.dat';
   local position = fs.open(positionFile, 'a');
-  local taskFile = config.recoveryPath .. 'tasks.dat';
+  local taskFile = config.recoveryPath .. '/tasks.dat';
   local tasks = {};
   local pvt = {};
 
@@ -260,22 +323,18 @@ TurtleCraft.export('services/recovery', function()
     location = {},
 
     face = function(direction)
-      direction = direction % 4;
-      if (direction == location.facing) then return true; end
-      local method = (direction > location.facing) and turtle.turnRight or turtle.turnLeft;
-      local turns = math.abs(direction - location.facing);
-      if (turns > 2) then
-        turns = 1;
-        method = (method == turtle.turnRight) and turtle.turnLeft or turtle.turnRight;
-      end
-      local name = (method == turtle.turnRight) and 'right' or 'left';
-      for i=0, turns do
+      local turns = (direction%4) - location.facing;
+      if (turns == 0) then return true; end;
+      if (turns > 2) then turns = -1; end
+      if (turns < -2) then turns = 1; end
+      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
+      local name = (turns > 0) and 'right' or 'left';
+      for i=1, math.abs(turns) do
         method();
         position.writeLine(name);
         position.flush();
-        if (method == turtle.turnRight) then location.facing = location.facing + 1; end
-        if (method == turtle.turnLeft) then location.facing = location.facing - 1; end
       end
+      location.facing = (location.facing + turns)%4
       return true;
     end,
 
@@ -585,23 +644,45 @@ TurtleCraft.export('services/recovery', function()
 end);
 
 TurtleCraft.export('views/border', function()
-  local config = TurtleCraft.import('config');
+  local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
   return {
     show = function()
-      IO.printCentered('TurtleCraft v' .. config.version)
+      local w, h = term.getSize();
+      IO.centerLine('TurtleCraft v' .. config.version .. ' ' .. config.env, '=', 1);
+      for l = 2, h do
+        term.setCursorPos(1, l);
+        term.write('|');
+        term.setCursorPos(w, l);
+        term.write('|');
+      end
+      term.setCursorPos(1, h);
+      term.write(('='):rep(w));
     end
   };
 end)
 
 TurtleCraft.export('views/notification', function()
-  
+  local border = TurtleCraft.import('views/border');
+  local IO = TurtleCraft.import('services/io');
+  return {
+    show = function(message)
+      term.clear();
+      IO.centerPage(message);
+      border.show();
+    end
+  };
 end);
 
 (function()
-  local JSON = TurtleCraft.import('services/json');
-  local config = TurtleCraft.import('services/config');
+  local plugins = TurtleCraft.import('services/plugins');
+  plugins.register('first', function() end, 0);
+  plugins.register('second', function() end, -1);
+  plugins.register('third', function() end, 0);
+  plugins.register('fourth', function() end, -1);
 
-  JSON.parse(JSON.format(config));
-  print(JSON.format(config));
+  local result = plugins.list();
+  for _, v in ipairs(result) do
+    print(v.title);
+  end
 end)()

@@ -1,4 +1,6 @@
 TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
-  return TurtleCraft.import('services/json').parse(cfgjson or '{}');
+  local config =  TurtleCraft.import('services/json').parse(cfgjson or '{}');
+  config.recoveryPath = config.recoveryPath:gsub('[%s/]+$', '');
+  return config;
 end)

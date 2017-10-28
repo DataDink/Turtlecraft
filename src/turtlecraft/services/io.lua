@@ -25,7 +25,7 @@ TurtleCraft.export('services/io', function()
       _, line = term.getCursorPos();
     end
     local width = term.getSize();
-    local inset = math.floor(width/2 - text:len()/2);
+    local inset = math.ceil(width/2 - text:len()/2);
     if (inset < 0) then
       term.setCursorPos(1, line);
       term.write(text:sub(math.abs(inset) + 1, inset - 1));

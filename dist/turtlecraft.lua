@@ -1,9 +1,602 @@
-local cfgjson = "{\"minify\":true,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509103674203\"}";
-TurtleCraft={}(function()local a={}TurtleCraft.export=function(b,c)local d=type(c)~='function'a[b]={resolved=d,value=c}end;TurtleCraft.import=function(b)if a[b]then error('module '..b..' does not exist.')end;if not a[b].resolved then a[b].value=a[b].value()end;return a[b].value end end)()
-TurtleCraft.export('services/config',function()return TurtleCraft.require('services/json').parse(cfgjson or'{}')end)
-TurtleCraft.export('services/io',function()local a={}a.readKey=function(b)if b then os.startTimer(b)end;local c,d,e;repeat c,d,e=os.pullEvent()until c=="key"or c=="timer"if c=="timer"then return false,false end;return d,e end;a.setCancelKey=function(d,f)parallel.waitForAny(f,function()local g;repeat _,g=os.pullEvent('key')until g==d end)end;a.centerLine=function(h,i,j)if j==nil then _,j=term.getCursorPos()end;local k=term.getSize()local l=math.floor(k/2-h:len()/2)if l<0 then term.setCursorPos(1,j)term.write(h:sub(math.abs(l)+1,l-1))return end;if i~=nil then term.setCursorPos(1,j)term.write(i:rep(k))end;term.setCursorPos(l,j)term.write(h)end;a.centerPage=function(h,i)local m={}for j in h:gsub('[^\n]+')do table.insert(m,j)end;local n=#m;local _,o=term.getSize()local p=math.floor(o/2-n/2)for q=1,n do a.centerLine(m[q],i,p+q)end end end)
-TurtleCraft.export('services/json',function()local a={}a.trim=function(b)return b:gsub('^%s|%s$')end;a.parseNull=function(b)b=a.trim(b)if not b:gmatch('^null')()then return false,b:len()end;b=b:sub(4)return true,nil,b end;a.parseNumber=function(b)b=a.trim(b)local c=b:gmatch('^-?%d+|^-?%d+%.%d+')()if c==nil then return false,b:len()end;b=b:sub(c:len()+1)return true,tonumber(c),b end;a.parseBoolean=function(b)b=a.trim(b)local c=b:lower():gmatch('^true|^false')()if c==nil then return false,b:len()end;b=b:sub(c:len()+1)return true,c=='true',b end;a.parseString=function(b)b=a.trim(b)if b:sub(1,1)~='"'then return false,b:len()end;b=b:sub(2)local c=''local d=b:gmatch('[^\\"]*[\\"]')()while d~=nil do b=b:sub(d:len()+1)if d:sub(-1)=='"'then c=c..d:sub(1,-2)return true,c,b end;c=c..d:sub(1,-2)local e=b:sub(1,1)b=b:sub(2)if e=='"'then c=c..'"'end;if e=='\\'then c=c..'\\'end;if e=='/'then c=c..'/'end;if e=='b'then c=c..'\b'end;if e=='f'then c=c..'\f'end;if e=='n'then c=c..'\n'end;if e=='r'then c=c..'\r'end;if e=='t'then c=c..'\t'end;if e=='u'then local f=tonumber(b:sub(1,4),16)%256;b=b:sub(5)c=c..string.char(f)end;d=b:gmatch('[^\\"]*[\\"]')()end;return false,b:len()end;a.parseArray=function(b)b=a.trim(b)if b:sub(1,1)~='['then return false,b:len()end;b=b:sub(2)local g={}local h,c,b=a.parseNext(b)while h do table.insert(g,c)b=a.trim(b)local i=b:sub(1,1)b=b:sub(2)if i==']'then return true,g,b end;if i~=','then return false,b:len()end;h,c,b=a.parseNext(b)end;return false,b:len()end;a.parseObject=function(b)b=a.trim(b)if b:sub(1,1)~='{'then return false,b:len()end;b=b:sub(2)local g={}local h,j,b=a.parseString(b)while h do b=a.trim(b)if b:sub(1,1)~=':'then return false,b:len()end;b=b:sub(2)local k,c,b=a.parseNext(b)if not k then return false end;g[j]=c;b=a.trim(b)local i=b:sub(1,1)b=b:sub(2)if i=='}'then return true,g,b end;if i~=','then return false,b:len()end;h,j,b=a.parseString(b)end;return false,b:len()end;a.parseNext=function(b)for l,m in ipairs({a.parseNull,a.parseNumber,a.parseBoolean,a.parseString,a.parseArray,a.parseObject})do local n,c,b=m(b)if n then return true,c,b end end;return false,b:len()end;a.parse=function(b)local n,c=a.parseNext(b)if n then return c else return nil end end;a.format=function(c)if type(c)=='nil'then return'null'end;if type(c)=='boolean'then return tostring(c)end;if type(c)=='number'then return tostring(c)end;if type(c)=='string'then c=c:gsub('\\','\\\\')c=c:gsub('\"','\\"')c=c:gsub('\/','\\/')c=c:gsub('\b','\\b')c=c:gsub('\f','\\f')c=c:gsub('\n','\\n')c=c:gsub('\r','\\r')c=c:gsub('\t','\\t')return'"'..c..'"'end;if type(c)=='table'and#c then local o={}for l,p in ipairs(c)do table.insert(o,a.format(p))end;return'['..table.concat(o,',')..']'end;if type(c)=='table'then local o={}for q,r in pairs(c)do table.insert(o,'"'..q..'":'..a.format(r))end;return'{'..table.concat(o,',')..'}'end end;return a end)
-TurtleCraft.export('services/recovery',function()local a=TurtleCraft.require('config')local b=TurtleCraft.require('services/io')local c={x=0,y=0,z=0,f=0}local d=a.recoveryPath..'position.dat'local e=fs.open(d,'a')local f=a.recoveryPath..'tasks.dat'local g={}local h={}local i={location={},face=function(j)j=j%4;if j==c.facing then return true end;local k=j>c.facing and turtle.turnRight or turtle.turnLeft;local l=math.abs(j-c.facing)if l>2 then l=1;k=k==turtle.turnRight and turtle.turnLeft or turtle.turnRight end;local m=k==turtle.turnRight and'right'or'left'for n=0,l do k()e.writeLine(m)e.flush()if k==turtle.turnRight then c.facing=c.facing+1 end;if k==turtle.turnLeft then c.facing=c.facing-1 end end;return true end,moveTo=function(o,p,q)return h.navigateTo('moveTo',h.moveForward,h.moveUp,h.moveDown,o,p,q)end,digTo=function(o,p,q)return h.navigateTo('digTo',h.digForward,h.digUp,h.digDown,o,p,q)end,excavateTo=function(o,p,q)return h.navigateTo('excavateTo',h.excavateForward,h.excavateUp,h.excavateDown,o,p,q)end,start=function(r)local s=fs.open(f,'a')s.writeLine(r)s.close()table.insert(g,r)end,finish=function()local s=fs.open(f,'a')s.writeLine('end')s.close()table.remove(g)local t=h.readTasks()if#t==0 then fs.open(f,'w').close()local u='location '..c.x..' '..c.y..' '..c.z..' '..c.f;e.close()e=fs.open(d,'w')e.writeLine(u)end end,recover=function()TurtleCraft.require('views/notification').show('Recovering...\nPress ESC to cancel')local v=b.readKey(60)if v==keys.esc then return end;TurtleCraft.require('views/notification').show('Recovering\nLast Session')h.recoverPosition()h.recoverTasks()end,reset=function()fs.open(f,'w')g={}e=fs.open(d,'w')c={x=0,y=0,z=0,f=0}end}setmetatable(i.location,{__index=c,__newindex=function()return end})h.processForward=function()if c.facing==0 then c.y=c.y+1 end;if c.facing==1 then c.x=c.x+1 end;if c.facing==2 then c.y=c.y-1 end;if c.facing==3 then c.x=c.x-1 end end;h.processDown=function()c.z=c.z-1 end;h.processUp=function()c.z=c.z+1 end;h.processRight=function()c.f=(c.f+1)%4 end;h.processLeft=function()c.f=(c.f-1)%4 end;h.readTasks=function()if not fs.exists(f)then return{}end;local w={}local s=fs.open(f,'r')local x=s.readLine()while x do if x=='end'then table.remove(w)else table.insert(w,x)end;local x=s.readLine()end;s.close()return w end;h.recoverPosition=function()if not fs.exists(d)then return end;local y=fs.open(a.recoveryPath,'r')local z=y.readLine()while z do if z=='forward'then h.processForward()end;if z=='up'then h.processUp()end;if z=='down'then h.processDown()end;if z=='left'then h.processLeft()end;if z=='right'then h.processRight()end;if z:match('^location %d+ %d+ %d+ %d$')then local A=z:gmatch('%d+')c.x=tonumber(A())c.y=tonumber(A())c.z=tonumber(A())c.f=tonumber(A())end;z=y.readLine()end;y.close()e=fs.open(d,'w')e.writeLine('location '..e.x..' '..e.y..' '..e.z..' '..e.f)end;h.recoverTasks=function()if not fs.exists(f)then return end;local B=h.readTasks()local s=fs.open(f,'w')for C,D in ipairs(B)do s.writeLine(D)end;s.close()for C,D in ipairs(B)do h.exec(D)end end;h.exec=function(z)local E=z:gsub('[^%s]+')local F=E()local k=E()local A={}local G=E()while G do if G:match('^%d+%.%d+$|^%d+$')then G=tonumber(G)end;if G:upper()=='TRUE'then G=true end;if G:upper()=='FALSE'then G=false end;table.insert(A,G)G=E()end;local H=TurtleCraft.require(F)local I=H[k]I(table.unpack(A))end;h.moveForward=function()return h.retry(function()if turtle.forward()then e.writeLine('forward')e.flush()h.processForward()return true end;return false end,a.maxMoves)end;h.moveUp=function()return h.retry(function()if turtle.up()then e.writeLine('up')e.flush()h.processUp()return true end;return false end,a.maxMoves)end;h.moveDown=function()return h.retry(function()if turtle.down()then e.writeLine('down')e.flush()h.processDown()return true end;return false end,a.maxMoves)end;h.digDetect=function(J,K)return h.retry(function()if not K()then return true end;J()return not K()end,a.maxDigs)end;h.digMove=function(K,J,L,M)return h.retry(function()if not h.digDetect(K,J)then return false end;L()return M()end,a.maxAttacks)end;h.digForward=function()return h.digMove(turtle.detect,turtle.dig,turtle.attack,function()if turtle.forward()then e.writeLine('forward')e.flush()h.processForward()return true end;return false end)end;h.digUp=function()return h.digMove(turtle.detectUp,turtle.digUp,turtle.attackUp,function()if turtle.up()then e.writeLine('up')e.flush()h.processUp()return true end;return false end)end;h.digDown=function()return h.digMove(turtle.detectDown,turtle.digDown,turtle.attackDown,function()if turtle.down()then e.writeLine('down')e.flush()h.processDown()return true end;return false end)end;h.excavateForward=function()h.digDetect(turtle.detectUp,turtle.digUp)h.digDetect(turtle.detectDown,turtle.digDown)return h.digForward()end;h.excavateUp=function()h.digDetect(turtle.detect,turtle.dig)return h.digUp()end;h.excavateDown=function()h.digDetect(turtle.detect,turtle.dig)return h.digDown()end;h.retry=function(k,N)for O=0,N do if k()then return true end end;return false end;h.navigateTo=function(P,Q,R,S,o,p,q)i.start('services/recovery '..P..' '..o..' '..p..' '..q)for n=0,n<3 do while c.x<o do i.face(1)if not Q()then break end end;while c.x>o do i.face(3)if not Q()then break end end;while c.y<p do i.face(0)if not Q()then break end end;while c.y>p do i.face(2)if not Q()then break end end;while c.z<q do if not R()then break end end;while c.z>q do if not S()then break end end end;i.finish()return c.x==o and c.y==p and c.z==q end;return i end)
-TurtleCraft.export('views/border',function()local a=TurtleCraft.require('config')local b=TurtleCraft.require('services/io')return{show=function()b.printCentered('TurtleCraft v'..a.version)end}end)
-TurtleCraft.export('views/notification',function()end)
-(function()local a=TurtleCraft.require('services/io')a.centerLine('test')a.readKey()a.centerPage('test')a.readKey()end)()
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"build\":\"1509164139100\"}";
+TurtleCraft = {};
+
+(function()
+  local modules = {};
+  TurtleCraft.export = function(name, module)
+    local resolved = type(module) ~= 'function';
+    modules[name] = {resolved = resolved, value = module};
+  end
+  TurtleCraft.import = function(name)
+    if (not modules[name]) then error('module ' .. name .. ' does not exist.'); end
+    if (not modules[name].resolved) then modules[name].value = modules[name].value(); end
+    return modules[name].value;
+  end
+end)();
+
+TurtleCraft.export('services/config', function()
+  -- NOTE: cfgjson will be added to the turtlecraft scope at build time
+  return TurtleCraft.require('services/json').parse(cfgjson or '{}');
+end)
+
+TurtleCraft.export('services/io', function()
+  local IO = {};
+
+  IO.readKey = function(timeout)
+    if (timeout) then os.startTimer(timeout); end
+    local event, code, held;
+    repeat
+      event, code, held = os.pullEvent();
+    until (event == "key" or event == "timer");
+    if (event == "timer") then return false, false; end
+    return code, held;
+  end
+
+  IO.setCancelKey = function(code, func)
+    parallel.waitForAny(func, function()
+      local input;
+      repeat
+        _, input = os.pullEvent('key');
+      until (input == code);
+    end);
+  end
+
+  IO.centerLine = function(text, fill, line)
+    if (line == nil) then
+      _, line = term.getCursorPos();
+    end
+    local width = term.getSize();
+    local inset = math.floor(width/2 - text:len()/2);
+    if (inset < 0) then
+      term.setCursorPos(1, line);
+      term.write(text:sub(math.abs(inset) + 1, inset - 1));
+      return;
+    end
+    if (fill ~= nil) then
+      term.setCursorPos(1, line);
+      term.write(fill:rep(width));
+    end
+    term.setCursorPos(inset, line);
+    term.write(text);
+  end
+
+  IO.centerPage = function(text, fill)
+    local lines = {};
+    for line in text:gmatch('[^\n]+') do
+      table.insert(lines, line);
+    end
+    local lineCount = #lines;
+    local _, height = term.getSize();
+    local start = math.floor(height/2-lineCount/2);
+    for i = 1, lineCount do
+      IO.centerLine(lines[i], fill, start + i);
+    end
+  end
+
+  return IO;
+
+end);
+
+TurtleCraft.export('services/json', function()
+  local Json = {};
+
+  Json.trim = function(remaining)
+    return remaining:gsub('^%s+', ''):gsub('%s+$', '');
+  end
+
+  Json.parseNull = function(remaining)
+    if (not remaining:lower():find('^%s*null')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*null', '');
+    return true, nil, remaining;
+  end
+
+  Json.parseNumber = function(remaining)
+    if (not remaining:find('^%s*-?%d+')) then return false, nil, remaining; end
+    remaining = Json.trim(remaining);
+    local value = remaining:match('^-?%d+') or remaining:match('^-?%d+%.%d+');
+    remaining = remaining:sub(value:len() + 1);
+    return true, tonumber(value), remaining;
+  end
+
+  Json.parseBoolean = function(remaining)
+    remaining = Json.trim(remaining);
+    local value = remaining:lower():match('^true') or remaining:lower():match('^false');
+    if (value == nil) then return false, nil, remaining; end
+    remaining = remaining:sub(value:len() + 1);
+    return true, value == 'true', remaining;
+  end
+
+  Json.parseString = function(remaining)
+    if (not remaining:find('^%s*"')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*"', '');
+    local value = '';
+    local chunk = remaining:match('^[^\\"]*[\\"]');
+    while (chunk ~= nil) do
+      remaining = remaining:sub(chunk:len() + 1);
+
+      if (chunk:sub(-1) == '"') then
+        value = value .. chunk:sub(1, -2);
+        return true, value, remaining;
+      end
+
+      value = value .. chunk:sub(1, -2);
+      local chr = remaining:sub(1,1);
+      remaining = remaining:sub(2);
+
+      if (chr == '"') then value = value .. '"'; end
+      if (chr == '\\') then value = value .. '\\'; end
+      if (chr == '/') then value = value .. '/'; end
+      if (chr == 'b') then value = value .. '\b'; end
+      if (chr == 'f') then value = value .. '\f'; end
+      if (chr == 'n') then value = value .. '\n'; end
+      if (chr == 'r') then value = value .. '\r'; end
+      if (chr == 't') then value = value .. '\t'; end
+      if (chr == 'u') then
+        local hex = tonumber(remaining:sub(1, 4), 16) % 256;
+        remaining = remaining:sub(5);
+        value = value .. string.char(hex);
+      end
+      chunk = remaining:match('[^\\"]*[\\"]');
+    end
+    return false, remaining:len();
+  end
+
+  Json.parseArray = function(remaining)
+    if (not remaining:find('^%s*%[')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*%[', '');
+    local result = {};
+    local valid, value, remaining = Json.parseNext(remaining);
+    while (valid) do
+      table.insert(result, value);
+      remaining = Json.trim(remaining);
+      local delim = remaining:sub(1, 1);
+      remaining = remaining:sub(2);
+      if (delim == ']') then return true, result, remaining; end
+      if (delim ~= ',') then return false, remaining:len(); end
+      valid, value, remaining = Json.parseNext(remaining);
+    end
+    return false, remaining:len();
+  end
+
+  Json.parseObject = function(remaining)
+    if (not remaining:find('^%s*%{')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*%{', '');
+    local result = {};
+    local valid, key, remaining = Json.parseString(remaining);
+    while (valid) do
+      remaining = Json.trim(remaining);
+      if (remaining:sub(1,1) ~= ':') then return false, remaining:len(); end
+      remaining = remaining:sub(2);
+      local continue, value, remaining = Json.parseNext(remaining);
+      if (not continue) then return false; end
+      result[key] = value;
+      remaining = Json.trim(remaining);
+      local delim = remaining:sub(1,1);
+      remaining = remaining:sub(2);
+      if (delim == '}') then return true, result, remaining; end
+      if (delim ~= ',') then return false, remaining:len(); end
+      valid, key, remaining = Json.parseString(remaining);
+    end
+    return false, remaining:len();
+  end
+
+  Json.parseNext = function(remaining)
+    for i, parser in ipairs({Json.parseNull, Json.parseNumber, Json.parseBoolean, Json.parseString, Json.parseArray, Json.parseObject}) do
+      local success, value, remaining = parser(remaining);
+      if (success) then return true, value, remaining; end
+    end
+    return false, remaining:len();
+  end
+
+  Json.parse = function(remaining)
+    local success, value = Json.parseNext(remaining);
+    if (success) then return value; else return nil; end
+  end
+
+  Json.format = function(value)
+    if (type(value) == 'nil') then return 'null'; end
+    if (type(value) == 'boolean') then return tostring(value); end
+    if (type(value) == 'number') then return tostring(value); end
+    if (type(value) == 'string') then
+      value = value:gsub('\\', '\\\\');
+      value = value:gsub('\"', '\\"');
+      value = value:gsub('\/', '\\/');
+      value = value:gsub('\b', '\\b');
+      value = value:gsub('\f', '\\f');
+      value = value:gsub('\n', '\\n');
+      value = value:gsub('\r', '\\r');
+      value = value:gsub('\t', '\\t');
+      return '"' .. value .. '"';
+    end
+    if (type(value) == 'table' and #value > 0) then
+      local array = {};
+      for i, content in ipairs(value) do
+        table.insert(array, Json.format(content));
+      end
+      return '[' .. table.concat(array, ',') .. ']';
+    end
+    if (type(value) == 'table') then
+      local members = {};
+      for k, v in pairs(value) do
+        table.insert(members, '"' .. k .. '":' .. Json.format(v));
+      end
+      return '{' .. table.concat(members, ',') .. '}';
+    end
+  end
+
+  return Json;
+end);
+
+-- Recovery
+-- Provides simple recovery functionality
+-- Use in place of normal turtle movement functions
+-- Coordinates and facing based on / relative to initial placement or last .reset()
+
+-- Recovery.moveTo(x, y, z)     :: moves the turtle to the coordinates
+-- Recovery.digTo(x, y, z)      :: digs and attacks the turtle to the coordinates
+-- Recovery.excavateTo(x, y, z) :: same as digTo, but adds up/down digging
+-- Recovery.face(d)             :: 0 = forward, 1 = right, 2 = backward, 3 = left
+-- Recovery.start(cmd)          :: starts a recovery command that will be restarted if interrupted
+--                              :: format: <module name> <method name> <param a> <param b> ...
+--                              :: example: Recovery.start("services/recovery moveTo 12 15 22")
+-- Recovery.finish()            :: completes the previously started recovery command so that it will not be re-initiated after an interruption
+-- Recovery.reset()             :: sets the current turtle location and facing coordinates to 0,0,0,0
+
+
+TurtleCraft.export('services/recovery', function()
+  local config = TurtleCraft.require('config');
+  local IO = TurtleCraft.require('services/io');
+  local location = {x=0,y=0,z=0,f=0};
+  local positionFile = config.recoveryPath .. 'position.dat';
+  local position = fs.open(positionFile, 'a');
+  local taskFile = config.recoveryPath .. 'tasks.dat';
+  local tasks = {};
+  local pvt = {};
+
+  ----------------------> Public API
+  local Recovery = {
+    location = {},
+
+    face = function(direction)
+      direction = direction % 4;
+      if (direction == location.facing) then return true; end
+      local method = (direction > location.facing) and turtle.turnRight or turtle.turnLeft;
+      local turns = math.abs(direction - location.facing);
+      if (turns > 2) then
+        turns = 1;
+        method = (method == turtle.turnRight) and turtle.turnLeft or turtle.turnRight;
+      end
+      local name = (method == turtle.turnRight) and 'right' or 'left';
+      for i=0, turns do
+        method();
+        position.writeLine(name);
+        position.flush();
+        if (method == turtle.turnRight) then location.facing = location.facing + 1; end
+        if (method == turtle.turnLeft) then location.facing = location.facing - 1; end
+      end
+      return true;
+    end,
+
+    moveTo = function(x, y, z)
+      return pvt.navigateTo('moveTo', pvt.moveForward, pvt.moveUp, pvt.moveDown, x, y, z);
+    end,
+
+    digTo = function(x, y, z)
+      return pvt.navigateTo('digTo', pvt.digForward, pvt.digUp, pvt.digDown, x, y, z);
+    end,
+
+    excavateTo = function(x, y, z)
+      return pvt.navigateTo('excavateTo', pvt.excavateForward, pvt.excavateUp, pvt.excavateDown, x, y, z);
+    end,
+
+    start = function(command)
+      local file = fs.open(taskFile, 'a');
+      file.writeLine(command);
+      file.close();
+      table.insert(tasks, command);
+    end,
+
+    finish = function()
+      local file = fs.open(taskFile, 'a');
+      file.writeLine('end');
+      file.close();
+      table.remove(tasks);
+      local remaining = pvt.readTasks();
+      if (#remaining == 0) then
+        fs.open(taskFile, 'w').close();
+        local posCmd = 'location ' .. location.x .. ' ' .. location.y .. ' ' .. location.z .. ' ' .. location.f;
+        position.close();
+        position = fs.open(positionFile, 'w');
+        position.writeLine(posCmd); -- resets position file so it doesn't get huge.
+      end
+    end,
+
+    recover = function()
+      TurtleCraft.require('views/notification')
+        .show('Recovering...\nPress ESC to cancel');
+      local code = IO.readKey(60);
+      if (code == keys.esc) then return; end
+      TurtleCraft.require('views/notification')
+        .show('Recovering\nLast Session');
+      pvt.recoverPosition();
+      pvt.recoverTasks();
+    end,
+
+    reset = function()
+      fs.open(taskFile, 'w');
+      tasks = {};
+      position = fs.open(positionFile, 'w');
+      location = {x = 0, y = 0, z = 0, f = 0};
+    end
+  };
+
+  ----------------------> Location Stuff
+  setmetatable(Recovery.location, {
+    __index = location,
+    __newindex = function() return; end,
+  });
+
+  pvt.processForward = function()
+    if (location.facing == 0) then location.y = location.y + 1; end
+    if (location.facing == 1) then location.x = location.x + 1; end
+    if (location.facing == 2) then location.y = location.y - 1; end
+    if (location.facing == 3) then location.x = location.x - 1; end
+  end
+
+  pvt.processDown = function()
+    location.z = location.z - 1;
+  end
+
+  pvt.processUp = function()
+    location.z = location.z + 1;
+  end
+
+  pvt.processRight = function()
+    location.f = (location.f + 1) % 4;
+  end
+
+  pvt.processLeft = function()
+    location.f = (location.f - 1) % 4;
+  end
+
+  ----------------------> Recovery Stuff
+  pvt.readTasks = function()
+    if (not fs.exists(taskFile)) then return {}; end
+    local items = {};
+    local file = fs.open(taskFile, 'r');
+    local line = file.readLine();
+    while (line) do
+      if (line == 'end') then
+        table.remove(items);
+      else
+        table.insert(items, line);
+      end
+      local line = file.readLine();
+    end
+    file.close();
+    return items;
+  end
+
+  pvt.recoverPosition = function()
+    if (not fs.exists(positionFile)) then return; end
+    local previous = fs.open(config.recoveryPath, 'r');
+    local cmd = previous.readLine();
+    while (cmd) do
+      if (cmd == 'forward') then pvt.processForward(); end
+      if (cmd == 'up') then pvt.processUp(); end
+      if (cmd == 'down') then pvt.processDown(); end
+      if (cmd == 'left') then pvt.processLeft(); end
+      if (cmd == 'right') then pvt.processRight(); end
+
+      if (cmd:match('^location %d+ %d+ %d+ %d$')) then
+        local values = cmd:gmatch('%d+');
+        location.x = tonumber(values());
+        location.y = tonumber(values());
+        location.z = tonumber(values());
+        location.f = tonumber(values());
+      end
+      cmd = previous.readLine();
+    end
+    previous.close();
+    position = fs.open(positionFile, 'w');
+    position.writeLine('location ' .. position.x .. ' ' .. position.y .. ' ' .. position.z .. ' ' .. position.f);
+  end
+
+  pvt.recoverTasks = function()
+    if (not fs.exists(taskFile)) then return; end
+    local recTasks = pvt.readTasks();
+    local file = fs.open(taskFile, 'w');
+    for _, task in ipairs(recTasks) do
+      file.writeLine(task);
+    end
+    file.close();
+
+    for _, task in ipairs(recTasks) do
+      pvt.exec(task);
+    end
+  end
+
+  pvt.exec = function(cmd)
+    local parts = cmd:gsub('[^%s]+');
+    local module = parts();
+    local method = parts();
+    local values = {};
+    local value = parts();
+    while (value) do
+      if (value:match('^%d+%.%d+$|^%d+$')) then value = tonumber(value); end
+      if (value:upper() == 'TRUE') then value = true; end
+      if (value:upper() == 'FALSE') then value = false; end
+      table.insert(values, value);
+      value = parts();
+    end
+    local lib = TurtleCraft.require(module);
+    local func = lib[method];
+    func(table.unpack(values));
+  end
+
+  ----------------------> Move Stuff
+  pvt.moveForward = function()
+    return pvt.retry(function()
+      if (turtle.forward()) then
+        position.writeLine('forward');
+        position.flush();
+        pvt.processForward();
+        return true;
+      end
+      return false;
+    end, config.maxMoves);
+  end
+
+  pvt.moveUp = function()
+    return pvt.retry(function()
+      if (turtle.up()) then
+        position.writeLine('up');
+        position.flush();
+        pvt.processUp();
+        return true;
+      end
+      return false;
+    end, config.maxMoves);
+  end
+
+  pvt.moveDown = function()
+    return pvt.retry(function()
+      if (turtle.down()) then
+        position.writeLine('down');
+        position.flush();
+        pvt.processDown();
+        return true;
+      end
+      return false;
+    end, config.maxMoves);
+  end
+
+  ----------------------> Dig Stuff
+  pvt.digDetect = function(digMethod, detectMethod)
+    return pvt.retry(function()
+      if (not detectMethod()) then return true; end
+      digMethod();
+      return not detectMethod();
+    end, config.maxDigs);
+  end
+
+  pvt.digMove = function(detectMethod, digMethod, attackMethod, moveMethod)
+    return pvt.retry(function()
+      if (not pvt.digDetect(detectMethod, digMethod)) then return false; end
+      attackMethod();
+      return moveMethod();
+    end, config.maxAttacks);
+  end
+
+  pvt.digForward = function()
+    return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
+      if (turtle.forward()) then
+        position.writeLine('forward');
+        position.flush();
+        pvt.processForward();
+        return true;
+      end
+      return false;
+    end);
+  end
+
+  pvt.digUp = function()
+    return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
+      if (turtle.up()) then
+        position.writeLine('up');
+        position.flush();
+        pvt.processUp();
+        return true;
+      end
+      return false;
+    end);
+  end
+
+  pvt.digDown = function()
+    return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
+      if (turtle.down()) then
+        position.writeLine('down');
+        position.flush();
+        pvt.processDown();
+        return true;
+      end
+      return false;
+    end);
+  end
+
+  ---------------------->Excavate Stuff
+  pvt.excavateForward = function()
+    pvt.digDetect(turtle.detectUp, turtle.digUp);
+    pvt.digDetect(turtle.detectDown, turtle.digDown);
+    return pvt.digForward();
+  end
+
+  pvt.excavateUp = function()
+    pvt.digDetect(turtle.detect, turtle.dig);
+    return pvt.digUp();
+  end
+
+  pvt.excavateDown = function()
+    pvt.digDetect(turtle.detect, turtle.dig);
+    return pvt.digDown();
+  end
+
+  ---------------------->Other Stuff
+  pvt.retry = function(method, max)
+    for tries = 0, max do
+      if (method()) then return true; end
+    end
+    return false;
+  end
+
+  pvt.navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
+    Recovery.start('services/recovery ' .. methodName .. ' ' .. x .. ' ' .. y .. ' ' .. z);
+    for i = 0, i < 3 do
+      while (location.x < x) do
+        Recovery.face(1);
+        if (not forwardMethod()) then break; end
+      end
+      while (location.x > x) do
+        Recovery.face(3);
+        if (not forwardMethod()) then break; end
+      end
+      while (location.y < y) do
+        Recovery.face(0);
+        if (not forwardMethod()) then break; end
+      end
+      while (location.y > y) do
+        Recovery.face(2);
+        if (not forwardMethod()) then break; end
+      end
+      while (location.z < z) do
+        if (not upMethod()) then break; end
+      end
+      while (location.z > z) do
+        if (not downMethod()) then break; end
+      end
+    end
+    Recovery.finish();
+    return (location.x == x and location.y == y and location.z == z);
+  end
+
+  return Recovery;
+end);
+
+TurtleCraft.export('views/border', function()
+  local config = TurtleCraft.require('config');
+  local IO = TurtleCraft.require('services/io');
+  return {
+    show = function()
+      IO.printCentered('TurtleCraft v' .. config.version)
+    end
+  };
+end)
+
+TurtleCraft.export('views/notification', function()
+  
+end);
+
+(function()
+  local JSON = TurtleCraft.import('services/json');
+  print(#JSON.parseArray('["a",1,false]'));
+end)()

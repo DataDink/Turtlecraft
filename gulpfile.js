@@ -21,7 +21,11 @@ gulp.task('build', complete => {
     'src/bootstrap.lua'
   ]);
 
-  if (config.minify) { stream.pipe(minify()); }
+  if (config.minify) {
+    stream
+      .pipe(minify())
+      .pipe(insert.append(';'));
+  }
 
   stream
   .pipe(concat('turtlecraft.lua'))

@@ -41,7 +41,7 @@ TurtleCraft.export('services/io', function()
 
   IO.centerPage = function(text, fill)
     local lines = {};
-    for line in text:gsub('[^\n]+') do
+    for line in text:gmatch('[^\n]+') do
       table.insert(lines, line);
     end
     local lineCount = #lines;
@@ -51,5 +51,7 @@ TurtleCraft.export('services/io', function()
       IO.centerLine(lines[i], fill, start + i);
     end
   end
+
+  return IO;
 
 end);

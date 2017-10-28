@@ -351,4 +351,4 @@ TurtleCraft.export('services/recovery', function()
   end
 
   return Recovery;
-end)
+end);

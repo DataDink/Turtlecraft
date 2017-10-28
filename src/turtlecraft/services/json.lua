@@ -2,40 +2,39 @@ TurtleCraft.export('services/json', function()
   local Json = {};
 
   Json.trim = function(remaining)
-    return remaining:gsub('^%s|%s$');
+    return remaining:gsub('^%s+', ''):gsub('%s+$', '');
   end
 
   Json.parseNull = function(remaining)
-    remaining = Json.trim(remaining);
-    if (not remaining:gmatch('^null')()) then return false, remaining:len(); end
-    remaining = remaining:sub(4);
+    if (not remaining:lower():find('^%s*null')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*null', '');
     return true, nil, remaining;
   end
 
   Json.parseNumber = function(remaining)
+    if (not remaining:find('^%s*-?%d+')) then return false, nil, remaining; end
     remaining = Json.trim(remaining);
-    local value = remaining:gmatch('^-?%d+|^-?%d+%.%d+')();
-    if (value == nil) then return false, remaining:len(); end
+    local value = remaining:match('^-?%d+') or remaining:match('^-?%d+%.%d+');
     remaining = remaining:sub(value:len() + 1);
     return true, tonumber(value), remaining;
   end
 
   Json.parseBoolean = function(remaining)
     remaining = Json.trim(remaining);
-    local value = remaining:lower():gmatch('^true|^false')();
-    if (value == nil) then return false, remaining:len(); end
+    local value = remaining:lower():match('^true') or remaining:lower():match('^false');
+    if (value == nil) then return false, nil, remaining; end
     remaining = remaining:sub(value:len() + 1);
     return true, value == 'true', remaining;
   end
 
   Json.parseString = function(remaining)
-    remaining = Json.trim(remaining);
-    if (remaining:sub(1,1) ~= '"') then return false, remaining:len(); end
-    remaining = remaining:sub(2);
+    if (not remaining:find('^%s*"')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*"', '');
     local value = '';
-    local chunk = remaining:gmatch('[^\\"]*[\\"]')();
+    local chunk = remaining:match('^[^\\"]*[\\"]');
     while (chunk ~= nil) do
       remaining = remaining:sub(chunk:len() + 1);
+
       if (chunk:sub(-1) == '"') then
         value = value .. chunk:sub(1, -2);
         return true, value, remaining;
@@ -58,15 +57,14 @@ TurtleCraft.export('services/json', function()
         remaining = remaining:sub(5);
         value = value .. string.char(hex);
       end
-      chunk = remaining:gmatch('[^\\"]*[\\"]')();
+      chunk = remaining:match('[^\\"]*[\\"]');
     end
     return false, remaining:len();
   end
 
   Json.parseArray = function(remaining)
-    remaining = Json.trim(remaining);
-    if (remaining:sub(1,1) ~= '[') then return false, remaining:len(); end
-    remaining = remaining:sub(2);
+    if (not remaining:find('^%s*%[')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*%[', '');
     local result = {};
     local valid, value, remaining = Json.parseNext(remaining);
     while (valid) do
@@ -82,9 +80,8 @@ TurtleCraft.export('services/json', function()
   end
 
   Json.parseObject = function(remaining)
-    remaining = Json.trim(remaining);
-    if (remaining:sub(1,1) ~= '{') then return false, remaining:len(); end
-    remaining = remaining:sub(2);
+    if (not remaining:find('^%s*%{')) then return false, nil, remaining; end
+    remaining = remaining:gsub('^%s*%{', '');
     local result = {};
     local valid, key, remaining = Json.parseString(remaining);
     while (valid) do
@@ -132,7 +129,7 @@ TurtleCraft.export('services/json', function()
       value = value:gsub('\t', '\\t');
       return '"' .. value .. '"';
     end
-    if (type(value) == 'table' and #value) then
+    if (type(value) == 'table' and #value > 0) then
       local array = {};
       for i, content in ipairs(value) do
         table.insert(array, Json.format(content));
@@ -140,11 +137,11 @@ TurtleCraft.export('services/json', function()
       return '[' .. table.concat(array, ',') .. ']';
     end
     if (type(value) == 'table') then
-      local array = {};
+      local members = {};
       for k, v in pairs(value) do
-        table.insert(array, '"' .. k .. '":' .. Json.format(v));
+        table.insert(members, '"' .. k .. '":' .. Json.format(v));
       end
-      return '{' .. table.concat(array, ',') .. '}';
+      return '{' .. table.concat(members, ',') .. '}';
     end
   end
 

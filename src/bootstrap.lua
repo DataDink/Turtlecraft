@@ -1,7 +1,4 @@
 (function()
-  local IO = TurtleCraft.require('services/io');
-  IO.centerLine('test');
-  IO.readKey();
-  IO.centerPage('test');
-  IO.readKey();
+  local JSON = TurtleCraft.import('services/json');
+  print(#JSON.parseArray('["a",1,false]'));
 end)()

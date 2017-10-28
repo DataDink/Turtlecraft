@@ -1,5 +1,5 @@
 {
-  "minify": true,
+  "minify": false,
   "maxDigs": 300,
   "maxMoves": 10,
   "maxAttacks": 64,

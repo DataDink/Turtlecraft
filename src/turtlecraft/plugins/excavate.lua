@@ -1,34 +1,27 @@
 TurtleCraft.export('plugins/excavate', function()
-  local Excavate;
+  local Excavate, pvt;
   local Recovery = TurtleCraft.import('services/recovery');
   local UserInput = TurtleCraft.import('ui/user-input');
+  local config = TurtleCraft.import('services/config');
 
   Excavate = {
-    ask = function(question)
-      local value = UserInput.show(question .. '\n(nothing to cancel)');
-      while (not value:find('^%d+$')) do
-        if (value:len() == 0) then return nil; end
-        value = UserInput.show(question .. '\n(please enter positive a number)');
-      end
-      return tonumber(value);
-    end,
-
     start = function()
-      local forward = Excavate.ask('How far forward should I dig?');
+      local forward = pvt.ask('How far forward should I dig?');
       if (forward == nil) then return; end
 
-      local left = Excavate.ask('How far to the left should I dig?');
+      local left = pvt.ask('How far to the left should I dig?');
       if (left == nil) then return; end
 
-      local right = Excavate.ask('How far to the right should I dig?');
+      local right = pvt.ask('How far to the right should I dig?');
       if (right == nil) then return; end
 
-      local up = Excavate.ask('How far up should I dig?');
+      local up = pvt.ask('How far up should I dig?');
       if (up == nil) then return; end
 
-      local down = Excavate.ask('How far down should I dig?');
+      local down = pvt.ask('How far down should I dig?');
       if (down == nil) then return; end
 
+      Recovery.reset();
       Excavate.recover(forward, left, right, up, down);
     end,
 
@@ -40,45 +33,93 @@ TurtleCraft.export('plugins/excavate', function()
       down = -math.abs(down);
 
       if (not recovered) then
-        Recovery.reset();
-        Recovery.start('plugins/excavate', 'recover', forward, -left, right, up, -down, ' true');
+        Recovery.start('plugins/excavate', 'recover', forward, -left, right, up, -down, true);
         Recovery.digTo(left, 0, up - 1);
       end
 
-      local function doRow()
-        if (Recovery.location.x < right) then
-          Recovery.excavateTo(right, Recovery.location.y, Recovery.location.z);
-        else
-          Recovery.excavateTo(left, Recovery.location.y, Recovery.location.z);
+      local function row()
+        local direction = Recovery.location.x < right and 1 or -1;
+        local distance = math.abs(Recovery.location.x - (direction == 1 and right or left));
+        for i = 1, distance do
+          if (direction == 1) then Recovery.face(1); else Recovery.face(3); end
+          pvt.checkFuel(2);
+          pvt.checkInventory();
+          if (not Recovery.excavateForward()) then return false; end
         end
+        return true;
       end
 
-      local function doLayer()
-        if (Recovery.location.y > 0) then
-          while (Recovery.location.y > 0) do
-            doRow();
-            Recovery.excavateTo(Recovery.location.x, Recovery.location.y - 1, Recovery.location.z);
-          end
-        else
-          while (Recovery.location.y < forward) do
-            doRow();
-            Recovery.excavateTo(Recovery.location.x, Recovery.location.y + 1, Recovery.location.z);
-          end
+      local function plane()
+        local direction = Recovery.location.y < forward and 1 or -1;
+        local distance = math.abs(Recovery.location.y - (direction == 1 and forward or 0));
+        for i = 1, distance do
+          if (not row()) then return false; end
+          if (direction == 1) then Recovery.face(0); else Recovery.face(2); end
+          if (not Recovery.excavateForward()) then return false; end
         end
+        return true;
       end
 
-      while (Recovery.location.z > down) do
-        doLayer();
-        Recovery.excavateTo(Recovery.location.x, Recovery.location.y, Recovery.location.z - 1);
+      local function block()
+        local distance = math.max(0, Recovery.location.z - down);
+        for i = 1, distance do
+          if (not plane()) then return false; end
+          if (not Recovery.excavateDown()) then return false; end
+        end
+        return true;
       end
+
+      block();
 
       Recovery.finish();
       Recovery.digTo(0,0,0);
     end,
 
-    step = function()
-      Excavate.checkFuel();
-      Excavate.checkInventory();
+    refuel = function(required, x, y, z, recovered)
+      if (not recovered) then
+        Recovery.start('plugins/excavate', 'refuel', x, y, z, required, true);
+      end
+      Recovery.digTo(0,0,0);
+
+      while (turtle.getFuelLevel() < required) do
+        TurtleCraft.import('ui/dialog')
+                   .show('I need more fuel!\nPlease put some in\nmy inventory and\npress any key');
+        pvt.seekFuel(required);
+      end
+
+      Recovery.digTo(x, y, z);
+      Recovery.finish();
+    end,
+
+    empty = function(x, y, z, recovered)
+      if (not recovered) then
+        Recovery.start('plugins/excavate', 'empty', x, y, z, true);
+      end
+      Recovery.digTo(0,0,0);
+      Recovery.face(2);
+      for slot = 1, 16 do
+        local info = turtle.getItemDetail(slot);
+        if (info and not pvt.isFuelItem(info)) then
+          turtle.select(slot);
+          repeat
+            turtle.select(slot);
+          until (turtle.getItemCount() == 0 or turtle.drop());
+        end
+      end
+      pvt.consolidate();
+      Recovery.digTo(x, y, z);
+      Recovery.finish();
+    end
+  };
+
+  pvt = {
+    ask = function(question)
+      local value = UserInput.show(question .. '\n(nothing to cancel)');
+      while (not value:find('^%d+$')) do
+        if (value:len() == 0) then return nil; end
+        value = UserInput.show(question .. '\n(please enter positive a number)');
+      end
+      return tonumber(value);
     end,
 
     checkFuel = function(required)
@@ -88,25 +129,9 @@ TurtleCraft.export('plugins/excavate', function()
       required = required + math.abs(Recovery.location.x);
       required = required + math.abs(Recovery.location.y);
       required = required + math.abs(Recovery.location.z);
-      if (turtle.getFuelLevel() < required and not Excavate.seekFuel(required)) then
-        Excavate.refuel(Recovery.location.x, Recovery.location.y, Recovery.location.z, required);
+      if (turtle.getFuelLevel() < required and not pvt.seekFuel(required)) then
+        Excavate.refuel(required, Recovery.location.x, Recovery.location.y, Recovery.location.z);
       end
-    end,
-
-    refuel = function(x, y, z, required, recovered)
-      if (not recovered) then
-        Recovery.start('plugins/excavate', 'refuel', x, y, z, required, true);
-      end
-      Recovery.digTo(0,0,0);
-
-      while (turtle.getFuelLevel() < required) do
-        TurtleCraft.import('ui/dialog')
-                   .show('I need more fuel!\nPlease put some in\nmy inventory and\npress any key');
-        Excavate.seekFuel(required);
-      end
-
-      Recovery.digTo(x, y, z);
-      Recovery.finish();
     end,
 
     seekFuel = function(required)
@@ -121,11 +146,33 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     checkInventory = function()
-      for slot = 1, 16 do
-        if (turtle.getItemCount(slot) == 0) then return; end
+      for i = 1, 2 do
+        for slot = 1, 16 do
+          if (turtle.getItemCount(slot) == 0) then return; end
+        end
+        pvt.consolidate();
+      end
+      Excavate.empty(Recovery.location.x, Recovery.location.y, Recovery.location.z);
+    end,
+
+    isFuelItem = function(info)
+      if (not info.id and not info.id:find('^%d+')) then return false; end
+      local itemId = tonumber(info.id:match('^%d+'));
+      for _, fuelId in ipairs(config.fuelItems) do
+        if (fuelId == itemId) then return true; end
+      end
+      return false;
+    end,
+
+    consolidate = function()
+      for consolidate = 2, 16 do
+        for slot = 1, consolidate - 1 do
+          turtle.select(consolidate);
+          if (turtle.transferTo(slot)) then break; end
+        end
       end
     end
-  };
+  }
 
   return Excavate;
 end).onready(function()

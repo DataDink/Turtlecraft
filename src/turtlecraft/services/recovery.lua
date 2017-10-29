@@ -82,13 +82,18 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
-      TurtleCraft.import('ui/views/notification')
-        .show('Recovering...\nPress ESC to cancel');
-      local code = IO.readKey(60);
-      if (code == keys.esc) then return; end
+      pvt.recoverPosition();
+      if (not fs.exists(taskFile)) then return; end
+
+      local key;
+      repeat
+        TurtleCraft.import('ui/views/notification')
+          .show('Recovering...\nPress ESC to cancel');
+        local key = IO.readKey(60);
+      until (key == false or key == keys.esc);
+
       TurtleCraft.import('ui/views/notification')
         .show('Recovering\nLast Session');
-      pvt.recoverPosition();
       pvt.recoverTasks();
     end,
 
@@ -107,264 +112,280 @@ TurtleCraft.export('services/recovery', function()
     __newindex = function() return; end,
   });
 
-  pvt.processForward = function()
-    if (location.f == 0) then location.y = location.y + 1; end
-    if (location.f == 1) then location.x = location.x + 1; end
-    if (location.f == 2) then location.y = location.y - 1; end
-    if (location.f == 3) then location.x = location.x - 1; end
-  end
+  pvt = {
+    processForward = function()
+      if (location.f == 0) then location.y = location.y + 1; end
+      if (location.f == 1) then location.x = location.x + 1; end
+      if (location.f == 2) then location.y = location.y - 1; end
+      if (location.f == 3) then location.x = location.x - 1; end
+    end,
 
-  pvt.processDown = function()
-    location.z = location.z - 1;
-  end
+    processDown = function()
+      location.z = location.z - 1;
+    end,
 
-  pvt.processUp = function()
-    location.z = location.z + 1;
-  end
+    processUp = function()
+      location.z = location.z + 1;
+    end,
 
-  pvt.processRight = function()
-    location.f = (location.f + 1) % 4;
-  end
+    processRight = function()
+      location.f = (location.f + 1) % 4;
+    end,
 
-  pvt.processLeft = function()
-    location.f = (location.f - 1) % 4;
-  end
+    processLeft = function()
+      location.f = (location.f - 1) % 4;
+    end,
 
-  ----------------------> Recovery Stuff
-  pvt.readTasks = function()
-    if (not fs.exists(taskFile)) then return {}; end
-    local items = {};
-    local file = fs.open(taskFile, 'r');
-    local line = file.readLine();
-    while (line) do
-      if (line == 'end') then
-        table.remove(items);
-      else
-        table.insert(items, line);
-      end
+    cleanPosition = function()
+      if (location.x + location.y + location.z + location.f ~= 0) then return; end
+      position.close();
+      position = fs.open(positionFile, 'w');
+    end,
+
+    ----------------------> Recovery Stuff
+    readTasks = function()
+      if (not fs.exists(taskFile)) then return {}; end
+      local items = {};
+      local file = fs.open(taskFile, 'r');
       local line = file.readLine();
-    end
-    file.close();
-    return items;
-  end
-
-  pvt.recoverPosition = function()
-    if (not fs.exists(positionFile)) then return; end
-    local previous = fs.open(config.recoveryPath, 'r');
-    local cmd = previous.readLine();
-    while (cmd) do
-      if (cmd == 'forward') then pvt.processForward(); end
-      if (cmd == 'up') then pvt.processUp(); end
-      if (cmd == 'down') then pvt.processDown(); end
-      if (cmd == 'left') then pvt.processLeft(); end
-      if (cmd == 'right') then pvt.processRight(); end
-
-      if (cmd:match('^location %d+ %d+ %d+ %d$')) then
-        local values = cmd:gmatch('%d+');
-        location.x = tonumber(values());
-        location.y = tonumber(values());
-        location.z = tonumber(values());
-        location.f = tonumber(values());
+      while (line) do
+        if (line == 'end') then
+          table.remove(items);
+        else
+          table.insert(items, line);
+        end
+        local line = file.readLine();
       end
-      cmd = previous.readLine();
-    end
-    previous.close();
-    position = fs.open(positionFile, 'w');
-    position.writeLine('location ' .. position.x .. ' ' .. position.y .. ' ' .. position.z .. ' ' .. position.f);
-  end
+      file.close();
+      return items;
+    end,
 
-  pvt.recoverTasks = function()
-    if (not fs.exists(taskFile)) then return; end
-    local recTasks = pvt.readTasks();
-    local file = fs.open(taskFile, 'w');
-    for _, task in ipairs(recTasks) do
-      file.writeLine(task);
-    end
-    file.close();
+    recoverPosition = function()
+      if (not fs.exists(positionFile)) then return; end
+      local recovery = fs.open(config.recoveryPath, 'r');
+      local cmd = recovery.readLine();
+      while (cmd) do
+        if (cmd == 'forward') then pvt.processForward(); end
+        if (cmd == 'up') then pvt.processUp(); end
+        if (cmd == 'down') then pvt.processDown(); end
+        if (cmd == 'left') then pvt.processLeft(); end
+        if (cmd == 'right') then pvt.processRight(); end
 
-    for _, task in ipairs(recTasks) do
-      pvt.exec(task);
-    end
-  end
+        if (cmd:find('^location %d+ %d+ %d+ %d$')) then
+          local values = cmd:gmatch('%d+');
+          location.x = tonumber(values());
+          location.y = tonumber(values());
+          location.z = tonumber(values());
+          location.f = tonumber(values());
+        end
+        cmd = recovery.readLine();
+      end
+      recovery.close();
+      position = fs.open(positionFile, 'w');
+      position.writeLine('location ' .. position.x .. ' ' .. position.y .. ' ' .. position.z .. ' ' .. position.f);
+    end,
 
-  pvt.exec = function(cmd)
-    local parts = cmd:gsub('[^%s]+');
-    local module = parts();
-    local method = parts();
-    local values = {};
-    local value = parts();
-    while (value) do
-      if (value:match('^%d+%.%d+$|^%d+$')) then value = tonumber(value); end
-      if (value:upper() == 'TRUE') then value = true; end
-      if (value:upper() == 'FALSE') then value = false; end
-      table.insert(values, value);
-      value = parts();
-    end
-    local lib = TurtleCraft.import(module);
-    local func = lib[method];
-    func(table.unpack(values));
-  end
+    recoverTasks = function()
+      if (not fs.exists(taskFile)) then return; end
+      local recovery = pvt.readTasks();
+      local file = fs.open(taskFile, 'w');
+      for _, task in ipairs(recovery) do
+        file.writeLine(task);
+      end
+      file.close();
 
-  ----------------------> Move Stuff
-  pvt.face = function(direction)
-    local turns = (direction % 4) - location.f;
-    if (turns == 0) then return true; end;
-    if (turns > 2) then turns = -1; end
-    if (turns < -2) then turns = 1; end
-    local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
-    local name = (turns > 0) and 'right' or 'left';
-    for i=1, math.abs(turns) do
-      method();
-      position.writeLine(name);
-      position.flush();
-    end
-    location.f = (location.f + turns) % 4
-    return true;
-  end;
+      for _, task in ipairs(recovery) do
+        pvt.exec(task);
+      end
+    end,
 
-  pvt.moveForward = function()
-    return pvt.retry(function()
-      if (turtle.forward()) then
-        position.writeLine('forward');
+    exec = function(cmd)
+      local parts = cmd:gsub('[^%s]+');
+      local module = parts();
+      local method = parts();
+      local values = {};
+      local value = parts();
+      while (value) do
+        if (value:match('^%d+%.%d+$') or value:match('^%d+$')) then value = tonumber(value); end
+        if (value:upper() == 'TRUE') then value = true; end
+        if (value:upper() == 'FALSE') then value = false; end
+        table.insert(values, value);
+        value = parts();
+      end
+      local lib = TurtleCraft.import(module);
+      local func = lib[method];
+      func(table.unpack(values));
+    end,
+
+    ----------------------> Move Stuff
+    face = function(direction)
+      local turns = (direction % 4) - location.f;
+      if (turns == 0) then return true; end;
+      if (turns > 2) then turns = -1; end
+      if (turns < -2) then turns = 1; end
+      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
+      local name = (turns > 0) and 'right' or 'left';
+      for i=1, math.abs(turns) do
+        method();
+        position.writeLine(name);
         position.flush();
-        pvt.processForward();
-        return true;
+        pvt.cleanPosition();
+      end
+      location.f = (location.f + turns) % 4
+      return true;
+    end,
+
+    moveForward = function()
+      return pvt.retry(function()
+        if (turtle.forward()) then
+          position.writeLine('forward');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processForward();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
+
+    moveUp = function()
+      return pvt.retry(function()
+        if (turtle.up()) then
+          position.writeLine('up');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processUp();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
+
+    moveDown = function()
+      return pvt.retry(function()
+        if (turtle.down()) then
+          position.writeLine('down');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processDown();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
+
+    ----------------------> Dig Stuff
+    digDetect = function(digMethod, detectMethod)
+      return pvt.retry(function()
+        if (not detectMethod()) then return true; end
+        digMethod();
+        return not detectMethod();
+      end, config.maxDigs);
+    end,
+
+    digMove = function(detectMethod, digMethod, attackMethod, moveMethod)
+      return pvt.retry(function()
+        if (not pvt.digDetect(detectMethod, digMethod)) then return false; end
+        attackMethod();
+        return moveMethod();
+      end, config.maxAttacks);
+    end,
+
+    digForward = function()
+      return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
+        if (turtle.forward()) then
+          position.writeLine('forward');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processForward();
+          return true;
+        end
+        return false;
+      end);
+    end,
+
+    digUp = function()
+      return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
+        if (turtle.up()) then
+          position.writeLine('up');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processUp();
+          return true;
+        end
+        return false;
+      end);
+    end,
+
+    digDown = function()
+      return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
+        if (turtle.down()) then
+          position.writeLine('down');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processDown();
+          return true;
+        end
+        return false;
+      end);
+    end,
+
+    ---------------------->Excavate Stuff
+    excavateForward = function()
+      pvt.digDetect(turtle.detectUp, turtle.digUp);
+      pvt.digDetect(turtle.detectDown, turtle.digDown);
+      return pvt.digForward();
+    end,
+
+    excavateUp = function()
+      pvt.digDetect(turtle.detect, turtle.dig);
+      return pvt.digUp();
+    end,
+
+    excavateDown = function()
+      pvt.digDetect(turtle.detect, turtle.dig);
+      return pvt.digDown();
+    end,
+
+    ---------------------->Other Stuff
+    retry = function(method, max)
+      for tries = 1, max do
+        if (method()) then return true; end
       end
       return false;
-    end, config.maxMoves);
-  end
+    end,
 
-  pvt.moveUp = function()
-    return pvt.retry(function()
-      if (turtle.up()) then
-        position.writeLine('up');
-        position.flush();
-        pvt.processUp();
-        return true;
+    navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
+      Recovery.start('services/recovery', methodName, x, y, z);
+      for i = 1, 3 do
+        while (location.x < x) do
+          pvt.face(1);
+          if (not forwardMethod()) then break; end
+        end
+        while (location.x > x) do
+          pvt.face(3);
+          if (not forwardMethod()) then break; end
+        end
+        while (location.y < y) do
+          pvt.face(0);
+          if (not forwardMethod()) then break; end
+        end
+        while (location.y > y) do
+          pvt.face(2);
+          if (not forwardMethod()) then break; end
+        end
+        while (location.z < z) do
+          if (not upMethod()) then break; end
+        end
+        while (location.z > z) do
+          if (not downMethod()) then break; end
+        end
       end
-      return false;
-    end, config.maxMoves);
-  end
-
-  pvt.moveDown = function()
-    return pvt.retry(function()
-      if (turtle.down()) then
-        position.writeLine('down');
-        position.flush();
-        pvt.processDown();
-        return true;
-      end
-      return false;
-    end, config.maxMoves);
-  end
-
-  ----------------------> Dig Stuff
-  pvt.digDetect = function(digMethod, detectMethod)
-    return pvt.retry(function()
-      if (not detectMethod()) then return true; end
-      digMethod();
-      return not detectMethod();
-    end, config.maxDigs);
-  end
-
-  pvt.digMove = function(detectMethod, digMethod, attackMethod, moveMethod)
-    return pvt.retry(function()
-      if (not pvt.digDetect(detectMethod, digMethod)) then return false; end
-      attackMethod();
-      return moveMethod();
-    end, config.maxAttacks);
-  end
-
-  pvt.digForward = function()
-    return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
-      if (turtle.forward()) then
-        position.writeLine('forward');
-        position.flush();
-        pvt.processForward();
-        return true;
-      end
-      return false;
-    end);
-  end
-
-  pvt.digUp = function()
-    return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
-      if (turtle.up()) then
-        position.writeLine('up');
-        position.flush();
-        pvt.processUp();
-        return true;
-      end
-      return false;
-    end);
-  end
-
-  pvt.digDown = function()
-    return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
-      if (turtle.down()) then
-        position.writeLine('down');
-        position.flush();
-        pvt.processDown();
-        return true;
-      end
-      return false;
-    end);
-  end
-
-  ---------------------->Excavate Stuff
-  pvt.excavateForward = function()
-    pvt.digDetect(turtle.detectUp, turtle.digUp);
-    pvt.digDetect(turtle.detectDown, turtle.digDown);
-    return pvt.digForward();
-  end
-
-  pvt.excavateUp = function()
-    pvt.digDetect(turtle.detect, turtle.dig);
-    return pvt.digUp();
-  end
-
-  pvt.excavateDown = function()
-    pvt.digDetect(turtle.detect, turtle.dig);
-    return pvt.digDown();
-  end
-
-  ---------------------->Other Stuff
-  pvt.retry = function(method, max)
-    for tries = 0, max do
-      if (method()) then return true; end
+      Recovery.finish();
+      return (location.x == x and location.y == y and location.z == z);
     end
-    return false;
-  end
+  }
 
-  pvt.navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
-    Recovery.start('services/recovery', methodName, x, y, z);
-    for i = 1, 3 do
-      while (location.x < x) do
-        pvt.face(1);
-        if (not forwardMethod()) then break; end
-      end
-      while (location.x > x) do
-        pvt.face(3);
-        if (not forwardMethod()) then break; end
-      end
-      while (location.y < y) do
-        pvt.face(0);
-        if (not forwardMethod()) then break; end
-      end
-      while (location.y > y) do
-        pvt.face(2);
-        if (not forwardMethod()) then break; end
-      end
-      while (location.z < z) do
-        if (not upMethod()) then break; end
-      end
-      while (location.z > z) do
-        if (not downMethod()) then break; end
-      end
-    end
-    Recovery.finish();
-    return (location.x == x and location.y == y and location.z == z);
-  end
 
   return Recovery;
 end);

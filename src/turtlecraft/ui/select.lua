@@ -1,5 +1,5 @@
-TurtleCraft.export('ui/menu', function()
-  local view = TurtleCraft.import('ui/views/menu');
+TurtleCraft.export('ui/select', function()
+  local view = TurtleCraft.import('ui/views/select');
   local IO = TurtleCraft.import('services/io');
   return {
     show = function(items, transform)
@@ -7,7 +7,7 @@ TurtleCraft.export('ui/menu', function()
       local transformed = {};
       for _, v in ipairs(items) do
         local display = transform and transform(v) or v;
-        if (type(display) ~= 'string') then error('Menu items must be transformed to strings'); end
+        if (type(display) ~= 'string') then error('Select items must be transformed to strings'); end
         table.insert(transformed, display);
       end
 

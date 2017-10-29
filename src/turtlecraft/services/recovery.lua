@@ -7,7 +7,7 @@
 -- Recovery.digTo(x, y, z)      :: digs and attacks the turtle to the coordinates
 -- Recovery.excavateTo(x, y, z) :: same as digTo, but adds up/down digging
 -- Recovery.face(d)             :: 0 = forward, 1 = right, 2 = backward, 3 = left
--- Recovery.start(cmd)          :: starts a recovery command that will be restarted if interrupted
+-- Recovery.start(...)          :: starts a recovery command that will be restarted if interrupted
 --                              :: format: <module name> <method name> <param a> <param b> ...
 --                              :: example: Recovery.start("services/recovery moveTo 12 15 22")
 -- Recovery.finish()            :: completes the previously started recovery command so that it will not be re-initiated after an interruption
@@ -15,48 +15,51 @@
 
 
 TurtleCraft.export('services/recovery', function()
+  local Recovery, location, pvt;
   local config = TurtleCraft.import('services/config');
   local IO = TurtleCraft.import('services/io');
-  local location = {x=0,y=0,z=0,f=0};
   local positionFile = config.recoveryPath .. '/position.dat';
   local position = fs.open(positionFile, 'a');
   local taskFile = config.recoveryPath .. '/tasks.dat';
   local tasks = {};
-  local pvt = {};
 
-  ----------------------> Public API
-  local Recovery = {
+  Recovery = {
     location = {},
 
-    face = function(direction)
-      local turns = (direction % 4) - location.f;
-      if (turns == 0) then return true; end;
-      if (turns > 2) then turns = -1; end
-      if (turns < -2) then turns = 1; end
-      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
-      local name = (turns > 0) and 'right' or 'left';
-      for i=1, math.abs(turns) do
-        method();
-        position.writeLine(name);
-        position.flush();
-      end
-      location.f = (location.f + turns) % 4
-      return true;
-    end,
+    face = pvt.face,
 
     moveTo = function(x, y, z)
       return pvt.navigateTo('moveTo', pvt.moveForward, pvt.moveUp, pvt.moveDown, x, y, z);
     end,
 
+    moveForward = pvt.moveForward,
+
+    moveUp = pvt.moveUp,
+
+    moveDown = pvt.moveDown,
+
     digTo = function(x, y, z)
       return pvt.navigateTo('digTo', pvt.digForward, pvt.digUp, pvt.digDown, x, y, z);
     end,
+
+    digForward = pvt.digForward,
+
+    digUp = pvt.digUp,
+
+    digDown = pvt.digDown,
 
     excavateTo = function(x, y, z)
       return pvt.navigateTo('excavateTo', pvt.excavateForward, pvt.excavateUp, pvt.excavateDown, x, y, z);
     end,
 
-    start = function(command)
+    excavateForward = pvt.excavateForward,
+
+    excavateUp = pvt.excavateUp,
+
+    excavateDown = pvt.excavateDown,
+
+    start = function(...)
+      local command = table.concat(table.pack(...), ' ');
       local file = fs.open(taskFile, 'a');
       file.writeLine(command);
       file.close();
@@ -93,13 +96,12 @@ TurtleCraft.export('services/recovery', function()
       fs.open(taskFile, 'w');
       tasks = {};
       position = fs.open(positionFile, 'w');
-      location = {x = 0, y = 0, z = 0, f = 0};
-    end,
-
-    onStep = function(callback) return pvt.onstep(callback); end
+      location.x = 0; location.y = 0; location.z = 0; location.f = 0;
+    end
   };
 
   ----------------------> Location Stuff
+  location = {x=0,y=0,z=0,f=0};
   setmetatable(Recovery.location, {
     __index = location,
     __newindex = function() return; end,
@@ -204,6 +206,22 @@ TurtleCraft.export('services/recovery', function()
   end
 
   ----------------------> Move Stuff
+  pvt.face = function(direction)
+    local turns = (direction % 4) - location.f;
+    if (turns == 0) then return true; end;
+    if (turns > 2) then turns = -1; end
+    if (turns < -2) then turns = 1; end
+    local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
+    local name = (turns > 0) and 'right' or 'left';
+    for i=1, math.abs(turns) do
+      method();
+      position.writeLine(name);
+      position.flush();
+    end
+    location.f = (location.f + turns) % 4
+    return true;
+  end;
+
   pvt.moveForward = function()
     return pvt.retry(function()
       if (turtle.forward()) then
@@ -319,58 +337,33 @@ TurtleCraft.export('services/recovery', function()
   end
 
   pvt.navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
-    Recovery.start('services/recovery ' .. methodName .. ' ' .. x .. ' ' .. y .. ' ' .. z);
+    Recovery.start('services/recovery', methodName, x, y, z);
     for i = 1, 3 do
       while (location.x < x) do
-        Recovery.face(1);
+        pvt.face(1);
         if (not forwardMethod()) then break; end
-        pvt.step();
       end
       while (location.x > x) do
-        Recovery.face(3);
+        pvt.face(3);
         if (not forwardMethod()) then break; end
-        pvt.step();
       end
       while (location.y < y) do
-        Recovery.face(0);
+        pvt.face(0);
         if (not forwardMethod()) then break; end
-        pvt.step();
       end
       while (location.y > y) do
-        Recovery.face(2);
+        pvt.face(2);
         if (not forwardMethod()) then break; end
-        pvt.step();
       end
       while (location.z < z) do
         if (not upMethod()) then break; end
-        pvt.step();
       end
       while (location.z > z) do
         if (not downMethod()) then break; end
-        pvt.step();
       end
     end
     Recovery.finish();
     return (location.x == x and location.y == y and location.z == z);
-  end
-
-  pvt.stepCallbacks = {};
-  pvt.step = function()
-    for _, callback in ipairs(pvt.stepCallbacks) do
-      callback();
-    end
-  end
-  pvt.onstep = function(callback)
-    table.insert(pvt.stepCallbacks, callback);
-    return (function() -- unassigner
-      for i, v in ipairs(pvt.stepCallbacks) do
-        if (v == callback) then
-          table.remove(pvt.stepCallbacks, i);
-          return true;
-        end
-      end
-      return false;
-    end);
   end
 
   return Recovery;

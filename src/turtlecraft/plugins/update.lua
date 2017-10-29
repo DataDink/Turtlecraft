@@ -1,5 +1,7 @@
 TurtleCraft.export('plugins/update', function()
-  return {
+  local Update;
+
+  Update = {
     start = function()
       local config = TurtleCraft.import('services/config');
       local path = shell.getRunningProgram();
@@ -14,6 +16,8 @@ TurtleCraft.export('plugins/update', function()
       os.reboot();
     end;
   };
+
+  return Update;
 end).onready(function()
   TurtleCraft.import('services/plugins').register(
     'Update TurtleCraft',

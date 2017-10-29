@@ -1,7 +1,7 @@
 TurtleCraft.export('plugins/excavate', function()
+  local Excavate;
   local Recovery = TurtleCraft.import('services/recovery');
   local UserInput = TurtleCraft.import('ui/user-input');
-  local Excavate = {};
 
   Excavate = {
     ask = function(question)
@@ -38,11 +38,10 @@ TurtleCraft.export('plugins/excavate', function()
       right = math.abs(right);
       up = math.abs(up);
       down = -math.abs(down);
-      local dispose = Recovery.onStep(Excavate.step);
 
       if (not recovered) then
         Recovery.reset();
-        Recovery.start('plugins/excavate recover ' .. forward .. ' ' .. -left .. ' ' .. right .. ' ' .. up .. ' ' .. -down .. ' true');
+        Recovery.start('plugins/excavate', 'recover', forward, -left, right, up, -down, ' true');
         Recovery.digTo(left, 0, up - 1);
       end
 
@@ -74,7 +73,6 @@ TurtleCraft.export('plugins/excavate', function()
       end
 
       Recovery.finish();
-      dispose();
       Recovery.digTo(0,0,0);
     end,
 
@@ -83,12 +81,49 @@ TurtleCraft.export('plugins/excavate', function()
       Excavate.checkInventory();
     end,
 
-    checkFuel = function()
+    checkFuel = function(required)
+      if (turtle.getFuelLevel() == 'unlimited') then return; end
+      required = required or 0;
+      required = required * 2; -- there and back
+      required = required + math.abs(Recovery.location.x);
+      required = required + math.abs(Recovery.location.y);
+      required = required + math.abs(Recovery.location.z);
+      if (turtle.getFuelLevel() < required and not Excavate.seekFuel(required)) then
+        Excavate.refuel(Recovery.location.x, Recovery.location.y, Recovery.location.z, required);
+      end
+    end,
 
+    refuel = function(x, y, z, required, recovered)
+      if (not recovered) then
+        Recovery.start('plugins/excavate', 'refuel', x, y, z, required, true);
+      end
+      Recovery.digTo(0,0,0);
+
+      while (turtle.getFuelLevel() < required) do
+        TurtleCraft.import('ui/dialog')
+                   .show('I need more fuel!\nPlease put some in\nmy inventory and\npress any key');
+        Excavate.seekFuel(required);
+      end
+
+      Recovery.digTo(x, y, z);
+      Recovery.finish();
+    end,
+
+    seekFuel = function(required)
+      local overdose = math.min(turtle.getFuelLimit(), required + 1000);
+      for slot = 1, 16 do
+        if (turtle.getSlotCount(slot) > 0) then
+          while ((turtle.getFuelLevel() < overdose and turtle.refuel(1)) do end
+          if (turtle.getFuelLevel() >= overdose) then return true; end
+        end
+      end
+      return false;
     end,
 
     checkInventory = function()
-
+      for slot = 1, 16 do
+        if (turtle.getItemCount(slot) == 0) then return; end
+      end
     end
   };
 

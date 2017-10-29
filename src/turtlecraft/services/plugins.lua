@@ -1,32 +1,7 @@
 TurtleCraft.export('services/plugins', function()
-  local register = {};
+  local Plugins, register, sort;
 
-  local function sort(array, by, next)
-    local grouped = {};
-    for _, v in ipairs(array) do
-      local key = by(v);
-      if (grouped[key] == nil) then grouped[key] = {}; end
-      table.insert(grouped[key], v);
-    end
-
-    local sorted = {};
-    for k in pairs(grouped) do
-      table.insert(sorted, k);
-    end
-    table.sort(sorted);
-
-    local result = {};
-    for _, k in ipairs(sorted) do
-      if (next and #grouped[k] > 0) then grouped[k] = next(grouped[k]); end
-      for _, v in ipairs(grouped[k]) do
-        table.insert(result, v);
-      end
-    end
-
-    return result;
-  end
-
-  return {
+  Plugins = {
     list = function()
       local sorted = sort(
         register,
@@ -55,5 +30,34 @@ TurtleCraft.export('services/plugins', function()
       end
       table.insert(register, {title=title, start=start, order=order});
     end,
-  }
+  };
+
+  local register = {};
+
+  local function sort(array, by, next)
+    local grouped = {};
+    for _, v in ipairs(array) do
+      local key = by(v);
+      if (grouped[key] == nil) then grouped[key] = {}; end
+      table.insert(grouped[key], v);
+    end
+
+    local sorted = {};
+    for k in pairs(grouped) do
+      table.insert(sorted, k);
+    end
+    table.sort(sorted);
+
+    local result = {};
+    for _, k in ipairs(sorted) do
+      if (next and #grouped[k] > 0) then grouped[k] = next(grouped[k]); end
+      for _, v in ipairs(grouped[k]) do
+        table.insert(result, v);
+      end
+    end
+
+    return result;
+  end
+
+  return Plugins;
 end);

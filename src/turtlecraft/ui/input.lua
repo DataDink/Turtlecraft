@@ -6,4 +6,4 @@ TurtleCraft.export('ui/user-input', function()
       return read();
     end
   }
-end)
+end);

@@ -32,9 +32,9 @@ TurtleCraft.export('services/plugins', function()
     end,
   };
 
-  local register = {};
+  register = {};
 
-  local function sort(array, by, next)
+  sort = function(array, by, next)
     local grouped = {};
     for _, v in ipairs(array) do
       local key = by(v);

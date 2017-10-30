@@ -24,4 +24,4 @@ TurtleCraft.export('ui/views/select', function()
       IO.centerLine('-use up/down/enter-', nil, h + 3);
     end
   }
-end)
+end);

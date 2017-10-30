@@ -15,4 +15,4 @@ TurtleCraft.export('ui/views/border', function()
       term.write(('='):rep(w));
     end
   };
-end)
+end);

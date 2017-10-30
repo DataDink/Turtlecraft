@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"fuelItems\":[17,162,263,327,369],\"build\":\"1509311980992\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"logsPath\":\"turtlecraft/logs/\",\"logsLevel\":0,\"fuelItems\":[17,162,263,327,369],\"build\":\"1509371208324\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
@@ -37,9 +37,12 @@ TurtleCraft.export('plugins/excavate', function()
   local Recovery = TurtleCraft.import('services/recovery');
   local UserInput = TurtleCraft.import('ui/user-input');
   local config = TurtleCraft.import('services/config');
+  local log = TurtleCraft.import('services/logger');
 
   Excavate = {
     start = function()
+      log.info('Excavate.start');
+
       local forward = pvt.ask('How far forward should I dig?');
       if (forward == nil) then return; end
 
@@ -60,6 +63,8 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     recover = function(forward, left, right, up, down, recovered)
+      log.info('Excavate.recover', left, right, up, down, recovered);
+
       forward = math.abs(forward);
       left = -math.abs(left);
       right = math.abs(right);
@@ -67,6 +72,7 @@ TurtleCraft.export('plugins/excavate', function()
       down = -math.abs(down);
 
       if (not recovered) then
+        if (not pvt.checkFuel(-left + up)) then return false; end
         Recovery.start('plugins/excavate', 'recover', forward, -left, right, up, -down, true);
         Recovery.digTo(left, 0, up - 1);
       end
@@ -76,7 +82,7 @@ TurtleCraft.export('plugins/excavate', function()
         local distance = math.abs(Recovery.location.x - (direction == 1 and right or left));
         for i = 1, distance do
           if (direction == 1) then Recovery.face(1); else Recovery.face(3); end
-          pvt.checkFuel(2);
+          if (not pvt.checkFuel(2)) then return false; end
           pvt.checkInventory();
           if (not Recovery.excavateForward()) then return false; end
         end
@@ -110,22 +116,37 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     refuel = function(required, x, y, z, recovered)
+      log.info('Excavate.refuel', required, x, y, z, recovered);
+
       if (not recovered) then
         Recovery.start('plugins/excavate', 'refuel', x, y, z, required, true);
       end
+
+      local minimum = math.abs(Recovery.location.x)
+                    + math.abs(Recovery.location.y)
+                    + math.abs(Recovery.location.z);
+      if (turtle.getFuelLevel() <= minimum and not pvt.seekFuel(minimum)) then
+        TurtleCraft.import('ui/dialog')
+                   .show('I am out of fuel.\nPlease add fuel to\nmy inventory.');
+        Recovery.finish();
+        return false;
+      end
+
       Recovery.digTo(0,0,0);
 
-      while (turtle.getFuelLevel() < required) do
+      while (turtle.getFuelLevel() < required and not pvt.seekFuel(required)) do
         TurtleCraft.import('ui/dialog')
-                   .show('I need more fuel!\nPlease put some in\nmy inventory and\npress any key');
-        pvt.seekFuel(required);
+                   .show('Please add fuel to\nmy inventory and\npress any key');
       end
 
       Recovery.digTo(x, y, z);
       Recovery.finish();
+      return true;
     end,
 
     empty = function(x, y, z, recovered)
+      log.info('Excavate.empty', x, y, z, recovered);
+
       if (not recovered) then
         Recovery.start('plugins/excavate', 'empty', x, y, z, true);
       end
@@ -148,6 +169,8 @@ TurtleCraft.export('plugins/excavate', function()
 
   pvt = {
     ask = function(question)
+      log.info('Excavate.ask');
+
       local value = UserInput.show(question .. '\n(nothing to cancel)');
       while (not value:find('^%d+$')) do
         if (value:len() == 0) then return nil; end
@@ -157,22 +180,27 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     checkFuel = function(required)
-      if (turtle.getFuelLevel() == 'unlimited') then return; end
+      log.info('Excavate.checkFuel', required);
+
+      if (turtle.getFuelLevel() == 'unlimited') then return true; end
       required = required or 0;
       required = required * 2; -- there and back
       required = required + math.abs(Recovery.location.x);
       required = required + math.abs(Recovery.location.y);
       required = required + math.abs(Recovery.location.z);
       if (turtle.getFuelLevel() < required and not pvt.seekFuel(required)) then
-        Excavate.refuel(required, Recovery.location.x, Recovery.location.y, Recovery.location.z);
+        return Excavate.refuel(required, Recovery.location.x, Recovery.location.y, Recovery.location.z);
       end
+      return true;
     end,
 
     seekFuel = function(required)
+      log.info('Excavate.seekFuel', required);
+
       local overdose = math.min(turtle.getFuelLimit(), required + 1000);
       for slot = 1, 16 do
-        if (turtle.getSlotCount(slot) > 0) then
-          while ((turtle.getFuelLevel() < overdose and turtle.refuel(1)) do end
+        if (turtle.getItemCount(slot) > 0) then
+          while (turtle.getFuelLevel() < overdose and turtle.refuel(1)) do end
           if (turtle.getFuelLevel() >= overdose) then return true; end
         end
       end
@@ -180,6 +208,8 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     checkInventory = function()
+      log.info('Excavate.checkInventory');
+
       for i = 1, 2 do
         for slot = 1, 16 do
           if (turtle.getItemCount(slot) == 0) then return; end
@@ -190,6 +220,8 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     isFuelItem = function(info)
+      log.info('Excavate.isFuelItem');
+
       if (not info.id and not info.id:find('^%d+')) then return false; end
       local itemId = tonumber(info.id:match('^%d+'));
       for _, fuelId in ipairs(config.fuelItems) do
@@ -199,6 +231,8 @@ TurtleCraft.export('plugins/excavate', function()
     end,
 
     consolidate = function()
+      log.info('Excavate.consolidate');
+
       for consolidate = 2, 16 do
         for slot = 1, consolidate - 1 do
           turtle.select(consolidate);
@@ -251,8 +285,9 @@ TurtleCraft.export('services/config', function()
   -- NOTE: cfgjson will be added to the turtlecraft scope at build time
   local config =  TurtleCraft.import('services/json').parse(cfgjson or '{}');
   config.recoveryPath = config.recoveryPath:gsub('[%s/]+$', '');
+  config.logsPath = config.logsPath:gsub('[%s/]+$', '');
   return config;
-end)
+end);
 
 TurtleCraft.export('services/io', function()
   local IO;
@@ -492,6 +527,43 @@ TurtleCraft.export('services/json', function()
   return Json;
 end);
 
+TurtleCraft.export('services/logger', function()
+  local config = TurtleCraft.import('services/config');
+  fs.delete(config.logsPath); -- per session
+
+  local function write(path, level, ...)
+    local args = table.pack(...);
+    for i, v in ipairs(args) do args[i] = tostring(v); end
+    
+    xpcall(function()
+      if (config.logsLevel > level) then return; end
+      path = path or 'general.log';
+      path = config.logsPath .. '/' .. path:gsub('^[%s/]+', '');
+      local msg = tostring(os.time()) .. '::' .. table.concat(args, ',');
+      local file = fs.open(path, 'a');
+      file.writeLine(msg);
+      file.close();
+    end, function(e)
+      print('logger failed');
+      print(e);
+    end);
+  end
+
+  return = {
+    to = function(path)
+      return {
+        info = function(...) write(path, 0, ...); end,
+        warn = function(...) write(path, 1, ...); end,
+        error = function(...) write(path, 2, ...); end
+      };
+    end,
+
+    info = function(...) write(nil, 0, ...); end,
+    warn = function(...) write(nil, 1, ...); end,
+    error = function(...) write(nil, 2, ...); end
+  }
+end);
+
 TurtleCraft.export('services/plugins', function()
   local Plugins, register, sort;
 
@@ -526,9 +598,9 @@ TurtleCraft.export('services/plugins', function()
     end,
   };
 
-  local register = {};
+  register = {};
 
-  local function sort(array, by, next)
+  sort = function(array, by, next)
     local grouped = {};
     for _, v in ipairs(array) do
       local key = by(v);
@@ -575,6 +647,7 @@ end);
 TurtleCraft.export('services/recovery', function()
   local Recovery, location, pvt;
   local config = TurtleCraft.import('services/config');
+  local log = TurtleCraft.import('services/logger');
   local IO = TurtleCraft.import('services/io');
   local positionFile = config.recoveryPath .. '/position.dat';
   local position = fs.open(positionFile, 'a');
@@ -584,40 +657,155 @@ TurtleCraft.export('services/recovery', function()
   Recovery = {
     location = {},
 
-    face = pvt.face,
+    face = function(direction)
+      log.info('Recovery.face', direction);
+
+      local turns = (direction % 4) - location.f;
+      if (turns == 0) then return true; end;
+      if (turns > 2) then turns = -1; end
+      if (turns < -2) then turns = 1; end
+      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
+      local name = (turns > 0) and 'right' or 'left';
+      for i=1, math.abs(turns) do
+        method();
+        position.writeLine(name);
+        position.flush();
+        pvt.cleanPosition();
+      end
+      location.f = (location.f + turns) % 4
+      return true;
+    end,
 
     moveTo = function(x, y, z)
-      return pvt.navigateTo('moveTo', pvt.moveForward, pvt.moveUp, pvt.moveDown, x, y, z);
+      return pvt.navigateTo('moveTo', Recovery.moveForward, Recovery.moveUp, Recovery.moveDown, x, y, z);
     end,
 
-    moveForward = pvt.moveForward,
+    moveForward = function()
+      log.info('Recovery.moveForward');
 
-    moveUp = pvt.moveUp,
+      return pvt.retry(function()
+        if (turtle.forward()) then
+          position.writeLine('forward');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processForward();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
 
-    moveDown = pvt.moveDown,
+    moveUp = function()
+      log.info('Recovery.moveUp');
+
+      return pvt.retry(function()
+        if (turtle.up()) then
+          position.writeLine('up');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processUp();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
+
+    moveDown = function()
+      log.info('Recovery.moveDown');
+
+      return pvt.retry(function()
+        if (turtle.down()) then
+          position.writeLine('down');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processDown();
+          return true;
+        end
+        return false;
+      end, config.maxMoves);
+    end,
 
     digTo = function(x, y, z)
-      return pvt.navigateTo('digTo', pvt.digForward, pvt.digUp, pvt.digDown, x, y, z);
+      return pvt.navigateTo('digTo', Recovery.digForward, Recovery.digUp, Recovery.digDown, x, y, z);
     end,
 
-    digForward = pvt.digForward,
+    digForward = function()
+      log.info('Recovery.digForward');
 
-    digUp = pvt.digUp,
+      return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
+        if (turtle.forward()) then
+          position.writeLine('forward');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processForward();
+          return true;
+        end
+        return false;
+      end);
+    end,
 
-    digDown = pvt.digDown,
+    digUp = function()
+      log.info('Recovery.digUp');
+
+      return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
+        if (turtle.up()) then
+          position.writeLine('up');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processUp();
+          return true;
+        end
+        return false;
+      end);
+    end,
+
+    digDown = function()
+      log.info('Recovery.digDown');
+
+      return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
+        if (turtle.down()) then
+          position.writeLine('down');
+          position.flush();
+          pvt.cleanPosition();
+          pvt.processDown();
+          return true;
+        end
+        return false;
+      end);
+    end,
 
     excavateTo = function(x, y, z)
-      return pvt.navigateTo('excavateTo', pvt.excavateForward, pvt.excavateUp, pvt.excavateDown, x, y, z);
+      return pvt.navigateTo('excavateTo', Recovery.excavateForward, Recovery.excavateUp, Recovery.excavateDown, x, y, z);
     end,
 
-    excavateForward = pvt.excavateForward,
+    excavateForward = function()
+      log.info('Recovery.excavateForward');
 
-    excavateUp = pvt.excavateUp,
+      pvt.digDetect(turtle.detectUp, turtle.digUp);
+      pvt.digDetect(turtle.detectDown, turtle.digDown);
+      return Recovery.digForward();
+    end,
 
-    excavateDown = pvt.excavateDown,
+    excavateUp = function()
+      log.info('Recovery.excavateUp');
+
+      pvt.digDetect(turtle.detect, turtle.dig);
+      return Recovery.digUp();
+    end,
+
+    excavateDown = function()
+      log.info('Recovery.excavateDown');
+
+      pvt.digDetect(turtle.detect, turtle.dig);
+      return Recovery.digDown();
+    end,
 
     start = function(...)
-      local command = table.concat(table.pack(...), ' ');
+      log.info('Recovery.start');
+
+      local args = table.pack(...);
+      for i, v in ipairs(args) do args[i] = tostring(v); end
+      local command = table.concat(args, ' ');
       local file = fs.open(taskFile, 'a');
       file.writeLine(command);
       file.close();
@@ -625,6 +813,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     finish = function()
+      log.info('Recovery.finish');
+
       local file = fs.open(taskFile, 'a');
       file.writeLine('end');
       file.close();
@@ -640,6 +830,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
+      log.info('Recovery.recover');
+
       pvt.recoverPosition();
       if (not fs.exists(taskFile)) then return; end
 
@@ -656,6 +848,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     reset = function()
+      log.info('Recovery.reset');
+
       fs.open(taskFile, 'w');
       tasks = {};
       position = fs.open(positionFile, 'w');
@@ -695,13 +889,15 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     cleanPosition = function()
-      if (location.x + location.y + location.z + location.f ~= 0) then return; end
+      if (location.x ~= 0 or location.y ~= 0 or location.z ~= 0 or location.f ~= 0) then return; end
       position.close();
       position = fs.open(positionFile, 'w');
     end,
 
     ----------------------> Recovery Stuff
     readTasks = function()
+      log.info('Recovery.readTasks');
+
       if (not fs.exists(taskFile)) then return {}; end
       local items = {};
       local file = fs.open(taskFile, 'r');
@@ -719,6 +915,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recoverPosition = function()
+      log.info('Recovery.recoverPosition');
+
       if (not fs.exists(positionFile)) then return; end
       local recovery = fs.open(config.recoveryPath, 'r');
       local cmd = recovery.readLine();
@@ -744,6 +942,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recoverTasks = function()
+      log.info('Recovery.recoverTasks');
+
       if (not fs.exists(taskFile)) then return; end
       local recovery = pvt.readTasks();
       local file = fs.open(taskFile, 'w');
@@ -758,6 +958,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     exec = function(cmd)
+      log.info('Recovery.exec', cmd);
+
       local parts = cmd:gsub('[^%s]+');
       local module = parts();
       local method = parts();
@@ -775,65 +977,10 @@ TurtleCraft.export('services/recovery', function()
       func(table.unpack(values));
     end,
 
-    ----------------------> Move Stuff
-    face = function(direction)
-      local turns = (direction % 4) - location.f;
-      if (turns == 0) then return true; end;
-      if (turns > 2) then turns = -1; end
-      if (turns < -2) then turns = 1; end
-      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
-      local name = (turns > 0) and 'right' or 'left';
-      for i=1, math.abs(turns) do
-        method();
-        position.writeLine(name);
-        position.flush();
-        pvt.cleanPosition();
-      end
-      location.f = (location.f + turns) % 4
-      return true;
-    end,
-
-    moveForward = function()
-      return pvt.retry(function()
-        if (turtle.forward()) then
-          position.writeLine('forward');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processForward();
-          return true;
-        end
-        return false;
-      end, config.maxMoves);
-    end,
-
-    moveUp = function()
-      return pvt.retry(function()
-        if (turtle.up()) then
-          position.writeLine('up');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processUp();
-          return true;
-        end
-        return false;
-      end, config.maxMoves);
-    end,
-
-    moveDown = function()
-      return pvt.retry(function()
-        if (turtle.down()) then
-          position.writeLine('down');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processDown();
-          return true;
-        end
-        return false;
-      end, config.maxMoves);
-    end,
-
     ----------------------> Dig Stuff
     digDetect = function(digMethod, detectMethod)
+      log.info('Recovery.digDetect');
+
       return pvt.retry(function()
         if (not detectMethod()) then return true; end
         digMethod();
@@ -842,6 +989,8 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     digMove = function(detectMethod, digMethod, attackMethod, moveMethod)
+      log.info('Recovery.digMove');
+
       return pvt.retry(function()
         if (not pvt.digDetect(detectMethod, digMethod)) then return false; end
         attackMethod();
@@ -849,64 +998,10 @@ TurtleCraft.export('services/recovery', function()
       end, config.maxAttacks);
     end,
 
-    digForward = function()
-      return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
-        if (turtle.forward()) then
-          position.writeLine('forward');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processForward();
-          return true;
-        end
-        return false;
-      end);
-    end,
-
-    digUp = function()
-      return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
-        if (turtle.up()) then
-          position.writeLine('up');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processUp();
-          return true;
-        end
-        return false;
-      end);
-    end,
-
-    digDown = function()
-      return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
-        if (turtle.down()) then
-          position.writeLine('down');
-          position.flush();
-          pvt.cleanPosition();
-          pvt.processDown();
-          return true;
-        end
-        return false;
-      end);
-    end,
-
-    ---------------------->Excavate Stuff
-    excavateForward = function()
-      pvt.digDetect(turtle.detectUp, turtle.digUp);
-      pvt.digDetect(turtle.detectDown, turtle.digDown);
-      return pvt.digForward();
-    end,
-
-    excavateUp = function()
-      pvt.digDetect(turtle.detect, turtle.dig);
-      return pvt.digUp();
-    end,
-
-    excavateDown = function()
-      pvt.digDetect(turtle.detect, turtle.dig);
-      return pvt.digDown();
-    end,
-
     ---------------------->Other Stuff
     retry = function(method, max)
+      log.info('Recovery.retry');
+
       for tries = 1, max do
         if (method()) then return true; end
       end
@@ -914,22 +1009,24 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
+      log.info('Recovery.navigateTo', methodName, x, y, z);
+
       Recovery.start('services/recovery', methodName, x, y, z);
       for i = 1, 3 do
         while (location.x < x) do
-          pvt.face(1);
+          Recovery.face(1);
           if (not forwardMethod()) then break; end
         end
         while (location.x > x) do
-          pvt.face(3);
+          Recovery.face(3);
           if (not forwardMethod()) then break; end
         end
         while (location.y < y) do
-          pvt.face(0);
+          Recovery.face(0);
           if (not forwardMethod()) then break; end
         end
         while (location.y > y) do
-          pvt.face(2);
+          Recovery.face(2);
           if (not forwardMethod()) then break; end
         end
         while (location.z < z) do
@@ -968,7 +1065,7 @@ TurtleCraft.export('ui/user-input', function()
       return read();
     end
   }
-end)
+end);
 
 TurtleCraft.export('ui/plugin-menu', function()
   local Select = TurtleCraft.import('ui/select');
@@ -1035,7 +1132,7 @@ TurtleCraft.export('ui/views/border', function()
       term.write(('='):rep(w));
     end
   };
-end)
+end);
 
 TurtleCraft.export('ui/views/input', function()
   local IO = TurtleCraft.import('services/io');
@@ -1095,7 +1192,7 @@ TurtleCraft.export('ui/views/select', function()
       IO.centerLine('-use up/down/enter-', nil, h + 3);
     end
   }
-end)
+end);
 
 (function()
   if (os.getComputerLabel() == nil) then os.setComputerLabel('TurtleCraft'); end
@@ -1105,4 +1202,4 @@ end)
   term.clear();
   term.setCursorPos(1,1);
   print('TurtleCraft exited');
-end)()
+end)();

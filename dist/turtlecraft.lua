@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"logsPath\":\"turtlecraft/logs/\",\"logsLevel\":0,\"fuelItems\":[17,162,263,327,369],\"build\":\"1509371208324\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"logsPath\":\"turtlecraft/logs/\",\"logsLevel\":0,\"fuelItems\":[17,162,263,327,369],\"build\":\"1509371308954\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 (function()
@@ -534,7 +534,7 @@ TurtleCraft.export('services/logger', function()
   local function write(path, level, ...)
     local args = table.pack(...);
     for i, v in ipairs(args) do args[i] = tostring(v); end
-    
+
     xpcall(function()
       if (config.logsLevel > level) then return; end
       path = path or 'general.log';
@@ -549,7 +549,7 @@ TurtleCraft.export('services/logger', function()
     end);
   end
 
-  return = {
+  return {
     to = function(path)
       return {
         info = function(...) write(path, 0, ...); end,

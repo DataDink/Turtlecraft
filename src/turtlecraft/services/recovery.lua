@@ -278,7 +278,7 @@ TurtleCraft.export('services/recovery', function()
         else
           table.insert(items, line);
         end
-        local line = file.readLine();
+        line = file.readLine();
       end
       file.close();
       return items;

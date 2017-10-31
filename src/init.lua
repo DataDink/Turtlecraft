@@ -1,6 +1,6 @@
 local TurtleCraft = {};
 
-(function()
+print((function() -- printing the function output will get around an ambiguous minification issue.
   local modules = {};
   local startup = {};
   TurtleCraft.export = function(name, module)
@@ -29,4 +29,4 @@ local TurtleCraft = {};
     end
     startup = false;
   end
-end)();
+end)());

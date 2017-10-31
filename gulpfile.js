@@ -22,18 +22,16 @@ gulp.task('build', complete => {
     'src/init.lua',
     'src/turtlecraft/**/*.lua',
     'src/bootstrap.lua'
-  ]);
+  ]).pipe(insert.append('\nz99999();')) // Ambiguous errors fix
+    .pipe(concat('turtlecraft.lua'))
+    .pipe(insert.prepend('local cfgjson = ' + cfgjson + ';\n', {src: true}));
 
-  if (config.minify) {
-    stream
-      .pipe(minify())
-      .pipe(insert.append(';'));
-  }
+  if (config.minify) { stream.pipe(minify()) }
 
-  stream
-  .pipe(concat('turtlecraft.lua'))
-  .pipe(insert.prepend('local cfgjson = ' + cfgjson + ';\n', {src: true}))
-  .pipe(gulp.dest('dist'));
+  stream.pipe(insert.transform(v => {
+          return v.replace(/\s*;?\s*z99999\(\)\s*\;?\s*/gi, ';\n');
+        }))
+        .pipe(gulp.dest('dist'));
 
   return stream;
 });

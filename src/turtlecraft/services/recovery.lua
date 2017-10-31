@@ -203,14 +203,13 @@ TurtleCraft.export('services/recovery', function()
       log.info('Recovery.recover');
 
       pvt.recoverPosition();
-      if (not fs.exists(taskFile)) then return; end
+      if (#pvt.readTasks() == 0) then return; end
 
-      local key;
       repeat
         TurtleCraft.import('ui/views/notification')
-          .show('Recovering...\nPress ESC to cancel');
+          .show('Recovering...\nPress Q to cancel');
         local key = IO.readKey(60);
-      until (key == false or key == keys.esc);
+      until (key == false or key == keys.q);
 
       TurtleCraft.import('ui/views/notification')
         .show('Recovering\nLast Session');
@@ -288,7 +287,7 @@ TurtleCraft.export('services/recovery', function()
       log.info('Recovery.recoverPosition');
 
       if (not fs.exists(positionFile)) then return; end
-      local recovery = fs.open(config.recoveryPath, 'r');
+      local recovery = fs.open(positionFile, 'r');
       local cmd = recovery.readLine();
       while (cmd) do
         if (cmd == 'forward') then pvt.processForward(); end
@@ -308,7 +307,7 @@ TurtleCraft.export('services/recovery', function()
       end
       recovery.close();
       position = fs.open(positionFile, 'w');
-      position.writeLine('location ' .. position.x .. ' ' .. position.y .. ' ' .. position.z .. ' ' .. position.f);
+      position.writeLine('location ' .. location.x .. ' ' .. location.y .. ' ' .. location.z .. ' ' .. location.f);
     end,
 
     recoverTasks = function()

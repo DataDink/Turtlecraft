@@ -69,7 +69,7 @@ TurtleCraft.export('services/io', function()
           line = '';
         end
       end
-      return table.concat(lines, '\n'), #lines;
+      return table.concat(lines, '\n'), lines;
     end,
 
     writeBlock = function(text, left, top)

@@ -16,7 +16,7 @@ reboot
 
 **About**
 
-This is a mini, menu-driven, OS for turtles from the ComputerCraft mod.
+This is a mini, menu-driven OS for turtles from the ComputerCraft mod.
 The key feature of this system is its recovery service.
 When the chunk unloads and reloads the turtle will (usually) pick up where it left off.
 The system is not perfect, but as fail-safe as I can make it.

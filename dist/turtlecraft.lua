@@ -1,4 +1,4 @@
-local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"logsPath\":\"turtlecraft/logs/\",\"logsLevel\":0,\"fuelItems\":[\"minecraft:log\",\"minecraft:log2\",\"minecraft:coal\",\"minecraft:lava_bucket\",\"minecraft:blaze_rod\"],\"build\":\"1509542323810\",\"env\":\"debug\"}";
+local cfgjson = "{\"minify\":false,\"maxDigs\":300,\"maxMoves\":10,\"maxAttacks\":64,\"recoveryPath\":\"turtlecraft/recovery/\",\"version\":\"2.0.0\",\"pastebin\":\"kLMahbgd\",\"logsPath\":\"turtlecraft/logs/\",\"logsLevel\":0,\"fuelItems\":[\"minecraft:log\",\"minecraft:log2\",\"minecraft:coal\",\"minecraft:lava_bucket\",\"minecraft:blaze_rod\"],\"build\":\"1509542846290\",\"env\":\"debug\"}";
 local TurtleCraft = {};
 
 print((function() -- printing the function output will get around an ambiguous minification issue.
@@ -701,9 +701,9 @@ TurtleCraft.export('services/recovery', function()
         position.writeLine(name);
         position.close();
         position = fs.open(positionFile, 'a');
-        pvt.cleanPosition();
       end
       location.f = (location.f + turns) % 4
+      pvt.cleanPosition();
       return true;
     end,
 
@@ -719,8 +719,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('forward');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processForward();
+          pvt.cleanPosition();
           return true;
         end
         return false;
@@ -735,8 +735,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('up');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processUp();
+          pvt.cleanPosition();
           return true;
         end
         return false;
@@ -751,8 +751,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('down');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processDown();
+          pvt.cleanPosition();
           return true;
         end
         return false;
@@ -771,8 +771,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('forward');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processForward();
+          pvt.cleanPosition();
           return true;
         end
         return false;
@@ -787,8 +787,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('up');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processUp();
+          pvt.cleanPosition();
           return true;
         end
         return false;
@@ -803,8 +803,8 @@ TurtleCraft.export('services/recovery', function()
           position.writeLine('down');
           position.close();
           position = fs.open(positionFile, 'a');
-          pvt.cleanPosition();
           pvt.processDown();
+          pvt.cleanPosition();
           return true;
         end
         return false;

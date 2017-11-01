@@ -46,6 +46,7 @@ TurtleCraft.export('plugins/excavate', function()
 
       local function row()
         local direction = Recovery.location.x < right;
+        if (direction) then Recovery.digTo(left, Recovery.location.y, Recovery.location.z); end
         local complete = direction
           and (function() return Recovery.location.x >= right; end)
            or (function() return Recovery.location.x <= left; end);
@@ -81,11 +82,10 @@ TurtleCraft.export('plugins/excavate', function()
       local function block()
         repeat
           if (not plane()) then return false; end
-          if (not Recovery.excavateDown()) then return false; end
+          if (not Recovery.digDown()) then return false; end
           for i = 1, 2 do
-            if (not Recovery.excavateDown()) then
+            if (not Recovery.digDown()) then
               if (not plane()) then return false; end
-              return false; 
             end
           end
         until (Recovery.location.z < (down - 1))
@@ -242,6 +242,7 @@ TurtleCraft.export('plugins/excavate', function()
           if (turtle.transferTo(slot)) then break; end
         end
       end
+      turtle.select(1);
     end
   }
 

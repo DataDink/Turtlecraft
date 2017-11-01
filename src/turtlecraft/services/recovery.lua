@@ -39,7 +39,8 @@ TurtleCraft.export('services/recovery', function()
       for i=1, math.abs(turns) do
         method();
         position.writeLine(name);
-        position.flush();
+        position.close();
+        position = fs.open(positionFile, 'a');
         pvt.cleanPosition();
       end
       location.f = (location.f + turns) % 4
@@ -56,7 +57,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.retry(function()
         if (turtle.forward()) then
           position.writeLine('forward');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processForward();
           return true;
@@ -71,7 +73,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.retry(function()
         if (turtle.up()) then
           position.writeLine('up');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processUp();
           return true;
@@ -86,7 +89,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.retry(function()
         if (turtle.down()) then
           position.writeLine('down');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processDown();
           return true;
@@ -105,7 +109,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
         if (turtle.forward()) then
           position.writeLine('forward');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processForward();
           return true;
@@ -120,7 +125,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
         if (turtle.up()) then
           position.writeLine('up');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processUp();
           return true;
@@ -135,7 +141,8 @@ TurtleCraft.export('services/recovery', function()
       return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
         if (turtle.down()) then
           position.writeLine('down');
-          position.flush();
+          position.close();
+          position = fs.open(positionFile, 'a');
           pvt.cleanPosition();
           pvt.processDown();
           return true;
@@ -196,6 +203,8 @@ TurtleCraft.export('services/recovery', function()
         position.close();
         position = fs.open(positionFile, 'w');
         position.writeLine(posCmd); -- resets position file so it doesn't get huge.
+        position.close();
+        position = fs.open(positionFile, 'a');
       end
     end,
 
@@ -211,7 +220,8 @@ TurtleCraft.export('services/recovery', function()
         local key = IO.readKey(30);
       until (key == false or key == keys.q);
 
-      if (key == false) then
+      log.info('Key read = ', key);
+      if (key ~= keys.q) then
         TurtleCraft.import('ui/views/notification')
           .show('Recovering\nLast Session');
         pvt.recoverTasks();
@@ -292,6 +302,7 @@ TurtleCraft.export('services/recovery', function()
       if (not fs.exists(positionFile)) then return; end
       local recovery = fs.open(positionFile, 'r');
       local cmd = recovery.readLine();
+      location.x = 0; location.y = 0; location.z = 0; location.f = 0;
       while (cmd) do
         if (cmd == 'forward') then pvt.processForward(); end
         if (cmd == 'up') then pvt.processUp(); end
@@ -306,11 +317,14 @@ TurtleCraft.export('services/recovery', function()
           location.z = tonumber(values());
           location.f = tonumber(values());
         end
+        log.info(cmd, location.x, location.y, location.z, location.f);
         cmd = recovery.readLine();
       end
       recovery.close();
       position = fs.open(positionFile, 'w');
       position.writeLine('location ' .. location.x .. ' ' .. location.y .. ' ' .. location.z .. ' ' .. location.f);
+      position.close();
+      position = fs.open(positionFile, 'a');
     end,
 
     recoverTasks = function()

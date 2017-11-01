@@ -27,6 +27,26 @@ TurtleCraft.export('services/recovery', function()
   Recovery = {
     location = {},
 
+    turnRight = function()
+      turtle.turnRight();
+      position.writeLine('right');
+      position.close();
+      position = fs.open(positionFile, 'a');
+      pvt.processRight();
+      pvt.cleanPosition();
+      return true;
+    end,
+
+    turnLeft = function()
+      turtle.turnLeft();
+      position.writeLine('left');
+      position.close();
+      position = fs.open(positionFile, 'a');
+      pvt.processLeft();
+      pvt.cleanPosition();
+      return true;
+    end,
+
     face = function(direction)
       log.info('Recovery.face', direction);
 
@@ -34,16 +54,10 @@ TurtleCraft.export('services/recovery', function()
       if (turns == 0) then return true; end;
       if (turns > 2) then turns = -1; end
       if (turns < -2) then turns = 1; end
-      local method = (turns > 0) and turtle.turnRight or turtle.turnLeft;
-      local name = (turns > 0) and 'right' or 'left';
+      local method = (turns > 0) and Recovery.turnRight or Recovery.turnLeft;
       for i=1, math.abs(turns) do
         method();
-        position.writeLine(name);
-        position.close();
-        position = fs.open(positionFile, 'a');
       end
-      location.f = (location.f + turns) % 4
-      pvt.cleanPosition();
       return true;
     end,
 

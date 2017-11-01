@@ -4,15 +4,15 @@ TurtleCraft 2.0
 **Install**
 
 ```
-pastebin get <version key> startup
+pastebin get nTNP03Bw startup
 reboot
 ```
 
 *versions:*
 
-- Debug key: kLMahbgd
-- Test key: nTNP03Bw
-- Release key: ??? <-- does not exist yet
+- Debug: kLMahbgd
+- Test: nTNP03Bw
+- Release: ??? <-- does not exist yet
 
 **About**
 

@@ -8,5 +8,11 @@
   "pastebin": "kLMahbgd",
   "logsPath": "turtlecraft/logs/",
   "logsLevel": 0,
-  "fuelItems": [17,162,263,327,369]
+  "fuelItems": [
+    "minecraft:log",
+    "minecraft:log2",
+    "minecraft:coal",
+    "minecraft:lava_bucket",
+    "minecraft:blaze_rod"
+  ]
 }

@@ -188,24 +188,22 @@ TurtleCraft.export('plugins/excavate', function()
     checkInventory = function()
       log.info('Excavate.checkInventory');
 
-      for i = 1, 2 do
+      for passes = 1, 2 do
         for slot = 1, 16 do
           if (turtle.getItemCount(slot) == 0) then return; end
         end
-        pvt.consolidate();
+        if (passes == 1) then pvt.consolidate(); end
       end
+
       Excavate.empty(Recovery.location.x, Recovery.location.y, Recovery.location.z);
     end,
 
     isFuelItem = function(info)
       log.info('Excavate.isFuelItem');
 
-      if (not info or not info.id or not info.id:find('^%d+')) then
-        return false;
-      end
-      local itemId = tonumber(info.id:match('^%d+'));
-      for _, fuelId in ipairs(config.fuelItems) do
-        if (fuelId == itemId) then return true; end
+      if (not info or not info.name) then return false; end
+      for _, fuelName in ipairs(config.fuelItems) do
+        if (fuelName == info.name) then return true; end
       end
       return false;
     end,
@@ -215,14 +213,20 @@ TurtleCraft.export('plugins/excavate', function()
       for slot = 1, 16 do
         local info = turtle.getItemDetail(slot);
         if (info and not pvt.isFuelItem(info)) then
-          turtle.select(slot);
+          repeat
+            turtle.select(slot);
+          until (turtle.getItemCount() == 0 or turtle.drop());
+        end
+      end
+      pvt.consolidate();
+      for slot = 2, 16 do
+        if (turtle.getItemCount(slot) > 0) then
           repeat
             turtle.select(slot);
           until (turtle.getItemCount() == 0 or turtle.drop());
         end
       end
       Recovery.face(0);
-      pvt.consolidate();
     end,
 
     consolidate = function()

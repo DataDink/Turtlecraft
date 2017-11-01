@@ -228,18 +228,9 @@ TurtleCraft.export('services/recovery', function()
       pvt.recoverPosition();
       if (#pvt.readTasks() == 0) then return; end
 
-      repeat
-        TurtleCraft.import('ui/views/notification')
-          .show('Recovering...\nPress Q to cancel');
-        local key = IO.readKey(30);
-      until (key == false or key == keys.q);
-
-      log.info('Key read = ', key);
-      if (key ~= keys.q) then
-        TurtleCraft.import('ui/views/notification')
-          .show('Recovering\nLast Session');
-        pvt.recoverTasks();
-      end
+      TurtleCraft.import('ui/views/notification')
+        .show('Recovering\nLast Session');
+      pvt.recoverTasks();
       Recovery.reset();
     end,
 

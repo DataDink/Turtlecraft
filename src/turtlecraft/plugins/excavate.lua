@@ -50,7 +50,7 @@ TurtleCraft.export('plugins/excavate', function()
         local complete = direction
           and (function() return Recovery.location.x >= right; end)
            or (function() return Recovery.location.x <= left; end);
-        repeat
+        while (not complete()) do
           pvt.showUpdate((up - Recovery.location.z) / (up - down));
           if (direction)
             then Recovery.face(1);
@@ -59,7 +59,7 @@ TurtleCraft.export('plugins/excavate', function()
           if (not Recovery.excavateForward()) then return false; end
           if (pvt.checkFuel(4) == false) then return false; end
           pvt.checkInventory();
-        until (complete())
+        end
         return true;
       end
 
@@ -68,20 +68,21 @@ TurtleCraft.export('plugins/excavate', function()
         local complete = direction
           and (function() return Recovery.location.y >= forward; end)
            or (function() return Recovery.location.y <= 0 end);
-        repeat
+        while (not complete()) do
           if (not row()) then return false; end
           if (direction)
             then Recovery.face(0);
             else Recovery.face(2);
           end
           if (not Recovery.excavateForward()) then return false; end
-        until (complete())
-        return true;
+        end
+        return row();
       end
 
       local function block()
         repeat
           if (not plane()) then return false; end
+          turtle.digUp();
           if (not Recovery.digDown()) then return false; end
           for i = 1, 2 do
             if (not Recovery.digDown()) then

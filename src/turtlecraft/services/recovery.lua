@@ -208,7 +208,7 @@ TurtleCraft.export('services/recovery', function()
       repeat
         TurtleCraft.import('ui/views/notification')
           .show('Recovering...\nPress Q to cancel');
-        local key = IO.readKey(60);
+        local key = IO.readKey(30);
       until (key == false or key == keys.q);
 
       if (key == false) then

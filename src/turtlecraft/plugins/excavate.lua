@@ -81,8 +81,12 @@ TurtleCraft.export('plugins/excavate', function()
       local function block()
         repeat
           if (not plane()) then return false; end
-          for i = 1, 3 do
-            if (not Recovery.excavateDown()) then return false; end
+          if (not Recovery.excavateDown()) then return false; end
+          for i = 1, 2 do
+            if (not Recovery.excavateDown()) then
+              if (not plane()) then return false; end
+              return false; 
+            end
           end
         until (Recovery.location.z < (down - 1))
         return true;

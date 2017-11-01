@@ -56,6 +56,8 @@ TurtleCraft.export('plugins/excavate', function()
             else Recovery.face(3);
           end
           if (not Recovery.excavateForward()) then return false; end
+          if (pvt.checkFuel(4) == false) then return false; end
+          pvt.checkInventory();
         until (complete())
         return true;
       end
@@ -106,14 +108,9 @@ TurtleCraft.export('plugins/excavate', function()
       local minimum = math.abs(Recovery.location.x)
                     + math.abs(Recovery.location.y)
                     + math.abs(Recovery.location.z);
-      if (turtle.getFuelLevel() <= minimum and not pvt.seekFuel(minimum)) then
-        TurtleCraft.import('ui/dialog')
-                   .show('I am out of fuel.\nPlease add fuel to\nmy inventory.');
-        Recovery.finish();
-        return false;
+      if (turtle.getFuelLevel() > minimum) then
+        Recovery.digTo(0,0,0);
       end
-
-      Recovery.digTo(0,0,0);
 
       while (turtle.getFuelLevel() < required and not pvt.seekFuel(required)) do
         TurtleCraft.import('ui/dialog')
@@ -168,7 +165,7 @@ TurtleCraft.export('plugins/excavate', function()
       required = required + math.abs(Recovery.location.x);
       required = required + math.abs(Recovery.location.y);
       required = required + math.abs(Recovery.location.z);
-      if (turtle.getFuelLevel() < required and not pvt.seekFuel(required)) then
+      if (turtle.getFuelLevel() <= required and not pvt.seekFuel(required)) then
         return Excavate.refuel(required, Recovery.location.x, Recovery.location.y, Recovery.location.z);
       end
       return true;
@@ -180,6 +177,7 @@ TurtleCraft.export('plugins/excavate', function()
       local overdose = math.min(turtle.getFuelLimit(), required + 1000);
       for slot = 1, 16 do
         if (turtle.getItemCount(slot) > 0) then
+          turtle.select(slot);
           while (turtle.getFuelLevel() < overdose and turtle.refuel(1)) do end
           if (turtle.getFuelLevel() >= overdose) then return true; end
         end

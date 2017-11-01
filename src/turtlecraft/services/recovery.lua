@@ -211,9 +211,12 @@ TurtleCraft.export('services/recovery', function()
         local key = IO.readKey(60);
       until (key == false or key == keys.q);
 
-      TurtleCraft.import('ui/views/notification')
-        .show('Recovering\nLast Session');
-      pvt.recoverTasks();
+      if (key == false) then
+        TurtleCraft.import('ui/views/notification')
+          .show('Recovering\nLast Session');
+        pvt.recoverTasks();
+      end
+      Recovery.reset();
     end,
 
     reset = function()
@@ -329,15 +332,15 @@ TurtleCraft.export('services/recovery', function()
     exec = function(cmd)
       log.info('Recovery.exec', cmd);
 
-      local parts = cmd:gsub('[^%s]+');
+      local parts = cmd:gmatch('[^%s]+');
       local module = parts();
       local method = parts();
       local values = {};
       local value = parts();
       while (value) do
-        if (value:match('^%d+%.%d+$') or value:match('^%d+$')) then value = tonumber(value); end
-        if (value:upper() == 'TRUE') then value = true; end
-        if (value:upper() == 'FALSE') then value = false; end
+        if (value:match('^%d+%.%d+$') or value:match('^%d+$')) then value = tonumber(value);
+        elseif (value:upper() == 'TRUE') then value = true;
+        elseif (value:upper() == 'FALSE') then value = false; end
         table.insert(values, value);
         value = parts();
       end

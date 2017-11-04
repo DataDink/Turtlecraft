@@ -225,12 +225,17 @@ TurtleCraft.export('services/recovery', function()
     recover = function()
       log.info('Recovery.recover');
 
-      pvt.recoverPosition();
-      if (#pvt.readTasks() == 0) then return; end
+      xpcall(function()
+        pvt.recoverPosition();
+        if (#pvt.readTasks() == 0) then return; end
 
-      TurtleCraft.import('ui/views/notification')
-        .show('Recovering\nLast Session');
-      pvt.recoverTasks();
+        TurtleCraft.import('ui/views/notification')
+          .show('Recovering\nLast Session');
+        pvt.recoverTasks();
+      end, function(e)
+        TurtleCraft.import('ui/dialog').show('Recovery failed!');
+      end);
+
       Recovery.reset();
     end,
 

@@ -83,11 +83,11 @@ TurtleCraft.export('plugins/excavate', function()
         repeat
           if (not plane()) then return false; end
           turtle.digUp();
-          if (not Recovery.digDown()) then return false; end
-          for i = 1, 2 do
-            if (not Recovery.digDown()) then
-              if (not plane()) then return false; end
-            end
+          for i = 1, 3 do
+            local atBedrock = (not Recovery.digDown() and i < 3);
+            local allDone = Recovery.location.z < (down - 1);
+            if (atBedrock or allDone) then return false; end
+            if (not plane()) then return false; end
           end
         until (Recovery.location.z < (down - 1))
         return true;

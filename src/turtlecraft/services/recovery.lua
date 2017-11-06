@@ -10,6 +10,15 @@
 -- Recovery.start(...)          :: starts a recovery command that will be restarted if interrupted
 --                              :: format: <module name> <method name> <param a> <param b> ...
 --                              :: example: Recovery.start("services/recovery moveTo 12 15 22")
+-- Recovery.moveForward()       :: moves the turtle forward
+-- Recovery.moveUp()            :: moves the turtle up
+-- Recovery.moveDown()          :: moves the turtle down
+-- Recovery.digForward()        :: digs and moves the turtle forward
+-- Recovery.digUp()             :: digs and moves the turtle up
+-- Recovery.digDown()           :: digs and moves the turtle down
+-- Recovery.excavateForward()   :: excavates and moves the turtle forward
+-- Recovery.excavateUp()        :: excavates and moves the turtle up
+-- Recovery.excavateDown()      :: excavates and moves the turtle down
 -- Recovery.finish()            :: completes the previously started recovery command so that it will not be re-initiated after an interruption
 -- Recovery.reset()             :: sets the current turtle location and facing coordinates to 0,0,0,0
 
@@ -225,16 +234,18 @@ TurtleCraft.export('services/recovery', function()
     recover = function()
       log.info('Recovery.recover');
 
-      xpcall(function()
+      local success, err = pcall(function()
         pvt.recoverPosition();
         if (#pvt.readTasks() == 0) then return; end
-
         TurtleCraft.import('ui/views/notification')
           .show('Recovering\nLast Session');
         pvt.recoverTasks();
-      end, function(e)
-        TurtleCraft.import('ui/dialog').show('Recovery failed!');
       end);
+
+      if (not success) then
+        log.error(err);
+        TurtleCraft.import('ui/dialog').show('Recovery Failed!');
+      end
 
       Recovery.reset();
     end,
@@ -408,7 +419,7 @@ TurtleCraft.export('services/recovery', function()
       log.info('Recovery.navigateTo', methodName, x, y, z);
 
       Recovery.start('services/recovery', methodName, x, y, z);
-      for i = 1, 3 do
+      local function navigateX()
         while (location.x < x) do
           Recovery.face(1);
           if (not forwardMethod()) then break; end
@@ -417,6 +428,8 @@ TurtleCraft.export('services/recovery', function()
           Recovery.face(3);
           if (not forwardMethod()) then break; end
         end
+      end
+      local function navigateY()
         while (location.y < y) do
           Recovery.face(0);
           if (not forwardMethod()) then break; end
@@ -425,12 +438,20 @@ TurtleCraft.export('services/recovery', function()
           Recovery.face(2);
           if (not forwardMethod()) then break; end
         end
+      end
+      local function navigateZ()
         while (location.z < z) do
           if (not upMethod()) then break; end
         end
         while (location.z > z) do
           if (not downMethod()) then break; end
         end
+      end
+      for i = 1, 3 do
+        if (location.z == 0) then navigateZ(); end
+        navigateX();
+        navigateY();
+        if (location.z ~= 0) then navigateZ(); end
       end
       Recovery.finish();
       return (location.x == x and location.y == y and location.z == z);

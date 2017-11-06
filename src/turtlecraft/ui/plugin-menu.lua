@@ -3,6 +3,7 @@ TurtleCraft.export('ui/plugin-menu', function()
   local Dialog = TurtleCraft.import('ui/dialog');
   local Recovery = TurtleCraft.import('services/recovery');
   local Plugins = TurtleCraft.import('services/plugins');
+  local log = TurtleCraft.import('services/logger');
 
   return {
     show = function(exitText)
@@ -18,11 +19,11 @@ TurtleCraft.export('ui/plugin-menu', function()
         Recovery.reset();
         local selection = Select.show(items, function(i) return i.title; end);
         if (type(selection.start) == 'function') then
-          xpcall(
-            selection.start,
-            function(e)
-              Dialog.show(selection.title .. ' failed!');
-            end);
+          local success, err = pcall(selection.start);
+          if (not success) then
+            log.error(err);
+            Dialog.show(selection.title .. ' broke!');
+          end
         end
       until (selection == exitItem);
     end

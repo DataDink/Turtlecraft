@@ -6,7 +6,7 @@ TurtleCraft.export('services/logger', function()
     local args = table.pack(...);
     for i, v in ipairs(args) do args[i] = tostring(v); end
 
-    xpcall(function()
+    local success, err = pcall(function()
       if (config.logsLevel > level) then return; end
       path = path or 'general.log';
       path = config.logsPath .. '/' .. path:gsub('^[%s/]+', '');
@@ -14,10 +14,12 @@ TurtleCraft.export('services/logger', function()
       local file = fs.open(path, 'a');
       file.writeLine(msg);
       file.close();
-    end, function(e)
+    end);
+
+    if (not success) then
       print('logger failed');
       print(e);
-    end);
+    end
   end
 
   return {

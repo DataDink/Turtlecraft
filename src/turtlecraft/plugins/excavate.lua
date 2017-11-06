@@ -3,6 +3,7 @@ TurtleCraft.export('plugins/excavate', function()
   local IO = TurtleCraft.import('services/io');
   local Recovery = TurtleCraft.import('services/recovery');
   local UserInput = TurtleCraft.import('ui/user-input');
+  local Helpers = TurtleCraft.import('services/helpers');
   local config = TurtleCraft.import('services/config');
   local log = TurtleCraft.import('services/logger');
 
@@ -80,16 +81,17 @@ TurtleCraft.export('plugins/excavate', function()
       end
 
       local function block()
-        repeat
-          if (not plane()) then return false; end
+        if (not plane()) then return false; end
+        while (Recovery.location.z >= (down + 1)) do
           turtle.digUp();
-          for i = 1, 3 do
-            local atBedrock = (not Recovery.digDown() and i < 3);
-            local allDone = Recovery.location.z < (down - 1);
-            if (atBedrock or allDone) then return false; end
-            if (not plane()) then return false; end
+          local targetLayer = math.max(down + 1, Recovery.location.z - 2);
+          for layer = Recovery.location.z, targetLayer, -1 do
+            if (not Recovery.digDown() and Recovery.location.z ~= targetLayer) then
+              return false;
+            end
           end
-        until (Recovery.location.z < (down - 1))
+          if (not plane()) then return false; end
+        end
         return true;
       end
 
@@ -178,72 +180,22 @@ TurtleCraft.export('plugins/excavate', function()
 
     seekFuel = function(required)
       log.info('Excavate.seekFuel', required);
-
       local overdose = math.min(turtle.getFuelLimit(), required + 1000);
-      for slot = 1, 16 do
-        if (turtle.getItemCount(slot) > 0) then
-          turtle.select(slot);
-          while (turtle.getFuelLevel() < overdose and turtle.refuel(1)) do end
-          if (turtle.getFuelLevel() >= overdose) then return true; end
-        end
-      end
-      return false;
+      Helpers.refuel(overdose);
     end,
 
     checkInventory = function()
       log.info('Excavate.checkInventory');
-
-      for passes = 1, 2 do
-        for slot = 1, 16 do
-          if (turtle.getItemCount(slot) == 0) then return; end
-        end
-        if (passes == 1) then pvt.consolidate(); end
+      for slot = 1, 16 do if (turtle.getItemCount(slot) == 0) then return; end end
+      if (not Helpers.consolidate()) then
+        Excavate.empty(Recovery.location.x, Recovery.location.y, Recovery.location.z);
       end
-
-      Excavate.empty(Recovery.location.x, Recovery.location.y, Recovery.location.z);
-    end,
-
-    isFuelItem = function(info)
-      log.info('Excavate.isFuelItem');
-
-      if (not info or not info.name) then return false; end
-      for _, fuelName in ipairs(config.fuelItems) do
-        if (fuelName == info.name) then return true; end
-      end
-      return false;
     end,
 
     unload = function()
       Recovery.face(2);
-      for slot = 1, 16 do
-        local info = turtle.getItemDetail(slot);
-        if (info and not pvt.isFuelItem(info)) then
-          repeat
-            turtle.select(slot);
-          until (turtle.getItemCount() == 0 or turtle.drop());
-        end
-      end
-      pvt.consolidate();
-      for slot = 2, 16 do
-        if (turtle.getItemCount(slot) > 0) then
-          repeat
-            turtle.select(slot);
-          until (turtle.getItemCount() == 0 or turtle.drop());
-        end
-      end
+      Helpers.unload();
       Recovery.face(0);
-    end,
-
-    consolidate = function()
-      log.info('Excavate.consolidate');
-
-      for consolidate = 2, 16 do
-        for slot = 1, consolidate - 1 do
-          turtle.select(consolidate);
-          if (turtle.transferTo(slot)) then break; end
-        end
-      end
-      turtle.select(1);
     end
   }
 

@@ -31,7 +31,7 @@ TurtleCraft.export('services/helpers', function()
           if (not turtle.refuel(1)) then break; end
         end
       end
-      turtle.select(slot);
+      turtle.select(1);
       return turtle.getFuelLevel() >= required;
     end,
 

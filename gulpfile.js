@@ -2,7 +2,8 @@ var gulp = require('gulp');
 var concat = require('gulp-concat');
 var minify = require('gulp-luaminify');
 var insert = require('gulp-insert');
-var pastebin = require('./pastebin');
+var Pastebin = require('./pastebin');
+var fs = require('fs');
 
 // Creates an object-array of arguments passed to node/gulp
 var args = Array.from(process.argv).slice(3);
@@ -36,51 +37,29 @@ gulp.task('build', complete => {
   return stream;
 });
 
-// new pastebin API wrapper in progress... existing ones failed me
-gulp.task('deploy', complete => {
-  var fs = require('fs');
+gulp.task('upload', complete => {
   var turtlecraft = fs.readFileSync('dist/turtlecraft.lua', 'utf8');
-  var credentials = fs.existsSync('./pastebin.json') ? require('./pastebin.json') : {};
 
-  function upload() {
-    var pb = new pastebin(credentials.key);
-    pb.login(credentials.username, credentials.password)
-    .then(() => {
-
-    }).catch(e => console.error('Pastebin login failed! ' + e));
-
-
-    pastebin.setDevKey(credentials.key);
-    pastebin.login(credentials.username, credentials.password, (s, e) => {
-      if (!s) { throw e; }
-      pastebin.edit(config.pastebin, {
-        contents: turtlecraft,
-        expires: 'N',
-        format: 'text',
-        privacy: 1,
-        name: 'turtlecraft v' + config.version + ' ' + env
-      }, (s, e) => {
-        if (!s) { throw e; }
-        console.log('Deployed to: ' + config.pastebin);
-        complete();
-      });
-    });
-  }
-
-  if (args.pbapikey) { credentials.key = args.pbapikey; }
-  if (args.pbusername) { credentials.username = args.pbusername; }
-  if (args.pbpassword) { credentials.password = args.pbpassword; }
-  if (!args.pbusername || !args.pbpassword) {
-    require('prompt').get({ properties: {
-      username: { required: true },
-      password: { required: true, hidden: true }
-    }}, (e, input) => {
-      if (e) { throw 'Unable to resolve pastebin credentials'; }
-      credentials.username = input.username;
-      credentials.password = input.password;
-      upload();
-    });
-  } else {
-      upload();
-  }
+  authenticate().then(credentials => {
+    new Pastebin(credentials.key)
+    .login(credentials.username, credentials.password)
+      .then((data) => {
+        console.log(data);
+      }).catch(e => console.error('Failed to authenticate user: ', e));
+  }).catch(e => console.error('Failed to authenticate user: ', e));
 });
+
+function authenticate() {
+  return new Promise((success, error) => {
+    var credentials = fs.existsSync('./pastebin.json') ? require('./pastebin.json') : {};
+    var questions = {};
+    if (!('key' in credentials)) { questions.devkey = { required: true }; }
+    if (!('username' in credentials)) { questions.username = { required: true }; }
+    if (!('password' in credentials)) { questions.password = { required: true, hidden: true }; }
+    require('prompt').get({properties: questions}, (e, answers) => {
+      if (e) { return error(e); }
+      for (m in answers) { credentials[m] = answers[m]; }
+      success(credentials);
+    });
+  });
+}

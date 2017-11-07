@@ -31,18 +31,22 @@ TurtleCraft.export('services/helpers', function()
           if (not turtle.refuel(1)) then break; end
         end
       end
+      turtle.select(slot);
       return turtle.getFuelLevel() >= required;
     end,
 
     consolidate = function()
       for search = 2, 16 do
         for target = 1, search - 1 do
-          while (turtle.getItemCount(search) > 0) do
+          if (turtle.getItemCount(search) > 0) then
             turtle.select(search);
-            turtle.transferTo(target);
+            if (turtle.transferTo(target) and turtle.getItemCount(search) == 0) then
+              break;
+            end
           end
         end
       end
+      turtle.select(1);
       for search = 1, 16 do
         if (turtle.getItemCount(search) == 0) then return true; end
       end
@@ -66,6 +70,7 @@ TurtleCraft.export('services/helpers', function()
           until (turtle.getItemCount() == 0 or turtle.drop());
         end
       end
+      turtle.select(1);
     end
   };
 

@@ -10,16 +10,12 @@ TurtleCraft.export('plugins/tunnel', function()
 
     end,
 
-    forward = function()
-      Recovery.reset();
-      if (not Helpers.refuel(9)) then pvt.alertFuel(); end
-      TurtleCraft.import('ui/views/notification').show('Building Forward...');
-      if (not Recovery.digForward()) then return pvt.alertFailed(); end
-      Recovery.turnLeft();
-      if (not Recovery.excavateForward()) then
-        Recovery.digTo(0,0,0);
-        return alertFailed();
-      end
+    frame = function(exclude)
+
+    end,
+
+    chamber = function()
+
     end
   };
 
@@ -37,13 +33,18 @@ TurtleCraft.export('plugins/tunnel', function()
     end,
 
     selectBlock = function()
+      local map = Helpers.getItemMap();
       for slot = 1, 16 do
-        if (turtle.getItemCount(slot) > 1) then
+        if (map[slot].count > 1 and not map[slot].fuel) then
           turtle.select(slot);
           return true;
         end
         return false;
       end
+    end,
+
+    buildFrame = function(walls)
+
     end
   }
 

@@ -5,10 +5,11 @@ TurtleCraft.export('plugins/excavate', function()
   local UserInput = TurtleCraft.import('ui/user-input');
   local Helpers = TurtleCraft.import('services/helpers');
   local config = TurtleCraft.import('services/config');
-  local log = TurtleCraft.import('services/logger');
+  local log = TurtleCraft.import('services/logger').to('excavate.log');
 
   Excavate = {
     start = function()
+      log.reset();
       log.info('Excavate.start');
 
       local forward = pvt.ask('How far forward should I dig?');

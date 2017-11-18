@@ -10,7 +10,7 @@ TurtleCraft.export('plugins/tunnel', function()
 
     end,
 
-    frame = function(exclude)
+    frame = function(options)
 
     end,
 
@@ -50,9 +50,10 @@ TurtleCraft.export('plugins/tunnel', function()
 
   return Tunnel;
 end).onready(function()
-  TurtleCraft.import('services/plugins').register(
-    'Tunnel',
-    function()
-      TurtleCraft.import('plugins/tunnel').start();
-    end);
+  print('tunnel disabled');
+--  TurtleCraft.import('services/plugins').register(
+--    'Tunnel',
+--    function()
+--      TurtleCraft.import('plugins/tunnel').start();
+--    end);
 end)

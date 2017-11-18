@@ -22,17 +22,25 @@ TurtleCraft.export('services/logger', function()
     end
   end
 
+  local function reset(path)
+    path = path or 'general.log';
+    path = config.logsPath .. '/' .. path:gsub('^[%s/]+', '');
+    fs.delete(path);
+  end
+
   return {
     to = function(path)
       return {
         info = function(...) write(path, 0, ...); end,
         warn = function(...) write(path, 1, ...); end,
-        error = function(...) write(path, 2, ...); end
+        error = function(...) write(path, 2, ...); end,
+        reset = function() reset(path) end
       };
     end,
 
     info = function(...) write(nil, 0, ...); end,
     warn = function(...) write(nil, 1, ...); end,
-    error = function(...) write(nil, 2, ...); end
+    error = function(...) write(nil, 2, ...); end,
+    reset = function() reset(); end
   }
 end);

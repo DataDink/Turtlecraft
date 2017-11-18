@@ -7,7 +7,7 @@
   "version": "2.0.0",
   "pastebin": "nTNP03Bw",
   "logsPath": "turtlecraft/logs/",
-  "logsLevel": 1,
+  "logsLevel": 2,
   "fuelItems": [
     "minecraft:log",
     "minecraft:log2",

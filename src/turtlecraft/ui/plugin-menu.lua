@@ -3,10 +3,11 @@ TurtleCraft.export('ui/plugin-menu', function()
   local Dialog = TurtleCraft.import('ui/dialog');
   local Recovery = TurtleCraft.import('services/recovery');
   local Plugins = TurtleCraft.import('services/plugins');
-  local log = TurtleCraft.import('services/logger');
+  local log = TurtleCraft.import('services/logger').to('menu.log');
 
   return {
     show = function(exitText)
+      log.reset();
       local exitItem = {title=exitText or 'Exit'};
       local items = {};
 

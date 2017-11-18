@@ -26,7 +26,7 @@
 TurtleCraft.export('services/recovery', function()
   local Recovery, location, pvt;
   local config = TurtleCraft.import('services/config');
-  local log = TurtleCraft.import('services/logger');
+  local log = TurtleCraft.import('services/logger').to('recoverysvc.log');
   local IO = TurtleCraft.import('services/io');
   local positionFile = config.recoveryPath .. '/position.dat';
   local position = fs.open(positionFile, 'a');
@@ -86,6 +86,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.moveForward Failed');
         return false;
       end, config.maxMoves);
     end,
@@ -102,6 +103,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.moveUp Failed');
         return false;
       end, config.maxMoves);
     end,
@@ -118,6 +120,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.moveDown Failed');
         return false;
       end, config.maxMoves);
     end,
@@ -138,6 +141,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.digForward Failed');
         return false;
       end);
     end,
@@ -154,6 +158,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.digUp Failed');
         return false;
       end);
     end,
@@ -170,6 +175,7 @@ TurtleCraft.export('services/recovery', function()
           pvt.cleanPosition();
           return true;
         end
+        log.warn('Recovery.digDown Failed');
         return false;
       end);
     end,
@@ -201,6 +207,7 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     start = function(...)
+      log.reset();
       log.info('Recovery.start');
 
       local args = table.pack(...);
@@ -232,6 +239,7 @@ TurtleCraft.export('services/recovery', function()
     end,
 
     recover = function()
+      log.reset();
       log.info('Recovery.recover');
 
       local success, err = pcall(function()

@@ -1,8 +1,5 @@
 {
   "minify": true,
-  "maxDigs": 300,
-  "maxMoves": 10,
-  "maxAttacks": 64,
   "recoveryPath": "turtlecraft/recovery/",
   "version": "2.0.0",
   "pastebin": "nTNP03Bw",

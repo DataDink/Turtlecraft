@@ -3,24 +3,18 @@
 -- Use in place of normal turtle movement functions
 -- Coordinates and facing based on / relative to initial placement or last .reset()
 
--- Recovery.moveTo(x, y, z)     :: moves the turtle to the coordinates
--- Recovery.digTo(x, y, z)      :: digs and attacks the turtle to the coordinates
--- Recovery.excavateTo(x, y, z) :: same as digTo, but adds up/down digging
--- Recovery.face(d)             :: 0 = forward, 1 = right, 2 = backward, 3 = left
--- Recovery.start(...)          :: starts a recovery command that will be restarted if interrupted
---                              :: format: <module name> <method name> <param a> <param b> ...
---                              :: example: Recovery.start("services/recovery moveTo 12 15 22")
--- Recovery.moveForward()       :: moves the turtle forward
--- Recovery.moveUp()            :: moves the turtle up
--- Recovery.moveDown()          :: moves the turtle down
--- Recovery.digForward()        :: digs and moves the turtle forward
--- Recovery.digUp()             :: digs and moves the turtle up
--- Recovery.digDown()           :: digs and moves the turtle down
--- Recovery.excavateForward()   :: excavates and moves the turtle forward
--- Recovery.excavateUp()        :: excavates and moves the turtle up
--- Recovery.excavateDown()      :: excavates and moves the turtle down
--- Recovery.finish()            :: completes the previously started recovery command so that it will not be re-initiated after an interruption
--- Recovery.reset()             :: sets the current turtle location and facing coordinates to 0,0,0,0
+-- Recovery.location              :: The turtles current location
+-- Recovery.forward()             :: moves the turtle forward
+-- Recovery.up()                  :: moves the turtle up
+-- Recovery.down()                :: moves the turtle down
+-- Recovery.face(d)               :: 0 = forward, 1 = right, 2 = backward, 3 = left
+-- Recovery.left()                :: turns the turtle left
+-- Recovery.right()               :: turns the turtle right
+-- Recovery.start(...)            :: starts a recovery command that will be restarted if interrupted
+--                                :: format: <module name> <method name> <param a> <param b> ...
+--                                :: example: Recovery.start("services/recovery moveTo 12 15 22")
+-- Recovery.finish()              :: completes the previously started recovery command so that it will not be re-initiated after an interruption
+-- Recovery.reset()               :: sets the current turtle location and facing coordinates to 0,0,0,0
 
 
 TurtleCraft.export('services/recovery', function()
@@ -36,7 +30,7 @@ TurtleCraft.export('services/recovery', function()
   Recovery = {
     location = {},
 
-    turnRight = function()
+    right = function()
       turtle.turnRight();
       position.writeLine('right');
       position.close();
@@ -46,7 +40,7 @@ TurtleCraft.export('services/recovery', function()
       return true;
     end,
 
-    turnLeft = function()
+    left = function()
       turtle.turnLeft();
       position.writeLine('left');
       position.close();
@@ -63,147 +57,41 @@ TurtleCraft.export('services/recovery', function()
       if (turns == 0) then return true; end;
       if (turns > 2) then turns = -1; end
       if (turns < -2) then turns = 1; end
-      local method = (turns > 0) and Recovery.turnRight or Recovery.turnLeft;
+      local method = (turns > 0) and Recovery.right or Recovery.left;
       for i=1, math.abs(turns) do
         method();
       end
       return true;
     end,
 
-    moveTo = function(x, y, z)
-      return pvt.navigateTo('moveTo', Recovery.moveForward, Recovery.moveUp, Recovery.moveDown, x, y, z);
+    forward = function()
+      if (not turtle.forward()) then return false; end
+      position.writeLine('forward');
+      position.close();
+      position = fs.open(positionFile, 'a');
+      pvt.processForward();
+      pvt.cleanPosition();
+      return true;
     end,
 
-    moveForward = function()
-      log.info('Recovery.moveForward');
-
-      return pvt.retry(function()
-        if (turtle.forward()) then
-          position.writeLine('forward');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processForward();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.moveForward Failed');
-        return false;
-      end, config.maxMoves);
+    up = function()
+      if (not turtle.up()) then return false; end
+      position.writeLine('up');
+      position.close();
+      position = fs.open(positionFile, 'a');
+      pvt.processUp();
+      pvt.cleanPosition();
+      return true;
     end,
 
-    moveUp = function()
-      log.info('Recovery.moveUp');
-
-      return pvt.retry(function()
-        if (turtle.up()) then
-          position.writeLine('up');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processUp();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.moveUp Failed');
-        return false;
-      end, config.maxMoves);
-    end,
-
-    moveDown = function()
-      log.info('Recovery.moveDown');
-
-      return pvt.retry(function()
-        if (turtle.down()) then
-          position.writeLine('down');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processDown();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.moveDown Failed');
-        return false;
-      end, config.maxMoves);
-    end,
-
-    digTo = function(x, y, z)
-      return pvt.navigateTo('digTo', Recovery.digForward, Recovery.digUp, Recovery.digDown, x, y, z);
-    end,
-
-    digForward = function()
-      log.info('Recovery.digForward');
-
-      return pvt.digMove(turtle.detect, turtle.dig, turtle.attack, function()
-        if (turtle.forward()) then
-          position.writeLine('forward');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processForward();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.digForward Failed');
-        return false;
-      end);
-    end,
-
-    digUp = function()
-      log.info('Recovery.digUp');
-
-      return pvt.digMove(turtle.detectUp, turtle.digUp, turtle.attackUp, function()
-        if (turtle.up()) then
-          position.writeLine('up');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processUp();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.digUp Failed');
-        return false;
-      end);
-    end,
-
-    digDown = function()
-      log.info('Recovery.digDown');
-
-      return pvt.digMove(turtle.detectDown, turtle.digDown, turtle.attackDown, function()
-        if (turtle.down()) then
-          position.writeLine('down');
-          position.close();
-          position = fs.open(positionFile, 'a');
-          pvt.processDown();
-          pvt.cleanPosition();
-          return true;
-        end
-        log.warn('Recovery.digDown Failed');
-        return false;
-      end);
-    end,
-
-    excavateTo = function(x, y, z)
-      return pvt.navigateTo('excavateTo', Recovery.excavateForward, Recovery.excavateUp, Recovery.excavateDown, x, y, z);
-    end,
-
-    excavateForward = function()
-      log.info('Recovery.excavateForward');
-
-      pvt.digDetect(turtle.detectUp, turtle.digUp);
-      pvt.digDetect(turtle.detectDown, turtle.digDown);
-      return Recovery.digForward();
-    end,
-
-    excavateUp = function()
-      log.info('Recovery.excavateUp');
-
-      pvt.digDetect(turtle.detect, turtle.dig);
-      return Recovery.digUp();
-    end,
-
-    excavateDown = function()
-      log.info('Recovery.excavateDown');
-
-      pvt.digDetect(turtle.detect, turtle.dig);
-      return Recovery.digDown();
+    down = function()
+      if (not turtle.down()) then return false; end
+      position.writeLine('down');
+      position.close();
+      position = fs.open(positionFile, 'a');
+      pvt.processDown();
+      pvt.cleanPosition();
+      return true;
     end,
 
     start = function(...)
@@ -390,79 +278,6 @@ TurtleCraft.export('services/recovery', function()
       local lib = TurtleCraft.import(module);
       local func = lib[method];
       func(table.unpack(values));
-    end,
-
-    ----------------------> Dig Stuff
-    digDetect = function(digMethod, detectMethod)
-      log.info('Recovery.digDetect');
-
-      return pvt.retry(function()
-        if (not detectMethod()) then return true; end
-        digMethod();
-        return not detectMethod();
-      end, config.maxDigs);
-    end,
-
-    digMove = function(detectMethod, digMethod, attackMethod, moveMethod)
-      log.info('Recovery.digMove');
-
-      return pvt.retry(function()
-        if (not pvt.digDetect(detectMethod, digMethod)) then return false; end
-        attackMethod();
-        return moveMethod();
-      end, config.maxAttacks);
-    end,
-
-    ---------------------->Other Stuff
-    retry = function(method, max)
-      log.info('Recovery.retry');
-
-      for tries = 1, max do
-        if (method()) then return true; end
-      end
-      return false;
-    end,
-
-    navigateTo = function(methodName, forwardMethod, upMethod, downMethod, x, y, z)
-      log.info('Recovery.navigateTo', methodName, x, y, z);
-
-      Recovery.start('services/recovery', methodName, x, y, z);
-      local function navigateX()
-        while (location.x < x) do
-          Recovery.face(1);
-          if (not forwardMethod()) then break; end
-        end
-        while (location.x > x) do
-          Recovery.face(3);
-          if (not forwardMethod()) then break; end
-        end
-      end
-      local function navigateY()
-        while (location.y < y) do
-          Recovery.face(0);
-          if (not forwardMethod()) then break; end
-        end
-        while (location.y > y) do
-          Recovery.face(2);
-          if (not forwardMethod()) then break; end
-        end
-      end
-      local function navigateZ()
-        while (location.z < z) do
-          if (not upMethod()) then break; end
-        end
-        while (location.z > z) do
-          if (not downMethod()) then break; end
-        end
-      end
-      for i = 1, 3 do
-        if (location.z == 0) then navigateZ(); end
-        navigateX();
-        navigateY();
-        if (location.z ~= 0) then navigateZ(); end
-      end
-      Recovery.finish();
-      return (location.x == x and location.y == y and location.z == z);
     end
   }
 

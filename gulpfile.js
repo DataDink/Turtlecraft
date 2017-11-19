@@ -1,9 +1,8 @@
 var gulp = require('gulp');
-var concat = require('gulp-concat');
-var minify = require('gulp-luaminify');
-var insert = require('gulp-insert');
-var Pastebin = require('./pastebin');
+var parse = require('luaparse').parse;
+var minify = require('luamin').minify;
 var fs = require('fs');
+var dir = require('path');
 
 // Creates an object-array of arguments passed to node/gulp
 var args = Array.from(process.argv).slice(3);
@@ -19,47 +18,40 @@ var cfgjson = JSON.stringify(JSON.stringify(config));
 /*******************************GULP COMMANDS*******************************/
 
 gulp.task('build', complete => {
-  var stream = gulp.src([
-    'src/init.lua',
-    'src/turtlecraft/**/*.lua',
-    'src/bootstrap.lua'
-  ]).pipe(insert.append('\nz99999();')) // Ambiguous errors fix
-    .pipe(concat('turtlecraft.lua'))
-    .pipe(insert.prepend('local cfgjson = ' + cfgjson + ';\n', {src: true}));
+  new Promise((success, error) => {
+    var concat = fs.readFileSync('src/init.lua', 'utf8');
+    concat = search('src/turtlecraft', /\.lua$/gi)
+      .reduce((c, p) => (c + '\n' + fs.readFileSync(p, 'utf8')), concat);
+    concat = fs.readFileSync('src/bootstrap.lua', 'utf8');
+    concat = 'local cfgjson = ' + cfgjson + ';\n' + concat;
 
-  if (config.minify) { stream.pipe(minify()) }
+    fs.unlinkSync('dist/turtlecraft.lua');
+    fs.writeFileSync('dist/turtlecraft.lua', concat);
+    parse(concat);
 
-  stream.pipe(insert.transform(v => {
-          return v.replace(/\s*;?\s*z99999\(\)\s*\;?\s*/gi, ';\n');
-        }))
-        .pipe(gulp.dest('dist'));
-
-  return stream;
+    if (config.minify) {
+      var minify = minify(concat);
+      fs.writeFileSync('dist/turtlecraft.lua', minify);
+    }
+  }).then(() => complete())
+  .catch(e => console.error(e));
 });
 
-gulp.task('upload', complete => {
-  var turtlecraft = fs.readFileSync('dist/turtlecraft.lua', 'utf8');
+function search(root, filter) {
+  filter = filter || /.+/gi;
+  root = dir.resolve(root).replace(/^[\\\/]+|[\\\/]+$/gi, '');
+  var results = Array.from(fs.readdirSync(root))
+    .map(f => dir.join(root, f));
+  return results
+    .filter(f => fs.lstatSync(f).isDirectory())
+    .reduce((files, directory) => {
+      return files.concat(search(directory, filter));
+    }, results.filter(f => filter.exec(f) && fs.lstatSync(f).isFile()));
+}
 
-  authenticate().then(credentials => {
-    new Pastebin(credentials.key)
-    .login(credentials.username, credentials.password)
-      .then((data) => {
-        console.log(data);
-      }).catch(e => console.error('Failed to authenticate user: ', e));
-  }).catch(e => console.error('Failed to authenticate user: ', e));
-});
-
-function authenticate() {
-  return new Promise((success, error) => {
-    var credentials = fs.existsSync('./pastebin.json') ? require('./pastebin.json') : {};
-    var questions = {};
-    if (!('key' in credentials)) { questions.devkey = { required: true }; }
-    if (!('username' in credentials)) { questions.username = { required: true }; }
-    if (!('password' in credentials)) { questions.password = { required: true, hidden: true }; }
-    require('prompt').get({properties: questions}, (e, answers) => {
-      if (e) { return error(e); }
-      for (m in answers) { credentials[m] = answers[m]; }
-      success(credentials);
-    });
-  });
+function mkdir(path) {
+  if (!path) { return; }
+  mkdir(dir.dirname(path));
+  if (fs.existsSync(path)) { return; }
+  fs.mkdirSync(path);
 }

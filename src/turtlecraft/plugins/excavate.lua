@@ -76,7 +76,7 @@ TurtleCraft.export('plugins/excavate', function()
     recover = function(forward, left, right, up, down, recovered)
       log.info('Excavate.recover', left, right, up, down, recovered);
       if (not recovered) then
-        Recovery.start('plugins/excavate', 'recover', forward, left, right, up down, true);
+        Recovery.start('plugins/excavate', 'recover', forward, left, right, up, down, true);
         Excavate.digTo(left, 0, up - 1);
       else
         Excavate.digTo(left, 0, Recovery.location.z);

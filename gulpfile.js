@@ -3,6 +3,8 @@ var parse = require('luaparse').parse;
 var minify = require('luamin').minify;
 var fs = require('fs');
 var dir = require('path');
+const build = 'dst';
+const output = dir.join(build, 'turtlecraft.lua');
 
 // Creates an object-array of arguments passed to node/gulp
 var args = Array.from(process.argv).slice(3);
@@ -19,59 +21,59 @@ var cfgjson = JSON.stringify(JSON.stringify(config));
 
 gulp.task('build', complete => {
   new Promise((success, error) => {
-    var concat = fs.readFileSync('src/init.lua', 'utf8');
-    concat = search('src/turtlecraft', /\.lua$/gi)
-      .reduce((c, p) => (c + '\n' + fs.readFileSync(p, 'utf8')), concat);
-    concat = fs.readFileSync('src/bootstrap.lua', 'utf8');
-    concat = 'local cfgjson = ' + cfgjson + ';\n' + concat;
+    var content = loadlua('src/init.lua', 'utf8');
+    content += search('src/turtlecraft', /\.lua$/gi)
+      .reduce((c, p) => (c + '\n' + loadlua(p, 'utf8')), "");
+    content += loadlua('src/bootstrap.lua', 'utf8');
+    content = 'local cfgjson = ' + cfgjson + ';\n' + content;
+    if (config.minify) { content = minify(content); }
 
-    rmdir('dst');
+    if (fs.existsSync(build)) { rmdir(build); }
     mkdir('dst');
-
-    fs.unlinkSync('dst/turtlecraft.lua');
-    fs.writeFileSync('dst/turtlecraft.lua', concat);
-    parse(concat);
-
-    if (config.minify) {
-      var minify = minify(concat);
-      fs.writeFileSync('dist/turtlecraft.lua', minify);
-    }
+    fs.writeFileSync(output, content);
+    success();
   }).then(() => complete())
   .catch(e => console.error(e));
 });
 
 gulp.task('test', c => {
-  var results = search('src/turtlecraft', /\.lua$/gi);
+  console.log(dir.dirname('/'));
   c();
 });
 
-function search(root, filter) {
-  filter = filter || /.+/gi;
-  root = dir.resolve(root);
-  var results = Array.from(fs.readdirSync(root))
-    .map(f => dir.join(root, f));
+function loadlua(path) {
+  var content = fs.readFileSync(path, 'utf8');
+  try { parse(content); }
+  catch (e) { console.error(path, e); }
+  return content
+}
+
+function search(path, filter) {
+  filter = filter || /.+/i;
+  path = dir.resolve(path);
+  var results = Array.from(fs.readdirSync(path))
+    .map(f => dir.join(path, f));
   return results
     .filter(f => fs.lstatSync(f).isDirectory())
     .reduce((files, directory) => {
       return files.concat(search(directory, filter));
-    }, results.filter(f => filter.exec(f) && fs.lstatSync(f).isFile()));
+    }, results.filter(f => fs.lstatSync(f).isFile()));
 }
 
 function mkdir(path) {
-  if (!path) { return; }
-  mkdir(dir.dirname(path));
   if (fs.existsSync(path)) { return; }
+  mkdir(dir.dirname(path));
   fs.mkdirSync(path);
 }
 
 function rmdir(path) {
   if (!fs.existsSync(path)) { return; }
-  path = dir.resolve(path).replace(/^[\\\/]+|[\\\/]+$/gi, '');
+  path = dir.resolve(path);
   var results = Array.from(fs.readdirSync(path))
     .map(f => dir.join(path, f));
   results.filter(r => fs.lstatSync(r).isDirectory())
          .forEach(d => rmdir(d));
   results.filter(r => fs.lstatSync(r).isFile())
          .forEach(f => fs.unlinkSync(f));
-  fs.rmdirSync(root);
+  fs.rmdirSync(path);
 }

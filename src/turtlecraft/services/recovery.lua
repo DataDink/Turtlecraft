@@ -269,7 +269,7 @@ TurtleCraft.export('services/recovery', function()
       local values = {};
       local value = parts();
       while (value) do
-        if (value:match('^%d+%.%d+$') or value:match('^%d+$')) then value = tonumber(value);
+        if (value:match('^-?%d+%.%d+$') or value:match('^-?%d+$')) then value = tonumber(value);
         elseif (value:upper() == 'TRUE') then value = true;
         elseif (value:upper() == 'FALSE') then value = false; end
         table.insert(values, value);

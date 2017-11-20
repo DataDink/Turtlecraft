@@ -211,8 +211,8 @@ TurtleCraft.export('plugins/excavate', function()
 
     digTo = function(x, y, z)
       local function go(face, detect, dig, attack, move, complete)
-        Recovery.face(face);
         while (not complete()) do
+          Recovery.face(face);
           if (detect() and not dig()) then return;
           elseif (not move()) then attack(); end
         end

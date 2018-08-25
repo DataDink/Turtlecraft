@@ -36,13 +36,16 @@ TurtleCraft.export('services/helpers', function()
     end,
 
     consolidate = function()
-      for search = 2, 16 do
-        for target = 1, search - 1 do
-          if (turtle.getItemCount(search) > 0) then
+      for target = 1, 15 do
+        turtle.select(target);
+        for search = target + 1, 16 do
+          local somethingToMove = turtle.getItemCount(search) > 0;
+          local canMove = (somethingToMove and turtle.getItemCount(target) == 0);
+          local canFill = (somethingToMove and turtle.compareTo(search));
+          if (canMove or canFill) then
             turtle.select(search);
-            if (turtle.transferTo(target) and turtle.getItemCount(search) == 0) then
-              break;
-            end
+            turtle.transferTo(target);
+            turtle.select(target);
           end
         end
       end
@@ -54,6 +57,7 @@ TurtleCraft.export('services/helpers', function()
     end,
 
     unload = function()
+      -- Drop non-fuel
       local inventory = Helpers.getItemMap();
       for slot = 1, 16 do
         if (turtle.getItemCount(slot) > 0 and not inventory[slot].fuel) then
@@ -63,8 +67,9 @@ TurtleCraft.export('services/helpers', function()
         end
       end
       Helpers.consolidate();
+      -- Drop all but primary fuel
       for slot = 2, 16 do
-        if (turtle.getItemCount(slot)) then
+        if (turtle.getItemCount(slot) > 0) then
           repeat
             turtle.select(slot);
           until (turtle.getItemCount() == 0 or turtle.drop());

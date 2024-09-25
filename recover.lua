@@ -13,7 +13,7 @@ for i,v in ipairs(arg) do
 end
 startup = startup .. ')\n'
 
-local file = io.open('w+')
+local file = io.open('startup.lua', 'w+')
 file:write(startup)
 file:flush()
 file:close()

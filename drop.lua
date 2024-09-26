@@ -21,11 +21,11 @@ while (true) do
 
   local remaining = count
   for slot = 1, 16 do
-    local stack = turtle.getItemCount(i)
+    local stack = turtle.getItemCount(slot)
     if (stack) then
-      turtle.select(i)
+      turtle.select(slot)
       drop(math.min(remaining, stack))
-      local undropped = turtle.getItemCount(i)
+      local undropped = turtle.getItemCount(slot)
       remaining = remaining - stack + undropped
       if (remaining < 1) then break end
     end

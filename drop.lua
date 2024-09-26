@@ -22,7 +22,7 @@ while (true) do
   local remaining = count
   for slot = 1, 16 do
     local stack = turtle.getItemCount(slot)
-    if (stack) then
+    if (stack > 0) then
       turtle.select(slot)
       drop(math.min(remaining, stack))
       local undropped = turtle.getItemCount(slot)
@@ -30,6 +30,7 @@ while (true) do
       if (remaining < 1) then break end
     end
   end
+  turtle.select(1)
 
   local timer, id = os.startTimer(time)
   while (timer ~= id) do local _, id = os.pullEvent("timer") end

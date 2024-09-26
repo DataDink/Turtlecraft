@@ -1,3 +1,4 @@
+print('')
 print("Because solengolias don't stop everything...")
 print('')
 

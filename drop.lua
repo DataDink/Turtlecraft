@@ -10,7 +10,7 @@ local time = tonumber(arg[1]) or 10
 local count = tonumber(arg[2]) or 64
 
 print('Dropping stacks of ' .. count .. ' items for ' .. time .. ' seconds at a time.')
-print('This turtle should be encased leaving space above, below or in front for ejected items.')
+print('This turtle should be encased leaving space below, above or in front for ejected items.')
 print('Hold ctrl-T to stop this process.')
 
 while (true) do

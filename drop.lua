@@ -33,7 +33,7 @@ while (true) do
   turtle.select(1)
 
   local timer, id = os.startTimer(time)
-  while (timer ~= id) do local _, id = os.pullEvent("timer") end
+  while (timer ~= id) do _, id = os.pullEvent("timer") end
   turtle.suck()
   turtle.suckUp()
   turtle.suckDown()

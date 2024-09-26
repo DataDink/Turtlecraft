@@ -1,7 +1,3 @@
-print('')
-print("Because solengolias don't stop everything...")
-print('')
-
 if (not turtle) then
   print("Error: Drop requires a turtle")
   return

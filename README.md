@@ -3,7 +3,7 @@
 
 ### To Install:
 
-> wget https://raw.githubusercontent.com/DataDink/Turtlecraft/refs/heads/master/update.lua update.lua
+> `wget https://raw.githubusercontent.com/DataDink/Turtlecraft/refs/heads/master/update.lua update.lua`
 
 *Executing the update.lua script will download the rest of the files*
 

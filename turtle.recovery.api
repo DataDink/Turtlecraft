@@ -1,4 +1,4 @@
-local recoverPath = 'turtle.recovery'
+local recoverPath = 'turtle.recovery.data'
 local commands = {
   forward=true,
   back=true,

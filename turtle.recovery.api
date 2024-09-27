@@ -40,9 +40,11 @@ turtle.recovery = {
   recover = function()
     turtle[recoveryCommand]()
     fs.delete(recoverPath)
+    recoveryCommand = ''
   end,
   clear = function()
     fs.delete(recoverPath)
+    recoveryCommand = ''
   end,
   getReliability = function()
     return byFuel[recoveryCommand] and 1

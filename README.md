@@ -3,7 +3,7 @@
 
 ### To Install:
 
-> `wget https://raw.githubusercontent.com/DataDink/Turtlecraft/refs/heads/master/update.lua update.lua`
+> `wget https://raw.githubusercontent.com/DataDink/Turtlecraft/refs/heads/master/update.lua install.lua`
 
 *Executing the update.lua script will download the rest of the files*
 
@@ -39,3 +39,43 @@ Example:
 > drop 5 30
 
 *Drops up to 5 items and lets them sit for 30 seconds*
+
+## turtle.recovery.api
+
+When loaded using `os.loadAPI`, adds a recovery API to the turtle API at `turtle.recovery`.
+With the addition of a couple of extra steps each time you move the turtle,
+this API will assist in recovering from chunk unloads & unexpected reboots.
+It can only recover certain commands with variable reliability:
+
+<table>
+  <tr><th><code>forward</code></th><td>100%</td></tr>
+  <tr><th><code>back</code></th><td>100%</td></tr>
+  <tr><th><code>up</code></th><td>100%</td></tr>
+  <tr><th><code>down</code></th><td>100%</td></tr>
+  <tr><th><code>turnLeft</code></th><td>&lt; 100%</td></tr>
+  <tr><th><code>turnRight</code></th><td>&lt; 100%</td></tr>
+</table>
+
+Example:
+```lua
+os.loadAPI('turtle.recovery.api')
+
+-- Check for recovery when the program starts...
+local reliability = turtle.recovery.getReliability()
+if (reliability == 1) then
+  print('Recovering last turtle movement...')
+  turtle.recovery.execute()
+elseif (reliability > 0) then
+  print('Attempting recovery of last turtle movement. Steps should be taken to assure expected positioning & facing')
+  turtle.recovery.execute()
+else
+  print('There was nothing recoverable...')
+end
+
+-- Protect a forward movement
+turtle.recovery.set('forward')
+-- Execute the protected movement
+turtle.recovery.execute()
+```
+
+If a program interruption happens between a `set` and `execute`, the command will be re-`set` the next time the API is loaded.

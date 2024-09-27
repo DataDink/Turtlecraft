@@ -29,7 +29,7 @@ end)()
 
 turtle.recovery = {
   set = function(command)
-    if (not commands[command]) return false end
+    if (not commands[command]) then return false end
     recoveryCommand = command
     local file = fs.open(recoverPath, 'w+')
     file.write(tostring(turtle.getFuelLevel()) .. command)

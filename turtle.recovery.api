@@ -1,3 +1,5 @@
+if (not turtle) then error('Error: This functionality requires a turtle') end
+
 local recoverPath = 'turtle.recovery.data'
 local commands = {
   forward=true,
@@ -13,38 +15,43 @@ local byFuel = {
   up=true,
   down=true
 }
-local recoveryCommand = (function()
+local recoveryCommand, recoveryData = (function()
   local file = fs.open(recoverPath, 'r')
   if (not file) then return end
   local content =  file.readAll()
   file.close()
-  local parse = (content:find('%D') or #content+1)
-  local fuel = tonumber(content:sub(1,parse-1))
-  local command = content:sub(parse)
+  local commandStart = (content:find('%D') or #content+1)
+  local dataStart = (content:find(':') or #content+1)
+  local fuel = tonumber(content:sub(1,commandStart-1))
+  local command = content:sub(commandStart,dataStart-1)
+  local data = content:sub(dataStart+1)
   if (fuel ~= turtle.getFuelLevel()) then
     fs.delete(recoverPath)
     return
   end
-  return command
+  return command, data
 end)()
 
 turtle.recovery = {
-  set = function(command)
+  set = function(command, data)
     recoveryCommand = command
+    recoveryData = data or ''
     local score = turtle.recovery.getReliability()
     local file = fs.open(recoverPath, 'w')
-    file.write(tostring(turtle.getFuelLevel()) .. command)
+    file.write(tostring(turtle.getFuelLevel()) .. command .. ':' .. data)
     file.close()
     return score
   end,
   execute = function()
     turtle[recoveryCommand]()
     fs.delete(recoverPath)
-    recoveryCommand = ''
+    recoveryCommand = nil
+    return recoveryData
   end,
   clear = function()
     fs.delete(recoverPath)
-    recoveryCommand = ''
+    recoveryCommand = nil
+    recoveryData = nil
   end,
   getReliability = function()
     return byFuel[recoveryCommand] and 1

@@ -1,0 +1,27 @@
+if (not turtle) then error('Error: This functionality requires a turtle') end
+
+local recoverPath = 'turtle.track.api.data'
+local tempPath = 'turtle.track.api.data.temp'
+local position = {x=0,y=0,z=0,d=0}
+local transaction = nil
+local begin = function(command, x, y, z, d)
+  transaction = {
+    command = command,
+    fuel = turtle.getFuelLevel()-1,
+    x = x,
+    y = y,
+    z = z,
+    d = d
+  }
+  local file = fs.open(tempPath, 'w')
+  fs.write(textutils.serializeJSON(transaction))
+  file.close()
+end
+local commit = function()
+  if (not transaction) then
+    local file = fs.open(tempPath, 'r')
+    if (file) then transaction = textutils.unserializeJSON(file.readAll()) end
+  end
+  if (transaction) then turtle[transaction.command]() end
+end
+  

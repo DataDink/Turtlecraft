@@ -1,0 +1,48 @@
+local recoverPath = 'turtle.recovery'
+local commands = {
+  forward=true,
+  back=true,
+  up=true,
+  down=true,
+  turnLeft=true,
+  turnRight=true
+}
+local byFuel = {
+  forward=true,
+  back=true,
+  up=true,
+  down=true
+}
+local recoveryCommand = (function()
+  local file = fs.open(recoverPath, 'r')
+  if (not file) then return end
+  local content =  file.readAll()
+  file.close()
+  local fuel = tonumber(string.sub(content, content:find('%d+')))
+  local command = string.sub(content, content:find('%D+'))
+  if (fuel ~= turtle.getFuelLevel()) then
+    fs.delete(recoverPath)
+    return
+  end
+  return command
+end)()
+
+turtle.recovery = {
+  set = function(command)
+    if (not commands[command]) return false end
+    recoveryCommand = command
+    local file = fs.open(recoverPath, 'w+')
+    file.write(tostring(turtle.getFuelLevel()) .. command)
+    file.close()
+    return true
+  end,
+  recover = function()
+    turtle[recoveryCommand]()
+    fs.delete(recoverPath)
+  end,
+  getReliability function()
+    return byFuel[recoveryCommand] and 1
+        or commands[recoveryCommand] and 0.5
+        or 0
+  end
+}

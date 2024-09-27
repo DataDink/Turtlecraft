@@ -35,7 +35,7 @@ end)()
 turtle.recovery = {
   set = function(command, data)
     recoveryCommand = command
-    recoveryData = data or ''
+    recoveryData = tostring(data)
     local score = turtle.recovery.getReliability()
     local file = fs.open(recoverPath, 'w')
     file.write(tostring(turtle.getFuelLevel()) .. command .. ':' .. data)

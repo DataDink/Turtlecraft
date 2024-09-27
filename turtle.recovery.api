@@ -16,8 +16,8 @@ local byFuel = {
 local recoveryCommand = (function()
   local file = io.open(recoverPath, 'r')
   if (not file) then return end
-  local content =  file.readAll()
-  file.close()
+  local content =  file:readAll()
+  file:close()
   local fuel = tonumber(string.sub(content, content:find('%d+')))
   local command = string.sub(content, content:find('%D+'))
   if (fuel ~= turtle.getFuelLevel()) then
@@ -32,8 +32,8 @@ turtle.recovery = {
     if (not commands[command]) then return false end
     recoveryCommand = command
     local file = io.open(recoverPath, 'w+')
-    file.write(tostring(turtle.getFuelLevel()) .. command)
-    file.close()
+    file:write(tostring(turtle.getFuelLevel()) .. command)
+    file:close()
     return true
   end,
   recover = function()

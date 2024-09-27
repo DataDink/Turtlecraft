@@ -13,7 +13,7 @@ local directory = textutils.unserializeJSON(http.get(source .. '/contents').read
 if (directory) then
   for i,v in ipairs(directory) do
     local extension = v.name:sub(v.name:find('%.[^%.]+$') or #v.name+1):sub(2);
-    if (whitelist[extension]) then
+    if (filter[extension]) then
       print('* ' .. v.name)
       local content = http.get(v.download_url).readAll()
       local file = io.open(v.name, 'w+')

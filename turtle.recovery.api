@@ -14,7 +14,7 @@ local byFuel = {
   down=true
 }
 local recoveryCommand = (function()
-  local file = fs.open(recoverPath, 'r')
+  local file = io.open(recoverPath, 'r')
   if (not file) then return end
   local content =  file.readAll()
   file.close()
@@ -31,7 +31,7 @@ turtle.recovery = {
   set = function(command)
     if (not commands[command]) then return false end
     recoveryCommand = command
-    local file = fs.open(recoverPath, 'w+')
+    local file = io.open(recoverPath, 'w+')
     file.write(tostring(turtle.getFuelLevel()) .. command)
     file.close()
     return true

@@ -1,7 +1,7 @@
 local source = 'https://api.github.com/repos/DataDink/TurtleCraft'
-local whitelist = {
-  '.lua',
-  '.api'
+local filter = {
+  lua = true,
+  api = true
 }
 
 print('')
@@ -12,7 +12,7 @@ print('')
 local directory = textutils.unserializeJSON(http.get(source .. '/contents').readAll())
 if (directory) then
   for i,v in ipairs(directory) do
-    local extension = v.name:sub(v.name:find('.[^.]+$'));
+    local extension = v.name:sub(v.name:find('%.[^%.]+$') or #v.name+1):sub(2);
     if (whitelist[extension]) then
       print('* ' .. v.name)
       local content = http.get(v.download_url).readAll()

@@ -6,7 +6,10 @@ print()
 local directory = textutils.unserializeJSON(http.get(source .. '/contents').readAll())
 if (directory) then
   for i,v in ipairs(directory) do
-    if (v.name:sub(-#'.lua') == '.lua') then
+    local extension = v.name:sub(-4);
+    local filter = extension == '.lua'
+                or extension == '.api'
+    if (filter) then
       print('* ' .. v.name)
       local content = http.get(v.download_url).readAll()
       local file = io.open(v.name, 'w+')

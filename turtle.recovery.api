@@ -37,7 +37,7 @@ turtle.recovery = {
     file.close()
     return score
   end,
-  recover = function()
+  execute = function()
     turtle[recoveryCommand]()
     fs.delete(recoverPath)
     recoveryCommand = ''

@@ -23,5 +23,9 @@ local commit = function()
     if (file) then transaction = textutils.unserializeJSON(file.readAll()) end
   end
   if (transaction) then turtle[transaction.command]() end
+  if (not fs.exists(tempPath)) then return end
+  fs.delete(recoverPath)
+  fs.copy(tempPath, recoverPath)
+  fs.delete(tempPath)
 end
   

@@ -16,7 +16,7 @@ function display(status)
 end
 display()
 
-function awaitSpace() return 
+function awaitSpace() 
   while (true) do
     for i = 1,16 do
       if (turtle.getItemCount(i) == 0) then 

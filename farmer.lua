@@ -1,6 +1,6 @@
-local rest = 60*10
-local fuelSlot = 1
-local seedSlot = 2
+local rest = arg and arg[1] and tonumber(arg[1]) or 60*10
+local fuelSlot = arg and arg[2] and tonumber(arg[2]) or 1
+local seedSlot = arg and arg[3] and tonumber(arg[3]) or 2
 
 function display(status)
   term.clear()
@@ -19,7 +19,10 @@ display()
 function awaitSpace() return 
   while (true) do
     for i = 1,16 do
-      if (turtle.getItemCount(i) == 0) then return display() end
+      if (turtle.getItemCount(i) == 0) then 
+        display() 
+        return
+      end
       display('Please clear some inventory space')
       os.sleep(1)
     end
@@ -52,13 +55,13 @@ end
 
 function turn(phase) if (phase) then turtle.turnLeft() else turtle.turnRight() end end
 
-(function farm(phase)
-  while (true)
+(function(phase)
+  while (true) do
     repeat
       display('Farming... (work, work)')
       awaitSpace()
-      data = turtle.inspectDown()
-      if (data and data.metadata >= 7) then  
+      local success, data = turtle.inspectDown()
+      if (data and data.state and data.state.age >= 7) then  
         turtle.digDown()
         turtle.suckDown()
         plant()

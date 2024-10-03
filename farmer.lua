@@ -23,9 +23,9 @@ function awaitSpace()
         display() 
         return
       end
-      display('Please clear some inventory space')
-      os.sleep(1)
     end
+    display('Please clear some inventory space')
+    os.sleep(1)
   end
 end
 
@@ -63,8 +63,8 @@ end
 (function(phase)
   while (true) do
     repeat
-      display('Farming... (work, work)')
       awaitSpace()
+      display('Farming... (work, work)')
       local success, data = turtle.inspectDown()
       if (data and data.state and data.state.age >= 7) then  
         turtle.digDown()
@@ -77,7 +77,7 @@ end
     refuel()
     local next = turtle.forward()
     turn(phase)
-    if (not next) then phase = not phase end
+    if (next) then phase = not phase end
     display('Resting... (yawn)')
     os.sleep(rest)
   end

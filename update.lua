@@ -9,7 +9,7 @@ print('************************')
 print('Downloading from: ' .. source)
 print('')
 
-local directory = textutils.unserializeJSON(http.get(source .. '/contents?t=' .. os.epoch()).readAll())
+local directory = textutils.unserializeJSON(http.get(source .. '/contents').readAll())
 if (directory) then
   for i,v in ipairs(directory) do
     local extension = v.name:sub(v.name:find('%.[^%.]+$') or #v.name+1):sub(2);

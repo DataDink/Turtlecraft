@@ -41,19 +41,24 @@ end
 
 function refuel()
   if (turtle.getFuelLevel() > 0) then return end
-  turtle.select(fuelSlot)
-  while (turtle.getItemCount(fuelSlot) > 1 and turtle.getFuelLevel() < turtle.getFuelLimit()) do
-    while (turtle.getFuelLevel() == 0 and turtle.getItemCount(fuelSlot) < 2) do
-      display('Please add more fuel to slot: ' .. fuelSlot)
-      os.sleep(1)
-    end
+  while (turtle.getFuelLevel() == 0 and turtle.getItemCount(fuelSlot) < 2) do
+    display('Please add more fuel to slot: ' .. fuelSlot)
+    os.sleep(1)
+  end
+  while (turtle.getItemCount(fuelSlot > 1 and turtle.getFuelLevel() < turtle.getFuelLimit()) do
     display('Refueling... (munch, munch)')
     turtle.refuel(1)
   end
   display()
 end
 
-function turn(phase) if (phase) then turtle.turnLeft() else turtle.turnRight() end end
+function turn(phase) 
+  if (phase) then 
+    turtle.turnLeft() 
+  else 
+    turtle.turnRight() 
+  end 
+end
 
 (function(phase)
   while (true) do

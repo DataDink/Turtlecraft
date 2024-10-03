@@ -45,7 +45,7 @@ function refuel()
     display('Please add more fuel to slot: ' .. fuelSlot)
     os.sleep(1)
   end
-  while (turtle.getItemCount(fuelSlot > 1 and turtle.getFuelLevel() < turtle.getFuelLimit()) do
+  while (turtle.getItemCount(fuelSlot) > 1 and turtle.getFuelLevel() < turtle.getFuelLimit()) do
     display('Refueling... (munch, munch)')
     turtle.refuel(1)
   end

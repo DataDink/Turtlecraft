@@ -1,4 +1,4 @@
-local source = 'https://api.github.com/repos/DataDink/TurtleCraft'
+local source = 'https://api.github.com/repos/DataDink/TurtleCraft?t=' .. os.epoch()
 local filter = {
   lua = true,
   api = true

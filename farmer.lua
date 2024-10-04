@@ -1,8 +1,21 @@
 os.loadAPI('turtle.boundary.api')
+os.loadAPI('turtle.metadata.api')
 
 local rest = arg and arg[1] and tonumber(arg[1]) or 60*10
 local fuelSlot = arg and arg[2] and tonumber(arg[2]) or 1
 local seedSlot = arg and arg[3] and tonumber(arg[3]) or 2
+
+local knownCrops = {}
+knownCrops['minecraft:wheat'] = 7
+knownCrops['minecraft:carrots'] = 7
+knownCrops['minecraft:potatoes'] = 7
+knownCrops['actuallyadditions:block_canola'] = 7
+knownCrops['actuallyadditions:block_rice'] = 7
+knownCrops['actuallyadditions:block_coffee'] = 7
+knownCrops['actuallyadditions:block_flax'] = 7
+knownCrops['minecraft:reeds'] = 0
+knownCrops['natura:cotton_crop'] = 4
+knownCrops['natura:barley_crop'] = 3
 
 function display(status)
   term.clear()
@@ -60,7 +73,12 @@ end
       awaitSpace()
       display('Farming... (work, work)')
       local success, data = turtle.inspectDown()
-      if (data and data.state and data.state.age >= 7) then  
+      local isCrop = data and data.state and data.state.age and true or false
+      if (isCrop and not knownCrops[data.name]) then
+        display('Stopped! Unknown crop: ' .. data.name)
+        return
+      end
+      if (isCrop and data.state.age >= knownCrops[data.name]) then  
         turtle.digDown()
         turtle.suckDown()
         plant()

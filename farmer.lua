@@ -1,3 +1,5 @@
+os.loadAPI('turtle.boundary.api')
+
 local rest = arg and arg[1] and tonumber(arg[1]) or 60*10
 local fuelSlot = arg and arg[2] and tonumber(arg[2]) or 1
 local seedSlot = arg and arg[3] and tonumber(arg[3]) or 2
@@ -52,15 +54,7 @@ function refuel()
   display()
 end
 
-function turn(phase) 
-  if (phase) then 
-    turtle.turnLeft() 
-  else 
-    turtle.turnRight() 
-  end 
-end
-
-(function(phase)
+(function()
   while (true) do
     repeat
       awaitSpace()
@@ -72,13 +66,8 @@ end
         plant()
       end
       refuel()
-    until (not turtle.forward())
-    turn(phase)
-    refuel()
-    local next = turtle.forward()
-    turn(phase)
-    if (next) then phase = not phase end
+    until (not turtle.boundary.next())
     display('Resting... (yawn)')
     os.sleep(rest)
   end
-end)(false)
+end)()

@@ -4,9 +4,9 @@ turtle.boundary = {
     if (turtle.detect()) then
       if (phase) then turtle.turnRight() else turtle.turnLeft() end
       local complete = turtle.detect()
+      if (not complete) then turtle.forward() end
       if (phase) then turtle.turnRight() else turtle.turnLeft() end
       if (not complete) then phase = not phase end
-      return false
     end
     return turtle.forward()
   end

@@ -17,16 +17,15 @@ end
 
 while (true) do
   local mature, reason = turtle.crop.mature()
-  display("Inspecting: " .. mature .. "/" .. reason)
+  display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))
   if (mature) then turtle.dig() end
   if (not turtle.detect()) then
     for i = 1,16 do
       if (turtle.getItemCount(i) > 0 and turtle.select(i)) then
         local placed, reason = turtle.place()
-        if (not placed and reason) then display("Failed to plant: " .. reason) end
+        if (not placed and reason) then display("Failed to plant: " .. tostring(reason)) end
       end
     end
-    display("Nothing to replant");
   end
   for i = 1,16 do
     if (turtle.getItemCount(i) > 0 and turtle.select(i)) then 
@@ -34,4 +33,5 @@ while (true) do
     end
   end
   os.sleep(timer)
+  turtle.turnRight()
 end

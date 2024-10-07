@@ -11,26 +11,28 @@ local harvestable = {
     barley_crop = 3
   },
   harvestcraft = {
-    default = 7
+    default = 3
   }
 }
 
-local mature = function(inspect, dig)
+local mature = function(inspect)
   local inspected, data = inspect()
   if (not inspected) then return false end
   if (data and data.state and data.state.berries) then return true end
-  local mod = data and data.name and data.name:gsub(":.+","")
-  local item = data and data.name and data.name:gsub(".+:", "")
+  local name = data and data.name or ""
+  local mod = name:gsub(":.+","")
+  local item = name:gsub(".+:", "")
   local growth = tonumber(data and data.state and data.state.age or data.metadata)
-  if (not growth) then error("unknown crop type") end
-  if (harvestable[mod] and harvestable[mod][item] and harvestable[mod][item] <= growth then return true end
-  if (harvestable[mod] and harvestable[mod].default and harvestable[mod].default <= growth then return true end 
+  if (not growth) then error("unknown configuration (" .. name .. ")") end
+  local target = harvestable[mod] and harvestable[mod][item] or harvestable[mod].default
+  if (not target) then error("unknown crop (" .. name .. ")") end
+  if (target <= growth then return true end
   return false;    
 end
 
 turtle.farm = {
-  mature = function() return mature(turtle.inspect, turtle.dig) end,
-  matureUp = function() return mature(turtle.inspectUp, turtle.digUp) end,
+  mature = function() return mature(turtle.inspect) end,
+  matureUp = function() return mature(turtle.inspectUp) end,
   matureDown = function() return mature(turtle.inspectDown) end
 }
 

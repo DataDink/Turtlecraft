@@ -26,7 +26,7 @@ local mature = function(inspect)
   if (not growth) then return false, "unknown configuration" end
   local target = harvestable[mod] and harvestable[mod][item] or harvestable[mod].default
   if (not target) then return false, "unknown crop" end
-  if (target <= growth then return true end
+  if (target <= growth) then return true end
   return false, name .. ":" .. growth;    
 end
 

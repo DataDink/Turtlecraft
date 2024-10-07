@@ -2,8 +2,8 @@ if (not turtle) then error("farm requires a turtle") end
 
 os.loadAPI('turtle.crop.api')
 
-local timer = args and args[1] or 10
-local direction = args and args[2] == "down" or false
+local timer = arg and arg[1] or 10
+local direction = arg and arg[2] == "down" or false
 
 function display(message)
   term.clear()

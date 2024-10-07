@@ -1,14 +1,32 @@
+if (not turtle) then error("farm requires a turtle") end
+
 os.loadAPI('turtle.crop.api')
 
 local timer = args and args[1] or 10
 local direction = args and args[2] == "down" or false
 
+function display(message)
+  term.clear()
+  term.setCursorPos(1,1)
+  print("Farm checks for crops in the spaces around it.")
+  print("When a crop is mature it will be harvested then replanted and the remaining items are ejected upwards.")
+  print("farm [<timeout:number> [<direction:up/down>]]")
+  print("")
+  print(message)
+end
+
 while (true) do
-  if (turtle.crop.mature()) then turtle.dig() end
+  local mature, reason = turtle.crop.mature()
+  display("Inspecting: " .. mature .. "/" .. reason)
+  if (mature) then turtle.dig() end
   if (not turtle.detect()) then
     for i = 1,16 do
-      if (turtle.getItemCount(i) > 0 and turtle.select(i) and turtle.place()) then break end
+      if (turtle.getItemCount(i) > 0 and turtle.select(i)) then
+        local placed, reason = turtle.place()
+        if (not placed and reason) then display("Failed to plant: " .. reason) end
+      end
     end
+    display("Nothing to replant");
   end
   for i = 1,16 do
     if (turtle.getItemCount(i) > 0 and turtle.select(i)) then 

@@ -30,7 +30,7 @@ local mature = function(inspect)
   return false;    
 end
 
-turtle.farm = {
+turtle.crop = {
   mature = function() return mature(turtle.inspect) end,
   matureUp = function() return mature(turtle.inspectUp) end,
   matureDown = function() return mature(turtle.inspectDown) end

@@ -1,0 +1,36 @@
+local harvestable = {
+  mincraft = {
+    default = 7,
+    reeds = 0
+  },
+  actuallyadditions = {
+    default = 7
+  },
+  natura = {
+    cotton_crop = 4,
+    barley_crop = 3
+  },
+  harvestcraft = {
+    default = 7
+  }
+}
+
+local mature = function(inspect, dig)
+  local inspected, data = inspect()
+  if (not inspected) then return false end
+  if (data and data.state and data.state.berries) then return true end
+  local mod = data and data.name and data.name:gsub(":.+","")
+  local item = data and data.name and data.name:gsub(".+:", "")
+  local growth = tonumber(data and data.state and data.state.age or data.metadata)
+  if (not growth) then error("unknown crop type") end
+  if (harvestable[mod] and harvestable[mod][item] and harvestable[mod][item] <= growth then return true end
+  if (harvestable[mod] and harvestable[mod].default and harvestable[mod].default <= growth then return true end 
+  return false;    
+end
+
+turtle.farm = {
+  mature = function() return mature(turtle.inspect, turtle.dig) end,
+  matureUp = function() return mature(turtle.inspectUp, turtle.digUp) end,
+  matureDown = function() return mature(turtle.inspectDown) end
+}
+

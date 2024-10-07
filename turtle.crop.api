@@ -17,17 +17,17 @@ local harvestable = {
 
 local mature = function(inspect)
   local inspected, data = inspect()
-  if (not inspected) then return false end
+  if (not inspected) then return false, "crop undetected" end
   if (data and data.state and data.state.berries) then return true end
   local name = data and data.name or ""
   local mod = name:gsub(":.+","")
   local item = name:gsub(".+:", "")
   local growth = tonumber(data and data.state and data.state.age or data.metadata)
-  if (not growth) then error("unknown configuration (" .. name .. ")") end
+  if (not growth) then return false, "unknown configuration" end
   local target = harvestable[mod] and harvestable[mod][item] or harvestable[mod].default
-  if (not target) then error("unknown crop (" .. name .. ")") end
+  if (not target) then return false, "unknown crop" end
   if (target <= growth then return true end
-  return false;    
+  return false, name .. ":" .. growth;    
 end
 
 turtle.crop = {

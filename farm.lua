@@ -57,7 +57,7 @@ while (true) do
   else
     local mature, reason = turtle.crop.mature()
     display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))
-    tryHarvest() and tryReplant() and tryEject()
+    local harvest = mature and tryHarvest() and tryReplant() and tryEject()
   end
   os.sleep(timer)
   turtle.turnRight()

@@ -3,7 +3,7 @@ if (not turtle) then error("farm requires a turtle") end
 os.loadAPI('turtle.crop.api')
 
 local timer = arg and tonumber(arg[1]) or 10
-local direction = arg and arg[2] == "down" or false
+local drop = arg and arg[2] == "down" and turtle.dropDown or turtle.dropUp
 
 function display(message)
   term.clear()
@@ -15,22 +15,49 @@ function display(message)
   print(message)
 end
 
-while (true) do
-  local mature, reason = turtle.crop.mature()
-  display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))
-  if (mature) then turtle.dig() end
-  if (not turtle.detect()) then
-    for i = 1,16 do
-      if (turtle.getItemCount(i) > 0 and turtle.select(i)) then
-        local placed, reason = turtle.place()
-        if (not placed and reason) then display("Failed to plant: " .. tostring(reason)) end
-      end
+function checkSpace()
+  for i = 1,16 do
+    if (turtle.getItemCount(i) == 0) then return true end
+  end
+  return false
+end
+
+function tryHarvest()
+  local harvested, reason = turtle.dig()
+  if (not harvested) then display("Failed to harvest: " .. tostring(reason)) end
+  return harvested
+end
+
+function tryReplant()
+  for i = 1,16 do
+    if (turtle.getItemCount(i) > 0 and turtle.select(i)) then
+      local placed, reason = turtle.place()
+      if (placed) then return true end
+      display("Failed to replant: " .. tostring(reason))
     end
   end
+  return false
+end
+
+function tryEject()
+  local success = true
   for i = 1,16 do
     if (turtle.getItemCount(i) > 0 and turtle.select(i)) then 
-      if (direction) then turtle.dropDown() else turtle.dropUp() end
+      local ejected, reason = drop() 
+      if (not ejected) then display("Failed to eject: " .. tostring(reason)) end
+      success = success and ejected
     end
+  end
+  return success
+end
+
+while (true) do
+  if (not checkSpace() and not tryEject()) then
+    display("Inventory is full")
+  else
+    local mature, reason = turtle.crop.mature()
+    display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))
+    tryHarvest() and tryReplant() and tryEject()
   end
   os.sleep(timer)
   turtle.turnRight()

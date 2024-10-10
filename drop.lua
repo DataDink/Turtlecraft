@@ -3,8 +3,8 @@ if (not turtle) then
   return
 end
 
-local time = tonumber(arg[1]) or 10
-local count = tonumber(arg[2]) or 64
+local time = arg and tonumber(arg[1]) or 10
+local count = arg and tonumber(arg[2]) or 64
 
 print('Dropping stacks of ' .. count .. ' items for ' .. time .. ' seconds at a time.')
 print('This turtle should be encased leaving space below, above or in front for ejected items.')

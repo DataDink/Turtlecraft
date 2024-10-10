@@ -25,7 +25,7 @@ local mature = function(inspect)
   local growth = tonumber(data and data.state and data.state.age or data.metadata)
   if (not growth) then return false, "unknown configuration" end
   local target = harvestable[mod] and (harvestable[mod][item] or harvestable[mod].default)
-  if (not target) then return false, "unknown crop" end
+  if (not target) then return false, "unknown crop: " .. name end
   if (target <= growth) then return true end
   return false, name .. ":" .. growth;    
 end

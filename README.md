@@ -44,6 +44,8 @@ Example:
 
 Farms the spaces around the turtle, harvesting and replanting mature crops and ejecting the yield above or below.
 
+<image style="width: 512px" src="farm.jpg" />
+
 Example:
 > farm
 

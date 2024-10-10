@@ -1,14 +1,15 @@
-if (not turtle) then
-  print("Error: Drop requires a turtle")
-  return
-end
+if (not turtle) then error("Error: Drop requires a turtle") end
 
 local time = arg and tonumber(arg[1]) or 10
 local count = arg and tonumber(arg[2]) or 64
 
-print('Dropping stacks of ' .. count .. ' items for ' .. time .. ' seconds at a time.')
-print('This turtle should be encased leaving space below, above or in front for ejected items.')
-print('Hold ctrl-T to stop this process.')
+function display(message)
+  print("Drop keeps dropped items refreshed so they don't get deleted.")
+  print('Items are picked up and re-ejected at a regular interval.')
+  print('drop [<interval:number> [<count:number>]]')
+  print('')
+  print(message)
+end
 
 while (true) do
   local drop = not turtle.detectDown() and turtle.dropDown
@@ -29,8 +30,9 @@ while (true) do
   end
   turtle.select(1)
 
-  local timer, id = os.startTimer(time)
-  while (timer ~= id) do _, id = os.pullEvent("timer") end
+  display("waiting for " .. time .. " seconds...")
+  os.sleep(time)
+  display("dropping up to " .. count .. " items...")
   turtle.suck()
   turtle.suckUp()
   turtle.suckDown()

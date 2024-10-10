@@ -9,8 +9,8 @@ function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print("Farm checks for crops in the spaces around it.")
-  print("When a crop is mature it will be harvested then replanted and the remaining items are ejected upwards.")
-  print("farm [<timeout:number> [<direction:up/down>]]")
+  print("Mature crops are harvested & replanted and the yield is ejected up or down.")
+  print("farm [<interval:number> [<eject:up/down>]]")
   print("")
   print(message)
 end
@@ -24,7 +24,7 @@ end
 
 function tryHarvest()
   local harvested, reason = turtle.dig()
-  if (not harvested) then display("Failed to harvest: " .. tostring(reason)) end
+  if (not harvested) then display("Harvest failed: " .. tostring(reason)) end
   return harvested
 end
 
@@ -33,7 +33,7 @@ function tryReplant()
     if (turtle.getItemCount(i) > 0 and turtle.select(i)) then
       local placed, reason = turtle.place()
       if (placed) then return true end
-      display("Failed to replant: " .. tostring(reason))
+      display("Replant failed: " .. tostring(reason))
     end
   end
   return false
@@ -44,7 +44,7 @@ function tryEject()
   for i = 1,16 do
     if (turtle.getItemCount(i) > 0 and turtle.select(i)) then 
       local ejected, reason = drop() 
-      if (not ejected) then display("Failed to eject: " .. tostring(reason)) end
+      if (not ejected) then display("Eject failed: " .. tostring(reason)) end
       success = success and ejected
     end
   end
@@ -53,7 +53,7 @@ end
 
 while (true) do
   if (not checkSpace() and not tryEject()) then
-    display("Inventory is full")
+    display("Inventory full")
   else
     local mature, reason = turtle.crop.mature()
     display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))

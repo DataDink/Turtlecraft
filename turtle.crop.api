@@ -12,6 +12,12 @@ local harvestable = {
   },
   harvestcraft = {
     default = 3
+  },
+  rustic = {
+    default = 3
+  },
+  immersiveengineering = {
+    default = 4
   }
 }
 

@@ -4,6 +4,8 @@ local time = arg and tonumber(arg[1]) or 10
 local count = arg and tonumber(arg[2]) or 64
 
 function display(message)
+  term.clear()
+  term.setCursorPos(1,1)
   print("Drop keeps dropped items refreshed so they don't get deleted.")
   print('Items are picked up and re-ejected at a regular interval.')
   print('drop [<interval:number> [<count:number>]]')

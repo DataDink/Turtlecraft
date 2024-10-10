@@ -40,42 +40,16 @@ Example:
 
 *Drops up to 5 items and lets them sit for 30 seconds*
 
-## turtle.recovery.api
+## farm.lua
 
-When loaded using `os.loadAPI`, adds a recovery API to the turtle API at `turtle.recovery`.
-With the addition of a couple of extra steps each time you move the turtle,
-this API will assist in recovering from chunk unloads & unexpected reboots.
-It can only recover certain commands with variable reliability:
-
-<table>
-  <tr><th><code>forward</code></th><td>100%</td></tr>
-  <tr><th><code>back</code></th><td>100%</td></tr>
-  <tr><th><code>up</code></th><td>100%</td></tr>
-  <tr><th><code>down</code></th><td>100%</td></tr>
-  <tr><th><code>turnLeft</code></th><td>&lt; 100%</td></tr>
-  <tr><th><code>turnRight</code></th><td>&lt; 100%</td></tr>
-</table>
+Farms the spaces around the turtle, harvesting and replanting mature crops and ejecting the yield above or below.
 
 Example:
-```lua
-os.loadAPI('turtle.recovery.api')
+> farm
 
--- Check for recovery when the program starts...
-local reliability = turtle.recovery.getReliability()
-if (reliability == 1) then
-  print('Recovering last turtle movement...')
-  turtle.recovery.execute()
-elseif (reliability > 0) then
-  print('Attempting recovery of last turtle movement. Steps should be taken to assure expected positioning & facing')
-  turtle.recovery.execute()
-else
-  print('There was nothing recoverable...')
-end
+*Rotates every 10 seconds looking for a mature crop and ejects upward*
 
--- Protect a forward movement
-turtle.recovery.set('forward')
--- Execute the protected movement
-turtle.recovery.execute()
-```
+Example:
+> farm 30 down
 
-If a program interruption happens between a `set` and `execute`, the command will be re-`set` the next time the API is loaded.
+*Rotates every 30 seconds looking for a mature crop and ejects downward*

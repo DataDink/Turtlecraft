@@ -1,5 +1,5 @@
 local harvestable = {
-  mincraft = {
+  minecraft = {
     default = 7,
     reeds = 0
   },

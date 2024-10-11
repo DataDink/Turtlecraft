@@ -17,7 +17,7 @@ end
 function eject(count)
   if (direction == 'down') then return turtle.dropDown(count) end
   if (direction == 'up') then return turtle.dropUp(count) end
-  if (direction == 'forward' then return turtle.drop(count) end
+  if (direction == 'forward') then return turtle.drop(count) end
   if (turtle.detectDown() and turtle.detectUp()) then return turtle.drop(count) end
   if (turtle.detectDown()) then return turtle.dropUp(count) end
   return turtle.dropDown(count)

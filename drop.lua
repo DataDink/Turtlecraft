@@ -3,13 +3,14 @@ if (not turtle) then error("Error: Drop requires a turtle") end
 local time = arg and tonumber(arg[1]) or 10
 local count = arg and tonumber(arg[2]) or 64
 local direction = arg and tostring(arg[3])
+local random = arg and tostring(arg[4]) == 'true'
 
 function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print("Drop keeps dropped items refreshed so they don't get deleted.")
   print('Items are picked up and re-ejected at a regular interval.')
-  print('drop [<interval:number> [<count:number> [<direction:up/down/forward]]]')
+  print('drop [<interval:number> [<count:number> [<direction:up/down/forward/auto> [<randomize:true/false>]]]]')
   print('')
   print(message)
 end
@@ -23,19 +24,35 @@ function eject(count)
   return turtle.dropDown(count)
 end
 
-while (true) do
-  local remaining = count
-  for slot = 1, 16 do
-    local stack = turtle.getItemCount(slot)
-    if (stack > 0) then
-      turtle.select(slot)
-      eject(math.min(remaining, stack))
-      local undropped = turtle.getItemCount(slot)
-      remaining = remaining - stack + undropped
-      if (remaining < 1) then break end
+function scanInventory()
+  local inventory = {}
+  for slot = 1,16 do
+    local quantity = turtle.getItemCount(slot)
+    if (quantity > 0) then
+      table.insert(inventory, {
+        slot = slot,
+        count = quantity
+      })
     end
   end
-  turtle.select(1)
+  return inventory
+end
+
+while (true) do
+  local remaining = count
+  while (remaining > 0) do
+    local inventory = scanInventory()
+    if (#inventory == 0) then break; end
+    local index = random and math.random(1,#inventory) or 1
+    local item = inventory[index]
+    local drop = random and 1 or math.min(remaining, info.count)
+    if (not turtle.select(info.slot) or not eject(drop)) then
+      display("Failed to drop " .. tostring(drop) .. " items from " .. tostring(info.slot))
+      os.sleep(10)
+    else
+      remaining = remaining - drop
+    end
+  end
 
   display("waiting for " .. time .. " seconds...")
   os.sleep(time)

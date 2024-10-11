@@ -43,11 +43,10 @@ while (true) do
   while (remaining > 0) do
     local inventory = scanInventory()
     if (#inventory == 0) then break; end
-    local index = random and math.random(1,#inventory) or 1
-    local item = inventory[index]
-    local drop = random and 1 or math.min(remaining, info.count)
-    if (not turtle.select(info.slot) or not eject(drop)) then
-      display("Failed to drop " .. tostring(drop) .. " items from " .. tostring(info.slot))
+    local item = inventory[random and math.random(1,#inventory) or 1]
+    local drop = random and 1 or math.min(remaining, item.count)
+    if (not turtle.select(item.slot) or not eject(drop)) then
+      display("Failed to drop " .. tostring(drop) .. " items from " .. tostring(item.slot))
       os.sleep(10)
     else
       remaining = remaining - drop

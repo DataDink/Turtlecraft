@@ -38,7 +38,7 @@ function scanInventory()
   return inventory
 end
 
-function signal()
+function suspended()
   for k,v in pairs(redstone.getSides()) do
     if (redstone.getInput(v)) then return true end
   end
@@ -46,24 +46,27 @@ function signal()
 end
 
 while (true) do
-  local remaining = count
-  while (not signal() and remaining > 0) do
-    local inventory = scanInventory()
-    if (#inventory == 0) then break; end
-    local item = inventory[random and math.random(1,#inventory) or 1]
-    local drop = random and 1 or math.min(remaining, item.count)
-    if (not turtle.select(item.slot) or not eject(drop)) then
-      display("Failed to drop " .. tostring(drop) .. " items from " .. tostring(item.slot))
-      os.sleep(10)
-    else
-      remaining = remaining - drop
-    end
-  end
-
-  display("waiting for " .. time .. " seconds...")
-  os.sleep(time)
-  display("dropping up to " .. count .. " items...")
-  if (not signal()) then
+  if (suspended()) then
+    display("suspended via redstone...")
+    os.sleep(1)
+  else
+    local remaining = count
+    while (remaining > 0) do
+      local inventory = scanInventory()
+      if (#inventory == 0) then break; end
+      local item = inventory[random and math.random(1,#inventory) or 1]
+      local drop = random and 1 or math.min(remaining, item.count)
+      if (not turtle.select(item.slot) or not eject(drop)) then
+        display("Failed to drop " .. tostring(drop) .. " items from " .. tostring(item.slot))
+        os.sleep(10)
+      else
+        remaining = remaining - drop
+      end
+    end    
+    
+    display("waiting for " .. time .. " seconds...")
+    os.sleep(time)
+    display("dropping up to " .. count .. " items...")
     turtle.suck()
     turtle.suckUp()
     turtle.suckDown()

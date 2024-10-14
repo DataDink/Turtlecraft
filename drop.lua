@@ -38,7 +38,7 @@ function scanInventory()
   return inventory
 end
 
-function redstone()
+function signal()
   for k,v in pairs(redstone.getSides()) do
     if (redstone.getInput(v)) then return true end
   end
@@ -47,7 +47,7 @@ end
 
 while (true) do
   local remaining = count
-  while (not redstone() and remaining > 0) do
+  while (not signal() and remaining > 0) do
     local inventory = scanInventory()
     if (#inventory == 0) then break; end
     local item = inventory[random and math.random(1,#inventory) or 1]
@@ -63,7 +63,7 @@ while (true) do
   display("waiting for " .. time .. " seconds...")
   os.sleep(time)
   display("dropping up to " .. count .. " items...")
-  if (not redstone()) then
+  if (not signal()) then
     turtle.suck()
     turtle.suckUp()
     turtle.suckDown()

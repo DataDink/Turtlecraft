@@ -1,4 +1,4 @@
-if (not turtle) then error("excavate requires a turtle") end
+if (not turtle) then error("excavate_boundary requires a turtle") end
 
 os.loadAPI('turtle.track.api')
 os.loadAPI('turtle.boundary.api')
@@ -14,9 +14,11 @@ function display(message)
   term.setCursorPos(1,1)
   print("Excavates a rectangular boundary down to bedrock.")
   print("Attempts to recover when reloaded.")
-  print("excavate_boundary")
+  print("Requires fuel in slot #1")
   print("")
   print(message)
 end
 
-
+function checkFuel()
+  
+end

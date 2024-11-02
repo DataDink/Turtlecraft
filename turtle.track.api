@@ -43,11 +43,17 @@ local move = function(mod, func)
 end
 
 turtle.track = {
+  active: function() return fs.exists(nowPath) end,
   up: function() return move(1, 'up') end,
   down: function() return move(-1, 'down') end,
   get: function() return depth end,
-  set: function(v) depth = tonumber(v) end,
-  active: function() return fs.exists(nowPath) end,
+  set: function(v) 
+    depth = tonumber(v)
+    local now = fs.open(nowPath, 'w')
+    now.writeLine(depth)
+    now.close()
+    fs.delete(nextPath)
+  end,
   clear: function() 
     fs.delete(nowPath)
     fs.delete(nextPath) 

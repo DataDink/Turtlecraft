@@ -24,7 +24,8 @@ function checkSpace()
 end
 
 function tryHarvest()
-  local name = (turtle.inspect() or {}).name
+  local _, info = turtle.inspect()
+  local name = info and info.name
   local harvested, reason = turtle.dig()
   if (not harvested) then display("Harvest failed: " .. tostring(reason)) end
   os.sleep(1)
@@ -35,8 +36,9 @@ end
 function tryReplant(prefer)
   for rescan = 1,2 do
     for i = 1,16 do
-      local name = (turtle.getItemInfo(i) or {}).name
+      local name = (turtle.getItemDetail(i) or {}).name
       if (name and (not prefer or name == prefer)) then
+        turtle.select(i)
         local placed, reason = turtle.place()
         if (placed) then return true end
         display("Replant failed: " .. tostring(reason))

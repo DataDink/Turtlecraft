@@ -10,7 +10,7 @@ function display(message)
   term.setCursorPos(1,1)
   print("Farm checks for crops in the spaces around it.")
   print("Mature crops are harvested & replanted and the yield is ejected up or down.")
-  print("farm [<interval:number> [<eject:up/down> [whitelist=expr blacklist=expr...]]")
+  print("farm [<interval:number> [<eject:up/down>]]")
   print("")
   print(message)
 end

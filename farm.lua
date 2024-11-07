@@ -63,7 +63,7 @@ end
 
 while (true) do
   os.sleep(timer)
-  if (not checkSpace() and not tryEject()) then
+  if (not checkSpace() or not tryEject()) then
     display("Inventory full")
   else
     local mature, reason = turtle.crop.mature()

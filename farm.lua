@@ -16,11 +16,11 @@ function display(message)
 end
 display("")
 
-function checkSpace()
+function isEmpty()
   for i = 1,16 do
-    if (turtle.getItemCount(i) == 0) then return true end
+    if (turtle.getItemCount(i) > 0) then return false end
   end
-  return false
+  return true
 end
 
 function tryHarvest()
@@ -63,8 +63,8 @@ end
 
 while (true) do
   os.sleep(timer)
-  if (not tryEject() or not checkSpace()) then
-    display("Inventory full")
+  if (not tryEject() or not isEmpty()) then
+    display("Can't eject inventory")
   else
     local mature, reason = turtle.crop.mature()
     display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))

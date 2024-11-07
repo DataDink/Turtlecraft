@@ -7,31 +7,10 @@ if (not arg or #arg == 0) then
   return
 end
 
-local files = fs.complete(arg[1])
-if (not files or #files == 0) then
-  print()
-  print(arg[1] .. ' not found')
-  return
-end
-
-if (#files > 1) then
-  print()
-  print(arg[1] .. ' ambiguous: ' .. table.concat(files, ','))
-  return
-end
-
-local file = files[1]
-os.setComputerLabel('Job: ' .. string.gsub(file, '%.%w+', ''))
-
-local startup = 'shell.run('
-for i = 2,#arg do
-  startup = startup .. "'" .. arg[i] .. "'"
-  if (i < #arg) then startup = startup .. ', ' end
-end
-startup = startup .. ')\n'
+os.setComputerLabel('Job: ' .. string.gsub(arg[1], '%.%w+', ''))
 
 local file = io.open('startup.lua', 'w+')
-file:write(startup)
+file:write('shell.run("' .. table.concat(arg, '", "') .. '")\n')
 file:flush()
 file:close()
 

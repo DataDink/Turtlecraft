@@ -23,7 +23,7 @@ end
 local file = files[1]
 os.setComputerLabel('Job: ' .. string.gsub(file, '%.%w+', ''))
 
-local startup = 'shell.run(' .. table.concat(
+local startup = 'shell.run('
 for i = 2,#arg do
   startup = startup .. "'" .. arg[i] .. "'"
   if (i < #arg) then startup = startup .. ', ' end

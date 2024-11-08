@@ -1,7 +1,8 @@
 local harvestable = {
   minecraft = {
     default = 7,
-    reeds = 0
+    reeds = 0,
+    nether_wart = 3
   },
   actuallyadditions = {
     default = 7
@@ -18,6 +19,9 @@ local harvestable = {
   },
   immersiveengineering = {
     default = 4
+  },
+  extrautils2 = {
+    default = 7
   }
 }
 

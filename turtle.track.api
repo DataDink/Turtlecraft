@@ -4,15 +4,16 @@ local level = 0
 
 if (fs.exists(nextpath)) then
   local next = fs.open(nextPath, 'r')
+  level = tonumber(next.readLine())
+  local mod = tonumber(next.readLine())
   local fuel = tonumber(next.readLine())
-  local mark = tonumber(next.readLine())
-  local func = next.readLine()
+  local move = turtle[next.readLine()]
   next.close()
-  if (func and fuel == turtle.getFuelLevel() and turtle[func]()) then
-    local now = fs.open(nowPath, 'w')
-    now.writeLine(mark)
-    now.close()
-  end
+  if (move and fuel == turtle.getFuelLevel()) then move() end
+  level = fuel == turtle.getFuelLevel() and level or level + mod
+  local now = fs.open(nowPath, 'w')
+  now.writeLine(level)
+  now.close()
   fs.delete(nextPath)
 end
 
@@ -23,20 +24,24 @@ if (fs.exists(nowPath)) then
 end
 
 local move = function(mod, func)
-  if (turtle.getFuelLevel() < 1) then return false end
-  local mark = level + mod
+  local fuel = turtle.getFuelLevel()
+  if (fuel < 1) then return false end
+  local move = turtle[func]
+  if (not move) then return false end
   local next = fs.open(nextPath, 'w')
-  next.writeLine(turtle.getFuelLevel())
-  next.writeLine(mark)
+  next.writeLine(level)
+  next.writeLine(mod)
+  next.writeLine(fuel)
   next.writeLine(func)
   next.close()
-  if (not turtle[func]()) then 
+  move()
+  if (fuel == turtle.getFuelLevel()) then
     fs.delete(nextPath)
     return false 
   end
-  level = mark
+  level = level + mod
   local now = fs.open(nowPath, 'w')
-  now.writeLine(mark)
+  now.writeLine(level)
   now.close()
   fs.delete(nextPath)
   return true

@@ -1,6 +1,6 @@
 local nowPath = 'turtle.track.now'
 local nextPath = 'turtle.track.next'
-local depth = 0
+local level = 0
 
 if (fs.exists(nextpath)) then
   local next = fs.open(nextPath, 'r')
@@ -18,13 +18,13 @@ end
 
 if (fs.exists(nowPath)) then
   local now = fs.open(nowPath, 'r')
-  depth = tonumber(now.readLine())
+  level = tonumber(now.readLine())
   now.close()
 end
 
 local move = function(mod, func)
   if (turtle.getFuelLevel() < 1) then return false end
-  local mark = depth + mod
+  local mark = level + mod
   local next = fs.open(nextPath, 'w')
   next.writeLine(turtle.getFuelLevel())
   next.writeLine(mark)
@@ -34,7 +34,7 @@ local move = function(mod, func)
     fs.delete(nextPath)
     return false 
   end
-  depth = mark
+  level = mark
   local now = fs.open(nowPath, 'w')
   now.writeLine(mark)
   now.close()
@@ -46,17 +46,17 @@ turtle.track = {
   active: function() return fs.exists(nowPath) end,
   up: function() return move(1, 'up') end,
   down: function() return move(-1, 'down') end,
-  get: function() return depth end,
+  get: function() return level end,
   set: function(v) 
-    depth = tonumber(v)
+    level = tonumber(v)
     local now = fs.open(nowPath, 'w')
-    now.writeLine(depth)
+    now.writeLine(level)
     now.close()
     fs.delete(nextPath)
   end,
   clear: function() 
     fs.delete(nowPath)
     fs.delete(nextPath) 
-    depth = 0 
+    level = 0 
   end
 }

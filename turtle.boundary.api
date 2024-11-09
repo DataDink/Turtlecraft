@@ -1,13 +1,16 @@
-local phase = false
+local recoverPath = 'turtle.boundary.phase' // This isn't bullet-proof
+local phase = fs.exists(recoverPath)
+
 turtle.boundary = {
   next = function()
-    if (turtle.getFuelLevel() < 1) then return false end
+    if (turtle.getFuelLevel() < 2) then return false end
     if (turtle.forward()) then return true end
-    if (turtle.getFuelLevel() < 1) then return false end
     if (phase) then turtle.turnRight() else turtle.turnLeft() end
     local continued = turtle.forward()
     if (phase) then turtle.turnRight() else turtle.turnLeft() end
     if (continued) then phase = not phase end
+    if (phase) then fs.open(recoverPath,'w').close()
+    else fs.delete(recoverPath) end
     return true;
   end
 }

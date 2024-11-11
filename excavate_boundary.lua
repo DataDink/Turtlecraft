@@ -23,22 +23,24 @@ function display(message)
 end
 
 function ask()
-  display("Press any key to cancel")
-  return parallel.waitForAny(
+  local result = false
+  parallel.waitForAny(
     function() 
       for i = 30,0,-1 do
-        display("Press any key to halt: " .. tostring(i))
+        display("Hold down any key to halt: " .. tostring(i))
         os.sleep(1)
       end
-      return true
+      display("Continuing...")
+      result = true
     end,
     function() 
       os.pullEvent('key')
       fs.delete('startup.lua')
-      display("Halted")
-      return false
+      display("Halting...")
+      result = false
     end
   )
+  return result
 end
 if (not ask()) then return end
 

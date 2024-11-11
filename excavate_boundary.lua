@@ -25,7 +25,7 @@ function ask()
   local result = false
   parallel.waitForAny(
     function() 
-      for i = 30,0,-1 do
+      for i = 15,0,-1 do
         display("Hold down any key to halt: " .. tostring(i))
         os.sleep(1)
       end

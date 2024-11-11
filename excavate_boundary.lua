@@ -24,12 +24,19 @@ end
 
 function ask()
   display("Press any key to cancel")
-  parallel.waitForAny(
-    function() os.sleep(30) display("continuing") end,
+  return parallel.waitForAny(
+    function() 
+      for i = 30,0,-1 do
+        display("Press any key to halt: " .. tostring(i))
+        os.sleep(1)
+      end
+      return true
+    end,
     function() 
       os.pullEvent('key')
       fs.delete('startup.lua')
       display("Halted")
+      return false
     end
   )
 end

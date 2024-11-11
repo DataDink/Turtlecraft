@@ -4,10 +4,12 @@ os.loadAPI('turtle.track.api')
 os.loadAPI('turtle.boundary.api')
 turtle.select(1)
 
-local resuming = arg and arg[1] == "resume"
+local resuming = arg and arg[1] == "recover"
 if (not resuming) then
   turtle.track.clear()
-  shell.run('recover excavate_boundary resume')
+end
+if (not resuming and fs.exists('startup.lua')) then
+  shell.run('recover excavate_boundary recover')
 end
 
 function display(message)
@@ -19,13 +21,25 @@ function display(message)
   print("")
   print(message)
 end
-message("")
+
+function ask()
+  display("Press any key to cancel")
+  parallel.waitForAny(
+    function() os.sleep(30) display("continuing") end,
+    function() 
+      os.pullEvent('key')
+      fs.delete('startup.lua')
+      display("Halted")
+    end
+  )
+end
+ask()
 
 function refuel(req)
   if (turtle.getFuelLevel() > req) then return true end
   while (turtle.getFuelLevel() < req) do
     if (turtle.getItemCount(1) < 2 or not turtle.refuel(1)) then
-      message("Refueling: need more fuel in slot 1")
+      display("Refueling: need more fuel in slot 1")
       os.sleep(1)
     end
   end
@@ -48,6 +62,8 @@ function full()
 end
 
 function dig()
+  ask()
+  refuel(256)
   while (not turtle.detectDown() or turtle.digDown() or not turtle.detectDown() or turtle.attackDown()) do
     turtle.track.down()
   end
@@ -57,7 +73,7 @@ end
 while (true) do
   while (full()) do
     surface()
-    message("Inventory: awaiting unload")
+    display("Inventory: awaiting unload")
     os.sleep(1)
   end
   dig()

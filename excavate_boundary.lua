@@ -24,7 +24,7 @@ message("")
 function refuel(req)
   if (turtle.getFuelLevel() > req) then return true end
   while (turtle.getFuelLevel() < req) do
-    if (turtle.getItemCount(1) < 2 or not turtle.refuel(1)) do
+    if (turtle.getItemCount(1) < 2 or not turtle.refuel(1)) then
       message("Refueling: need more fuel in slot 1")
       os.sleep(1)
     end
@@ -33,7 +33,7 @@ end
 
 function surface()
   if (turtle.track.get() == 0) then return true end
-  local move = turtle.track.get() > 0 and turtle.track.down or turtle.track.up end
+  local move = turtle.track.get() > 0 and turtle.track.down or turtle.track.up
   while (turtle.track.get() ~= 0) do
     refuel(1)
     move()

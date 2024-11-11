@@ -1,4 +1,4 @@
-local recoverPath = 'turtle.boundary.phase' // This isn't bullet-proof
+local recoverPath = 'turtle.boundary.phase' -- This isn't bullet-proof
 local phase = fs.exists(recoverPath)
 
 turtle.boundary = {

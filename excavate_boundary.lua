@@ -40,7 +40,7 @@ function ask()
     end
   )
 end
-ask()
+if (not ask()) then return end
 
 function refuel(req)
   if (turtle.getFuelLevel() > req) then return true end
@@ -69,7 +69,6 @@ function full()
 end
 
 function dig()
-  ask()
   refuel(256)
   while (not turtle.detectDown() or turtle.digDown() or not turtle.detectDown() or turtle.attackDown()) do
     turtle.track.down()
@@ -83,6 +82,7 @@ while (true) do
     display("Inventory: awaiting unload")
     os.sleep(1)
   end
+  if (not ask()) then return end
   dig()
   turtle.boundary.next()
 end

@@ -42,7 +42,6 @@ function ask()
   )
   return result
 end
-if (not ask()) then return end
 
 function refuel(req)
   if (turtle.getFuelLevel() > req) then return true end

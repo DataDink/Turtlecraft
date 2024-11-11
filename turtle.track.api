@@ -2,7 +2,7 @@ local nowPath = 'turtle.track.now'
 local nextPath = 'turtle.track.next'
 local level = 0
 
-if (fs.exists(nextpath)) then
+if (fs.exists(nextPath)) then
   local next = fs.open(nextPath, 'r')
   level = tonumber(next.readLine())
   local mod = tonumber(next.readLine())

@@ -2,7 +2,9 @@ local harvestable = {
   minecraft = {
     default = 7,
     reeds = 0,
-    nether_wart = 3
+    nether_wart = 3,
+    pumpkin = 2,
+    melon_block = 0
   },
   actuallyadditions = {
     default = 7

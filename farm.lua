@@ -53,7 +53,7 @@ function tryEject()
   local success = true
   for i = 1,16 do
     if (turtle.getItemCount(i) > 1 and turtle.select(i)) then 
-      local ejected, reason = drop() 
+      local ejected, reason = drop(turtle.getItemCount(i) - 1) 
       if (not ejected) then display("Eject failed: " .. tostring(reason)) end
       success = success and ejected
     end

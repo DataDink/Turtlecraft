@@ -25,4 +25,8 @@ local data = textutils.unserializeJSON(json, {
 })
 if (not data or #data == 0) then return display("No data") end
 
-
+while (true) do
+  for i = 1,#data do
+    
+  end
+end

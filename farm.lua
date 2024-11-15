@@ -16,11 +16,11 @@ function display(message)
 end
 display("")
 
-function isEmpty()
+function hasSpace()
   for i = 1,16 do
-    if (turtle.getItemCount(i) > 0) then return false end
+    if (turtle.getItemCount(i) == 0) then return true end
   end
-  return true
+  return false
 end
 
 function tryHarvest()
@@ -53,7 +53,7 @@ function tryEject()
   local success = true
   for i = 1,16 do
     if (turtle.getItemCount(i) > 1 and turtle.select(i)) then 
-      local ejected, reason = drop(turtle.getItemCount(i) - 1) 
+      local ejected, reason = drop(turtle.getItemCount() - 1) 
       if (not ejected) then display("Eject failed: " .. tostring(reason)) end
       success = success and ejected
     end
@@ -63,7 +63,7 @@ end
 
 while (true) do
   os.sleep(timer)
-  if (not tryEject() or not isEmpty()) then
+  if (not tryEject() or not hasSpace()) then
     display("Can't eject inventory")
   else
     local mature, reason = turtle.crop.mature()

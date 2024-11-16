@@ -2,6 +2,7 @@ if (not turtle) then error("farm requires a turtle") end
 
 os.loadAPI('turtle.crop.api')
 
+local recover = 'farm.time'
 local timer = arg and tonumber(arg[1]) or 10
 local drop = arg and arg[2] == "down" and turtle.dropDown or turtle.dropUp
 
@@ -16,63 +17,84 @@ function display(message)
 end
 display("")
 
-function hasSpace()
-  for i = 1,16 do
-    if (turtle.getItemCount(i) == 0) then return true end
+function rest()
+  local remaining = timer
+  if (fs.exists(recover)) then
+    local file = fs.open(recover, 'r')
+    remaining = tonumber(file.readAll() or timer)
+    file.close()
   end
-  return false
+  while (remaining > 0) do
+    display("Resting: " .. remaining)
+    os.sleep(math.min(remaining, 1))
+    remaining = remaining - 1
+    local file = fs.open(recover, 'w')
+    file.write(remaining)
+    file.close()
+  end
+  fs.delete(recover)
 end
 
-function tryHarvest()
-  local _, info = turtle.inspect()
-  local name = info and info.name
-  local harvested, reason = turtle.dig()
-  if (not harvested) then display("Harvest failed: " .. tostring(reason)) end
-  os.sleep(1)
-  turtle.suck()
-  return harvested, name
-end
-
-function tryReplant(prefer)
-  for rescan = 1,2 do
-    for i = 1,16 do
-      local name = (turtle.getItemDetail(i) or {}).name
-      if (name and (not prefer or name == prefer)) then
-        turtle.select(i)
-        local placed, reason = turtle.place()
-        if (placed) then return true end
-        display("Replant failed: " .. tostring(reason))
+function sort()
+  for i = 16,1,-1 do
+    for j = 1,i do
+      if (turtle.getItemCount(j) > 0) then
+        turtle.select(j)
+        turtle.transferTo(i)
       end
     end
-    prefer = nil
-  end
-  return false
-end
-
-function tryEject()
-  local success = true
-  for i = 1,16 do
-    if (turtle.getItemCount(i) > 1 and turtle.select(i)) then 
-      local ejected, reason = drop(turtle.getItemCount() - 1) 
-      if (not ejected) then display("Eject failed: " .. tostring(reason)) end
-      success = success and ejected
+    turtle.select(1)
+    local stack = turtle.getItemCount(i)
+    if (stack > 1) then
+      drop(stack - 1)
     end
   end
-  return success
+  for i = 1,4 do
+    if (turtle.getItemCount(i) > 0) then return false end
+  end
+  return true
+end
+
+function harvest()
+  turtle.select(1)
+  local harvested, reason = turtle.dig()
+  if (not harvested) then return false, reason end
+  os.sleep(1)
+  turtle.suck()
+  return trueß
+end
+
+function replant(name)
+  for search in pairs({name,"seed",""}) do
+    for i = 1,16 do
+      local detail = turtle.getItemDetail(i)
+      if (detail and string.find(detail.name, search) 
+          and turtle.select(i) 
+          and turtle.place()
+        ) then return true end
+    end
+  end
+  return false
 end
 
 while (true) do
-  os.sleep(timer)
-  if (not tryEject() or not hasSpace()) then
-    display("Can't eject inventory")
-  else
-    local mature, reason = turtle.crop.mature()
-    display("Inspecting: " .. tostring(mature) .. "/" .. tostring(reason))
-    if (mature) then
-      turtle.select(1)
-      local harvested, name = tryHarvest()
-      if (harvested) then tryReplant(name) end
-    end
+  rest()
+  while (not sort()) do
+    display("Additional space required")
+    os.sleep(10)
+  end
+  local _, inspection = turtle.inspect()
+  local name = inspection and inspection.name
+  local mature, reason = turtle.crop.mature()
+  display("Inpsection: " .. tostring(mature) .. "/" .. tostring(name))
+  local harvested, reason = harvest()
+  if (not harvested) then
+    display("Harvest Failed: " .. tostring(reason))
+  end
+  local replanted = harvested and replant(name)
+  if (not replanted) then
+    display("Replant Failed")
   end
   turtle.turnRight()
 end
+

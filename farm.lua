@@ -25,7 +25,7 @@ function rest()
     file.close()
   end
   while (remaining > 0) do
-    display("Resting: " .. remaining)
+    --display("Resting: " .. remaining)
     os.sleep(math.min(remaining, 1))
     remaining = remaining - 1
     local file = fs.open(recover, 'w')
@@ -43,9 +43,9 @@ function sort()
         turtle.transferTo(i)
       end
     end
-    turtle.select(1)
     local stack = turtle.getItemCount(i)
     if (stack > 1) then
+      turtle.select(i)
       drop(stack - 1)
     end
   end

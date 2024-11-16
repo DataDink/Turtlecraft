@@ -61,7 +61,7 @@ function harvest()
   if (not harvested) then return false, reason end
   os.sleep(1)
   turtle.suck()
-  return trueß
+  return true
 end
 
 function replant(name)

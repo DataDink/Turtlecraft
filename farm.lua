@@ -65,7 +65,7 @@ function harvest()
 end
 
 function replant(name)
-  for search in pairs({name,"seed",""}) do
+  for _,search in pairs({name,"seed",""}) do
     for i = 1,16 do
       local _, detail = turtle.getItemDetail(i)
       if (detail and string.find(detail.name, search) 
@@ -78,11 +78,11 @@ function replant(name)
 end
 
 while (true) do
-  rest()
   while (not sort()) do
     display("Additional space required")
     os.sleep(10)
   end
+  rest()
   local _, inspection = turtle.inspect()
   local name = inspection and inspection.name
   local mature, reason = turtle.crop.mature()

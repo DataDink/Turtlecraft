@@ -87,13 +87,15 @@ while (true) do
   local name = inspection and inspection.name
   local mature, reason = turtle.crop.mature()
   display("Inpsection: " .. tostring(mature) .. "/" .. tostring(name))
-  local harvested, reason = harvest()
-  if (not harvested) then
-    display("Harvest Failed: " .. tostring(reason))
-  end
-  local replanted = harvested and replant(name)
-  if (not replanted) then
-    display("Replant Failed")
+  if (mature) then
+    local harvested, reason = harvest()
+    if (not harvested) then
+      display("Harvest Failed: " .. tostring(reason))
+    end
+    local replanted = harvested and replant(name)
+    if (not replanted) then
+      display("Replant Failed")
+    end
   end
   turtle.turnRight()
 end

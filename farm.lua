@@ -65,9 +65,9 @@ function harvest()
 end
 
 function replant(name)
-  for _,search in pairs({name,"seed",""}) do
+  for _, search in pairs({name,"seed",""}) do
     for i = 1,16 do
-      local _, detail = turtle.getItemDetail(i)
+      local detail = turtle.getItemDetail(i)
       if (detail and string.find(detail.name, search) 
           and turtle.select(i) 
           and turtle.place()

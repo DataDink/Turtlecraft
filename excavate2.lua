@@ -1,4 +1,4 @@
-if (not turtle) then error("excavate_boundary requires a turtle") end
+if (not turtle) then error("excavate2 requires a turtle") end
 
 os.loadAPI('turtle.track.api')
 os.loadAPI('turtle.boundary.api')
@@ -9,7 +9,7 @@ if (not resuming) then
   turtle.track.clear()
 end
 if (not resuming and fs.exists('startup.lua')) then
-  shell.run('recover excavate_boundary recover')
+  shell.run('recover excavate2 recover')
 end
 
 function display(message)

@@ -26,16 +26,19 @@ function ask()
   parallel.waitForAny(
     function() 
       for i = 10,0,-1 do
-        display("Hold down any key to halt: " .. tostring(i))
+        display("Hold down ENTER to quit: " .. tostring(i))
         os.sleep(1)
       end
       display("Continuing...")
       result = true
     end,
     function() 
-      os.pullEvent('key')
+      local key = nil
+      while (key ~= keys.enter) do
+        _, key = os.pullEvent('key')
+      end
       fs.delete('startup.lua')
-      display("Halting...")
+      display("Exiting...")
       result = false
     end
   )

@@ -56,3 +56,25 @@ Example:
 > farm 30 down
 
 *Rotates every 30 seconds looking for a mature crop and ejects downward*
+
+## dig.lua
+
+Dig performs a task similar to excavate, but when used with `recover.lua` it can recover after being unloaded.
+This is useful when chunkloaders are unavailable or with servers that have frequent restarts. The program's down-first dig pattern results in less mob-spawns while excavating.
+
+To use this program, a physical boundary must be set up around the area to dig
+and fuel must be placed in the 1st slot of the turtle's inventory.
+This program will only recover after a restart/unload using the `recover.lua` program.
+
+<image style="width: 512px" src="dig.jpg" />
+
+Example:
+> recover dig
+
+*Begins a new dig using a physical boundary to define the area that will be excavated down to bedrock*
+
+**Notes:** 
+* This program works best as a digging assistant that works nearby while you do other things.
+* This program will not unload to a chest. It will surface the turtle and wait to be emptied.
+* A well-timed restart/unload may cause the turtle switch to a perpendicular pattern at reload. (e.g. may travel east-to-west if it was previously traveling north-to-south)
+* Not recommended for massive digs.

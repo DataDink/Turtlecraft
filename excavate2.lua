@@ -25,7 +25,7 @@ function ask()
   local result = false
   parallel.waitForAny(
     function() 
-      for i = 10,0,-1 do
+      for i = 5,0,-1 do
         display("Hold down ENTER to quit: " .. tostring(i))
         os.sleep(1)
       end
@@ -52,6 +52,7 @@ function refuel(req)
       display("Refueling: need more fuel in slot 1")
       os.sleep(1)
     end
+    display("Continuing...")
   end
 end
 

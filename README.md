@@ -75,6 +75,6 @@ Example:
 
 **Notes:** 
 * This program works best as a digging assistant that works nearby while you do other things.
-* This program will not unload to a chest. It will surface the turtle and wait to be emptied.
+* This program will not unload to a chest. It will surface the turtle and wait to be emptied when it is full.
 * A well-timed restart/unload may cause the turtle switch to a perpendicular pattern at reload. (e.g. may travel east-to-west if it was previously traveling north-to-south)
 * Not recommended for massive digs.

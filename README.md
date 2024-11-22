@@ -78,3 +78,13 @@ Example:
 * This program will not unload to a chest. It will surface the turtle and wait to be emptied when it is full.
 * A well-timed restart/unload may cause the turtle switch to a perpendicular pattern at reload. (e.g. may travel east-to-west if it was previously traveling north-to-south)
 * Not recommended for massive digs.
+
+## drive.lua
+
+Provides a keyboard interface for manually navigating the turtle.
+
+<image style="width: 512px" src="" />
+
+Example:
+> drive
+

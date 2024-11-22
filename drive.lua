@@ -8,12 +8,12 @@ while (true) do
   print('')
   print('           up')
   print('           \24')
-  print('   left \27   \26 right')
+  print('   left \27      \26 right')
   print('           \25')
   print('          down')
   print('')
-  print('    [space] [enter]')
-  print('    forward  exit')
+  print('     [space] [enter]')
+  print('     forward  exit')
 
   local _, key = os.pullEvent('key')
   if (key == keys.up) then

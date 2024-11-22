@@ -8,7 +8,7 @@ while (true) do
   print('')
   print('           up')
   print('           \24')
-  print('   left \27      \26 right')
+  print('   left \27     \26 right')
   print('           \25')
   print('          down')
   print('')

@@ -1,4 +1,4 @@
-if (not turtle) then error("dig requires a turtle") end
+if (not turtle) then error("drive requires a turtle") end
 local width, height = term.getSize()
 
 while (true) do

@@ -83,7 +83,7 @@ Example:
 
 Provides a keyboard interface for manually navigating the turtle.
 
-<image style="width: 512px" src="" />
+<image style="width: 512px" src="drive.jpg" />
 
 Example:
 > drive

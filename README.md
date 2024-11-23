@@ -5,7 +5,7 @@
 
 > `wget https://raw.githubusercontent.com/DataDink/Turtlecraft/refs/heads/master/update.lua install.lua`
 
-*Executing the update.lua script will download the rest of the files*
+*Executing the install.lua script will download the rest of the files*
 
 ## update.lua
 

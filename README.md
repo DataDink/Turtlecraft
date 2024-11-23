@@ -11,8 +11,6 @@
 > 
 > `install`
 
-*Executing the install.lua script will download the rest of the files*
-
 ## update.lua
 
 Redownloads all of the files to your computer/turtle

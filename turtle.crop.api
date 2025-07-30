@@ -24,7 +24,10 @@ local harvestable = {
   },
   extrautils2 = {
     default = 7
-  }
+  },
+  cottonly = {
+    default = 7
+  },
 }
 
 local mature = function(inspect)

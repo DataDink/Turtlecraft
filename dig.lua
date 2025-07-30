@@ -60,7 +60,6 @@ function surface()
   if (turtle.track.get() == 0) then return true end
   local move = turtle.track.get() > 0 and turtle.track.down or turtle.track.up
   while (turtle.track.get() ~= 0) do
-    refuel(1)
     move()
   end  
 end

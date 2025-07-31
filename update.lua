@@ -15,7 +15,7 @@ if (directory) then
     local extension = v.name:sub(v.name:find('%.[^%.]+$') or #v.name+1):sub(2);
     if (filter[extension]) then
       print('* ' .. v.name)
-      local content = http.get(v.download_url).readAll()
+      local content = http.get(v.download_url .. '?t=' .. os.epoch('utc')).readAll()
       local file = io.open(v.name, 'w+')
       file:write(content)
       file:flush()

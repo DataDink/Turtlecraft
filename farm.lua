@@ -5,13 +5,14 @@ os.loadAPI('turtle.crop.api')
 local recover = 'farm.time'
 local timer = arg and tonumber(arg[1]) or 10
 local drop = arg and arg[2] == "down" and turtle.dropDown or turtle.dropUp
+local noplant = arg and arg[3] == "no" and true or false
 
 function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print("Farm checks for crops in the spaces around it.")
   print("Mature crops are harvested & replanted and the yield is ejected up or down.")
-  print("farm [<interval:number> [<eject:up/down>]]")
+  print("farm [<interval:number> [<eject:up/down> [<replant:yes/no>]]]")
   print("")
   print(message)
 end
@@ -65,6 +66,7 @@ function harvest()
 end
 
 function replant(name)
+  if (noplant) then return true end
   for _, search in pairs({name,""}) do
     for i = 1,16 do
       local detail = turtle.getItemDetail(i)

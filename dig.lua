@@ -16,7 +16,7 @@ function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print("Excavates to a rectangular boundary.")
-  print("Requires fuel in slot #1")
+  print("Requires: a mining turtle on a flat surface surrounded by a rectangular boundary.")
   print("")
   print(message)
 end
@@ -24,7 +24,7 @@ end
 function ask()
   local result = false
   parallel.waitForAny(
-    function() 
+    function()
       for i = 5,0,-1 do
         display("Hold down ENTER to quit: " .. tostring(i))
         os.sleep(1)
@@ -85,7 +85,11 @@ while (true) do
     display("Inventory: awaiting unload")
     os.sleep(1)
   end
-  if (not ask()) then return end
   dig()
   turtle.boundary.next()
+  if (not turtle.detectDown()) then
+    display("Dig ended: no ground below turtle")
+    return fs.delete('startup.lua');
+  end
+  if (not ask()) then return end
 end

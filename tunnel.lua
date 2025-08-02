@@ -21,19 +21,20 @@ function refuel()
   display('')
   if (turtle.getFuelLevel() > 0) then return end
   for slot = 1, 16 do
-    turtle.select(slot)
-    if (turtle.refuel(1)) then return end
+    if (turtle.getItemCount(slot) > 0) then
+      turtle.select(slot)
+      if (turtle.refuel(1)) then return end
+    end
   end
   display('No fuel available')
 end
 
 function place(method, detect)
-  if (not detect()) then
-    for slot = 1, 16 do
-      if (turtle.getItemCount(slot) > 0) then
-        turtle.select(slot)
-        if (method) then return end
-      end
+  if (detect()) then return end
+  for slot = 1, 16 do
+    if (turtle.getItemCount(slot) > 0) then
+      turtle.select(slot)
+      if (method()) then return end
     end
   end
 end

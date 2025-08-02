@@ -1,22 +1,48 @@
 if (not turtle) then error("tunnel requires a turtle") end
 local width, height = term.getSize()
-turtle.select(1)
 
-while (true) do
+function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print('Tunnel with the keyboard:')
   print('')
   print('        forward')
-  print('           \24')
-  print('   left \27     \26 right')
-  print('           \25')
+  print('           w')
+  print('   left a  s  d right')
   print('        reverse')
   print('')
+  print('Press [space] to build')
   print('Press [enter] to exit')
+  print('')
+  print(message)
+end
+
+function refuel()
+  display('')
+  if (turtle.getFuelLevel() > 0) then return end
+  for slot = 1, 16 do
+    turtle.select(slot)
+    if (turtle.refuel(1)) then return end
+  end
+  display('No fuel available')
+end
+
+function place(method)
+  if (not turtle.detectDown()) then
+    for slot = 1, 16 do
+      if (turtle.getItemCount(slot) > 0) then
+        turtle.select(slot)
+        if (method) then return end
+      end
+    end
+  end
+end
+
+while (true) do
+  display('')
 
   local _, key = os.pullEvent('key')
-  if (turtle.fuelLevel() < 1) then turtle.refuel(1) end
+  refuel()
   if (turtle.detectUp()) then turtle.digUp() end
   if (key == keys.up) then
     if (not turtle.forward()) then
@@ -42,6 +68,14 @@ while (true) do
   if (key == keys.right) then
     turtle.turnRight()
   end
+  if (key == keys.space) then
+    turtle.turnLeft()
+    place(turtle.place)
+    turtle.turnRight()
+    turtle.turnRight()
+    place(turtle.place)
+    turtle.turnLeft()
+  end
   if (key == keys.enter) then
     term.clear()
     term.setCursorPos(1,1)
@@ -49,4 +83,5 @@ while (true) do
     return;
   end
   if (turtle.detectUp()) then turtle.digUp() end
+  place(turtle.placeDown)
 end

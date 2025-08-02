@@ -94,3 +94,12 @@ Provides a keyboard interface for manually navigating the turtle.
 Example:
 > drive
 
+## tunnel.lua
+
+Provides a keyboard interface for manually navigating the turtle.
+
+<image style="width: 512px" src="tunnel.jpg" />
+
+Example:
+> tunnel
+

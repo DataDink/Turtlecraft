@@ -1,49 +1,74 @@
 if (not turtle) then error("drive requires a turtle") end
-local width, height = term.getSize()
 
-while (true) do
+function display(message)
   term.clear()
   term.setCursorPos(1,1)
   print('Control the turtle with the keyboard:')
   print('')
-  print('           up')
-  print('           \24')
-  print('   left \27     \26 right')
-  print('           \25')
-  print('          down')
+  print('        forward')
+  print('           w')
+  print('   left a  s  d right')
+  print('        reverse')
   print('')
-  print('     [space] [enter]')
-  print('     forward  exit')
+  print('  [space] [x] [enter]')
+  print('    up   down   exit')
+  print('')
+  print(message)
+end
+
+function refuel()
+  display('')
+  if (turtle.getFuelLevel() > 0) then return end
+  for slot = 1, 16 do
+    if (turtle.getItemCount(slot) > 0) then
+      turtle.select(slot)
+      if (turtle.refuel(1)) then return end
+    end
+  end
+  display('No fuel available')
+end
+
+while (true) do
+  display('')
 
   local _, key = os.pullEvent('key')
-  if (key == keys.up) then
+  refuel()
+  if (key == keys.space) then
     if (not turtle.up()) then
-      turtle.refuel(1)
       turtle.digUp()
       turtle.attackUp()
       turtle.up()
     end
   end
-  if (key == keys.down) then
+  if (key == keys.x) then
     if (not turtle.down()) then
-      turtle.refuel(1)
       turtle.digDown()
       turtle.attackDown()
       turtle.down()
     end
   end
-  if (key == keys.left) then
+  if (key == keys.a) then
     turtle.turnLeft()
   end
-  if (key == keys.right) then
+  if (key == keys.d) then
     turtle.turnRight()
   end
-  if (key == keys.space) then
+  if (key == keys.w) then
     if (not turtle.forward()) then
-      turtle.refuel(1)
       turtle.dig()
       turtle.attack()
       turtle.forward()
+    end
+  end
+  if (key == keys.s) then
+    if (not turtle.back()) then
+      turtle.turnLeft()
+      turtle.turnLeft()
+      turtle.dig()
+      turtle.attack()
+      turtle.forward()
+      turtle.turnLeft()
+      turtle.turnLeft()
     end
   end
   if (key == keys.enter) then

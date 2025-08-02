@@ -82,7 +82,7 @@ while (true) do
   if (key == keys.enter) then
     term.clear()
     term.setCursorPos(1,1)
-    print('Drive complete')
+    print('Tunnel complete')
     return;
   end
   if (turtle.detectUp()) then turtle.digUp() end

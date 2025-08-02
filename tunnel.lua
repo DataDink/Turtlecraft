@@ -47,13 +47,13 @@ while (true) do
 
   local _, key = os.pullEvent('key')
   refuel()
-  if (turtle.detectUp()) then turtle.digUp() end
   if (key == keys.w) then
     if (not turtle.forward()) then
       turtle.dig()
       turtle.attack()
       turtle.forward()
     end
+    if (turtle.detectUp()) then turtle.digUp() end
   end
   if (key == keys.s) then
     if (not turtle.back()) then
@@ -86,6 +86,5 @@ while (true) do
     print('Tunnel complete')
     return;
   end
-  if (turtle.detectUp()) then turtle.digUp() end
   floor()
 end

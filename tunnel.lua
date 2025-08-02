@@ -44,14 +44,14 @@ while (true) do
   local _, key = os.pullEvent('key')
   refuel()
   if (turtle.detectUp()) then turtle.digUp() end
-  if (key == keys.up) then
+  if (key == keys.w) then
     if (not turtle.forward()) then
       turtle.dig()
       turtle.attack()
       turtle.forward()
     end
   end
-  if (key == keys.down) then
+  if (key == keys.s) then
     if (not turtle.back()) then
       turtle.turnLeft()
       turtle.turnLeft()
@@ -62,10 +62,10 @@ while (true) do
       turtle.turnLeft()
     end
   end
-  if (key == keys.left) then
+  if (key == keys.a) then
     turtle.turnLeft()
   end
-  if (key == keys.right) then
+  if (key == keys.d) then
     turtle.turnRight()
   end
   if (key == keys.space) then

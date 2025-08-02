@@ -11,7 +11,7 @@ function display(message)
   print('   left a  s  d right')
   print('        reverse')
   print('')
-  print('Press [space] to build')
+  print('Press [space] to build walls')
   print('Press [enter] to exit')
   print('')
   print(message)
@@ -27,8 +27,8 @@ function refuel()
   display('No fuel available')
 end
 
-function place(method)
-  if (not turtle.detectDown()) then
+function place(method, detect)
+  if (not detect()) then
     for slot = 1, 16 do
       if (turtle.getItemCount(slot) > 0) then
         turtle.select(slot)
@@ -37,6 +37,9 @@ function place(method)
     end
   end
 end
+
+function floor() return place(turtle.placeDown, turtle.detectDown) end
+function wall() return place(turtle.place, turtle.detect) end
 
 while (true) do
   display('')
@@ -70,10 +73,10 @@ while (true) do
   end
   if (key == keys.space) then
     turtle.turnLeft()
-    place(turtle.place)
+    wall()
     turtle.turnRight()
     turtle.turnRight()
-    place(turtle.place)
+    wall()
     turtle.turnLeft()
   end
   if (key == keys.enter) then
@@ -83,5 +86,5 @@ while (true) do
     return;
   end
   if (turtle.detectUp()) then turtle.digUp() end
-  place(turtle.placeDown)
+  floor()
 end

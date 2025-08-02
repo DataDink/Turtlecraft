@@ -16,10 +16,10 @@ while (true) do
   print('Press [enter] to exit')
 
   local _, key = os.pullEvent('key')
+  if (turtle.fuelLevel() < 1) then turtle.refuel(1) end
   if (turtle.detectUp()) then turtle.digUp() end
   if (key == keys.up) then
     if (not turtle.forward()) then
-      turtle.refuel(1)
       turtle.dig()
       turtle.attack()
       turtle.forward()
@@ -27,7 +27,6 @@ while (true) do
   end
   if (key == keys.down) then
     if (not turtle.back()) then
-      turtle.refuel(1)
       turtle.turnLeft()
       turtle.turnLeft()
       turtle.dig()

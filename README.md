@@ -64,9 +64,11 @@ Example:
 ## dig.lua
 
 Dig performs a task similar to excavate, but when used with `recover.lua` it can recover after being unloaded.
-This is useful when chunkloaders are unavailable or with servers that have frequent restarts. The program's down-first dig pattern results in less mob-spawns while excavating.
+This is useful when chunkloaders are unavailable or with servers that have frequent restarts. 
+The program's down-first dig pattern also results in less mob-spawns while excavating.
 
-To use this program, a physical boundary must be set up around the area to dig
+To use this program, a rectangular boundary must be set up around the area to dig,
+the top layer of the dig area should have no holes,
 and fuel must be placed in the 1st slot of the turtle's inventory.
 This program will only recover after a restart/unload using the `recover.lua` program.
 

@@ -1,6 +1,8 @@
 # TurtleCraft
 *A collection of scripts to extend usability of computers and turtles in modded minecraft settings*
 
+<image style="width: 512px" src="turtlecraft.jpg" />
+
 ### To Install:
 
 > **Download:**
@@ -17,33 +19,12 @@ Redownloads all of the files to your computer/turtle
 
 ## recover.lua
 
-Configures the computer/turtle to execute a command when it boots.
+Configures the computer/turtle to execute a command whenever it (re)boots.
 
 Example: 
 > recover ls ./rom/programs
 
 *Lists all of the programs in ./rom/programs whenever the computer/turtle boots*
-
-## drop.lua
-
-"Because solengolia's can only do so much..."
-
-Some machines in modded minecraft function by consuming dropped items,
-but there are all sorts of things that cause dropped items to be moved or deleted.
-Drop ejects items and then pick them back up after a short time.
-This can help with preventing despawn.
-
-<image style="width: 512px" src="drop.jpg" />
-
-Example:
-> drop
-
-*Drops up to a default of 64 items and lets them sit for 10 seconds*
-
-Example:
-> drop 5 30
-
-*Drops up to 5 items and lets them sit for 30 seconds*
 
 ## farm.lua
 
@@ -123,4 +104,25 @@ Provides a keyboard interface for manually navigating the turtle.
 
 Example:
 > tunnel
+
+## drop.lua
+
+"Because solengolia's can only do so much..."
+
+Some machines in modded minecraft function by consuming dropped items,
+but there are all sorts of things that cause dropped items to be moved or deleted.
+Drop ejects items and then pick them back up after a short time.
+This can help with preventing despawn.
+
+<image style="width: 512px" src="drop.jpg" />
+
+Example:
+> drop
+
+*Drops up to a default of 64 items and lets them sit for 10 seconds*
+
+Example:
+> drop 5 30
+
+*Drops up to 5 items and lets them sit for 30 seconds*
 

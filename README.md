@@ -61,6 +61,27 @@ Example:
 
 *Rotates every 30 seconds looking for a mature crop and ejects downward*
 
+Example:
+> farm 30 down no
+
+*Rotates every 30 seconds looking for a mature crop and ejects downward and doesn't replant*
+
+## treefarm.lua
+
+Plants saplings from its inventory and checks for logs in the spaces around it.
+
+<image style="width: 512px" src="treefarm.jpg" />
+
+Example:
+> treefarm
+
+*Rotates every 10 seconds planting saplings and looking for a log*
+
+**Notes:**
+* Reserve inventory for logs and saplings with single items in each slot.
+* Uses logs for fuel to harvest upward when a log is detected.
+* Only works with basic, straight trees.
+
 ## dig.lua
 
 Dig performs a task similar to excavate, but when used with `recover.lua` it can recover after being unloaded.

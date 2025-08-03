@@ -60,7 +60,7 @@ function floor()
 end
 
 function chop()
-  display("Chopping...")
+  display("Chopping logs and leaves...")
   while (true) do
     local up = turtle.detectUp()
     if (up) then turtle.digUp() end
@@ -73,7 +73,7 @@ function chop()
 end
 
 function gather()
-  display("Gathering...")
+  display("Gathering adjacent drops...")
   for i = 1,4 do
     turtle.suck()
     turtle.turnLeft()
@@ -81,7 +81,7 @@ function gather()
 end
 
 function plant()
-  display("Planting sapling...")
+  display("Planting a sapling...")
   while (true) do
     for i = 1,16 do
       if (identifySlot(i) == "sapling" and turtle.getItemCount(i) > 1) then
@@ -98,12 +98,12 @@ if (turtle.detectUp() or turtle.detect()) then chop() end
 floor()
 
 while (true) do
+  turtle.turnRight()
   if (not turtle.inspect()) then plant() end
   if (identifyFront() ~= "sapling") then 
     refuel()
     chop()
     gather()
   end
-  turtle.turnRight()
   os.sleep(timer)
 end

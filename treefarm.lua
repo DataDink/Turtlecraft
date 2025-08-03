@@ -8,7 +8,7 @@ function display(message)
   term.setCursorPos(1,1)
   print("TreeFarm checks for logs in the spaces around it and plants saplings.")
   print("Reserve slots with saplings and logs.")
-  print("For small, straight trees only."
+  print("For small, straight trees only.")
   print("treefarm [<interval:number>]")
   print("")
   print(message)
@@ -32,9 +32,9 @@ function identifyBlock(inspect)
   return info and identify(info.name)
 end
 
-function identifyUp() return identifyBlock(turtle.inspectUp()) end
-function identifyFront() return identifyBlock(turtle.inspect()) end
-function identifyDown() return identifyBlock(turtle.inspectDown()) end
+function identifyUp() return identifyBlock(turtle.inspectUp) end
+function identifyFront() return identifyBlock(turtle.inspect) end
+function identifyDown() return identifyBlock(turtle.inspectDown) end
 
 function refuel()
   while (turtle.getFuelLevel() < 50) do
@@ -54,6 +54,7 @@ function floor()
   while (true) do
     if (identifyDown()) then turtle.digDown() end
     if (turtle.detectDown()) then return end
+    turtle.down()
   end
   display("")
 end
@@ -66,6 +67,7 @@ function chop()
     local front = turtle.detect()
     if (front) then turtle.dig() end
     if (not up and not front) then break end
+    turtle.up()
   end
   floor()
 end

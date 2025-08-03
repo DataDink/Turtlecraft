@@ -98,12 +98,13 @@ if (turtle.detectUp() or turtle.detect()) then chop() end
 floor()
 
 while (true) do
-  turtle.turnRight()
   if (not turtle.inspect()) then plant() end
   if (identifyFront() ~= "sapling") then 
     refuel()
     chop()
     gather()
+    plant()
   end
   os.sleep(timer)
+  turtle.turnRight()
 end

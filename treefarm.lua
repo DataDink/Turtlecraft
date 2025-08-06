@@ -40,7 +40,7 @@ function refuel()
   while (turtle.getFuelLevel() < 50) do
     display("Consuming logs for fuel...")
     for i = 1,16 do
-      if (identifySlot(i) == "log" and turtle.getItemCount(i) > 1) then
+      while (turtle.getFuelLevel() < 50 and turtle.getItemCount(i) > 1 and identifySlot(i) == "log") then
         turtle.select(i)
         turtle.refuel(1)
       end

@@ -62,10 +62,8 @@ end
 function chop()
   display("Chopping logs and leaves...")
   while (true) do
-    local up = turtle.detectUp()
-    if (up) then turtle.digUp() end
-    local front = turtle.detect()
-    if (front) then turtle.dig() end
+    local up = identifyUp() and turtle.digUp()
+    local front = identifyFront() and turtle.dig()
     if (not up and not front) then break end
     turtle.up()
   end

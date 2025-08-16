@@ -22,9 +22,9 @@ Redownloads all of the files to your computer/turtle
 Configures the computer/turtle to execute a command whenever it (re)boots.
 
 Example: 
-> recover ls ./rom/programs
+> recover farm
 
-*Lists all of the programs in ./rom/programs whenever the computer/turtle boots*
+*Starts the farm program whenever the turtle boots. (e.g. when the chunk un/loads)*
 
 ## farm.lua
 

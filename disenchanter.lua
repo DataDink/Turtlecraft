@@ -5,9 +5,11 @@ while (true) do
   term.clear()
   term.setCursorPos(1, 1)
   print("** Disenchanter **")
+  print()
   print("- Insert Anvil")
   print("- Insert Book(s)")
   print("- Insert Item")
+  print()
   print("Press any key to continue...")
 
   os.pullEvent("key")
@@ -16,10 +18,10 @@ while (true) do
   local item = 0
 
   for i = 1, 16 do
-    local item = turtle.getItemDetail(i)
-    if (item) then
-      if (item.name == "minecraft:anvil") then anvil = i
-      elseif (item.name == "minecraft:book") then books = i
+    local detail = turtle.getItemDetail(i)
+    if (detail) then
+      if (detail.name == "minecraft:anvil") then anvil = i
+      elseif (detail.name == "minecraft:book") then books = i
       else item = i end
     end
   end
@@ -28,10 +30,12 @@ while (true) do
     term.clear()
     term.setCursorPos(1, 1)
     print("** Disenchanter **")
+    print()
     print("- Missing Required Items -")
     print("Anvil: " .. (anvil == 0 and "Missing" or "Present"))
     print("Books: " .. (books == 0 and "Missing" or "Present"))
     print("Item: " .. (item == 0 and "Missing" or "Present"))
+    print()
     print("Press any key to continue...")
     os.pullEvent("key")
   else
@@ -46,6 +50,7 @@ while (true) do
     term.clear()
     term.setCursorPos(1, 1)
     print("** Disenchanting **")
+    print()
     print("Awaiting anvil drop...")
     while (not turtle.detect()) do os.sleep(0.1) end
 

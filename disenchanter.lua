@@ -15,7 +15,7 @@ while (true) do
   local books = 0
   local item = 0
 
-  for (i = 1, 16) do
+  for i = 1, 16 do
     local item = turtle.getItemDetail(i)
     if (item) then
       if (item.name == "minecraft:anvil") then anvil = i

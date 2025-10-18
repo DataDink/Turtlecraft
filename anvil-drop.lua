@@ -1,10 +1,12 @@
 if (not turtle) then error("Error: Drop requires a turtle") end
 
+function waitKey()
+  local _,key = os.pullEvent("key")
+  return key
+end
+
 function waitEnter()
-  local key = nil
-  while key ~= keys.enter do
-    local _, key = os.pullEvent("key")
-  end
+  while waitKey() ~= keys.enter do end
 end
 
 function instruct()
@@ -23,9 +25,10 @@ end
 function find()
   for i = 1, 16 do
     local detail = turtle.getItemDetail(i)
-    if (not detail) then continue end
-    if (detail.name == "minecraft:anvil" or detail.name == "minecraft:chipped_anvil" or detail.name == "minecraft:damaged_anvil") then
-      return i
+    if (not detail) then
+      if (detail.name == "minecraft:anvil" or detail.name == "minecraft:chipped_anvil" or detail.name == "minecraft:damaged_anvil") then
+        return i
+      end
     end
   end
 end
@@ -58,8 +61,8 @@ while (true) do
   local found = find()
 
   if (found) then
-    for (i = 1, 16) do
-      if (i ~= found && turtle.getItemCount(i) > 0) then
+    for i = 1, 16 do
+      if (i ~= found and turtle.getItemCount(i) > 0) then
         turtle.select(i)
         turtle.drop(1)
       end

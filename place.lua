@@ -1,7 +1,7 @@
 if (not turtle) then error("Error: Drop requires a turtle") end
 
 local direction = arg and tostring(arg[1]) or 'front'
-local rstone = arg and tostring(arg[2]) == 'false'
+local rstone = arg and string.lower(tostring(arg[2])) == 'true'
 
 function display(message)
   term.clear()

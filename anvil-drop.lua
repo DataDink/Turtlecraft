@@ -24,8 +24,8 @@ end
 
 function find()
   for i = 1, 16 do
-    local detail = turtle.getItemDetail(i)
-    if (not detail) then
+    local detail = turtle.getItemCount(i)
+    if (detail) then
       if (detail.name == "minecraft:anvil" or detail.name == "minecraft:chipped_anvil" or detail.name == "minecraft:damaged_anvil") then
         return i
       end

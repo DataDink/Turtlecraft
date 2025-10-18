@@ -12,7 +12,7 @@ end
 function instruct()
   term.clear()
   term.setCursorPos(1, 1)
-  print("** Anvil Drop Instructions **")
+  print("** Anvil Drop **")
   print()
   print("- Put a block placer above the turtle")
   print("- Insert Anvil")

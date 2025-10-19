@@ -126,3 +126,38 @@ Example:
 
 *Drops up to 5 items and lets them sit for 30 seconds*
 
+
+## anvil-drop.lua
+
+"Simplify anvil crafting..."
+
+Setting up multiple anvil drops can be tedius.
+Also, modded environments sometimes complicate the process.
+Anvil-drop offers one-part of automating anvil drops.
+
+The setup for this is to put the turtle on top of a chest or other inventory.
+Place a wall one space in front of the turtle and inventory to catch tossed items.
+Place the anvil and the items for the recipe into the chest
+and press enter in the turtle's menu to start.
+The turtle will drop all items from the chest,
+place the anvil and then emit a redstone signal.
+The redstone signal can be used to trigger an automatic breaking of the anvil
+and any automated pickup of items.
+
+Profile of setup:
+```
+     
+ T_X 
+ I_X 
+  X  
+```
+* X is any solid block
+* T is the turtle facing to the right
+* I is the chest or inventory
+* _ is empty space
+
+<image style="width: 512px" src="drop.jpg" />
+
+Example:
+> anvil-drop
+

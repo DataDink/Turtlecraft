@@ -1,4 +1,4 @@
-if (not turtle) then error("Error: Drop requires a turtle") end
+if (not turtle) then error("Error: anvil-drop requires a turtle") end
 
 function waitKey()
   local _,key = os.pullEvent("key")

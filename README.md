@@ -156,8 +156,6 @@ Profile of setup:
 * I is the chest or inventory
 * _ is empty space
 
-<image style="width: 512px" src="drop.jpg" />
-
 Example:
 > anvil-drop
 

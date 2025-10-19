@@ -6,10 +6,10 @@ local REDSTONE = arg and string.lower(tostring(arg[2])) == 'true'
 function display(message)
   term.clear()
   term.setCursorPos(1,1)
-  print("Place will place blocks above, in front, and below.")
-  print("It will pull items from chests above, in front, and below it.")
+  print("Break will break blocks above, below or in front of it.")
+  print("It will push items into chests above, below or in front of it.")
   print("It will optionally wait for a redstone signal.")
-  print("place [<restrict:up/down/front> [<redstone:true/false>]]")
+  print("break [<restrict:up/down/front> [<redstone:true/false>]]")
   print('')
   print(message)
 end
@@ -20,16 +20,16 @@ function isRestricted(side)
   return true
 end
 
-function isInventory(side)
-  local _, type = peripheral.getType(side)
-  return type == "inventory"
-end
-
 function isSignal()
   for _, side in pairs(redstone.getSides()) do
     if (redstone.getInput(side)) then return true end
   end
   return false
+end
+
+function isInventory(side)
+  local _, type = peripheral.getType(side)
+  return type == "inventory"
 end
 
 function wait()
@@ -42,32 +42,23 @@ function wait()
   end
 end
 
-function refill()
-  for (side in pairs({
-    {isInventory("top"), turtle.suckUp}, 
-    {isInventory("bottom"), turtle.suckDown}, 
-    {isInventory("front"), turtle.suck}
-  })) do
-    if (side[0]) then
-      while (side[1]()) do os.sleep(0.1) end
-    end
-  end
+function dig()
+  if (not isRestricted("up") and not isInventory("top") and turtle.detectUp()) then return turtle.digUp end
+  if (not isRestricted("down") and not isInventory("bottom") and turtle.detectDown()) then return turtle.digDown end
+  if (not isRestricted("front") and not isInventory("front") and turtle.detect()) then return turtle.dig end
 end
 
-function place()
-  for (side in pairs({
-    {isRestricted("up"), turtle.detectUp(), turtle.placeUp},
-    {isRestricted("down"), turtle.detectDown(), turtle.placeDown},
-    {isRestricted("front"), turtle.detect(), turtle.place}
-  })) do
-    if (side[0] and not side[1]) then
-      refill()
-      for i = 1, 16 do
-        if (turtle.getItemCount(i) > 0) then
-          turtle.select(i)
-          if (side[2]()) then break end
-        end
-      end
+function collect()
+  os.sleep(1)
+  if (not turtle.detectUp()) then turtle.suckUp() end
+  if (not turtle.detectDown()) then turtle.suckDown() end
+  if (not turtle.detect()) then turtle.suck() end
+  for i = 1, 16 do
+    if (turtle.getItemCount(i) > 0) then
+      turtle.select(i)
+      if (isInventory("top")) then turtle.dropUp() end
+      if (isInventory("bottom")) then turtle.dropDown() end
+      if (isInventory("front")) then turtle.drop() end
     end
   end
 end
@@ -75,6 +66,7 @@ end
 display()
 while (true) do
   wait()
-  place()
+  dig()
+  collect()
 end
 

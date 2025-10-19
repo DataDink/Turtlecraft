@@ -14,11 +14,11 @@ function instruct()
   term.setCursorPos(1, 1)
   print("** Anvil Drop Instructions **")
   print()
-  print("* Place inventory below turtle.")
-  print("* Place wall 1 space in front.")
-  print("* Place anvil in the inventory.")
-  print("* Place items in the inventory.")
-  print("* After drop, turtle emits redstone.")
+  print("* Place chest below turtle.")
+  print("* Place 'break.lua' turtle below chest."
+  print("* Place a wall 1 space in front.")
+  print("* Place anvil in the chest/inventory.")
+  print("* Place items in the chest/inventory.")
   print()
   print("Press enter to start...")
   waitEnter()
@@ -34,14 +34,8 @@ function dialog(message)
   os.sleep(3)
 end
 
-function inventory()
-  local _,type = peripheral.getType("bottom")
-  if (type ~= 'inventory') then return false end
-  local items = {}
-  for _, item in pairs(peripheral.call("bottom", "list")) do 
-    table.insert(items, item) 
-  end
-  return items
+function isAnvil(name)
+  return name == "minecraft:anvil" or name == "minecraft:chipped_anvil" or name == "minecraft:damaged_anvil"
 end
 
 function inspect()
@@ -49,43 +43,42 @@ function inspect()
     dialog("There should be 1 empty space in front.")
     return false
   end
-  local items = inventory()
-  if (not items) then
+  local _, below = peripheral.getType("bottom")
+  if (below ~= "inventory") then
     dialog("Missing chest below.")
     return false
   end
   local hasAnvil = false
   local hasItems = false
+  for i = 1, 16 do
+    local info = turtle.getItemDetail(i)
+    if (info and isAnvil(info.name)) then hasAnvil = true
+    elseif (info and info.count > 0) then hasItems = true end
+  end
+  local items = peripheral.call("bottom", "list")
   for _, item in pairs(items) do
-    if (item.name == "minecraft:anvil" or item.name == "minecraft:chipped_anvil" or item.name == "minecraft:damaged_anvil") then
-      hasAnvil = true
-    elseif (item.count > 0) then
-      hasItems = true
-    end
+    if (isAnvil(item.name)) then hasAnvil = true
+    elseif (item.count > 0) then hasItems = true end
   end
   if (not hasAnvil) then
-    dialog("Missing anvil in chest.")
+    dialog("Missing anvil.")
     return false;
   end
   if (not hasItems) then
-    dialog("Missing items in chest.")
+    dialog("Missing items.")
     return false;
   end
   return true
 end
 
-function suck()
-  while (#inventory() > 0 and turtle.suckDown()) do 
+function refill()
+  while (turtle.suckDown()) do
     os.sleep(0.1)
   end
-  if (#inventory() > 0) then
-    dialog("Empty chest failed.")
-    return false
-  end
-  return true
 end
 
 function drop()
+  refill()
   for i = 1, 16 do
     local info = turtle.getItemDetail(i)
     if (info and info.name ~= "minecraft:anvil" and info.name ~= "minecraft:chipped_anvil" and info.name ~= "minecraft:damaged_anvil") then
@@ -93,6 +86,7 @@ function drop()
       turtle.drop()
     end
   end
+  os.sleep(1)
   for i = 1, 16 do
     local info = turtle.getItemDetail(i)
     if (info and (info.name == "minecraft:anvil" or info.name == "minecraft:chipped_anvil" or info.name == "minecraft:damaged_anvil")) then
@@ -117,7 +111,9 @@ end
 
 while (true) do
   instruct()
-  if (inspect() and suck() and drop()) then 
-    emit() 
+  if (inspect() and drop()) then 
+    emit()
+    dialog("One more moment...")
+    refill()
   end
 end

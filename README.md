@@ -126,36 +126,56 @@ Example:
 
 *Drops up to 5 items and lets them sit for 30 seconds*
 
-
 ## anvil-drop.lua
-
-"Simplify anvil crafting..."
 
 Setting up multiple anvil drops can be tedius.
 Also, modded environments sometimes complicate the process.
 Anvil-drop offers one-part of automating anvil drops.
 
 The setup for this is to put the turtle on top of a chest or other inventory.
-Place a wall one space in front of the turtle and inventory to catch tossed items.
-Place the anvil and the items for the recipe into the chest
-and press enter in the turtle's menu to start.
-The turtle will drop all items from the chest,
-place the anvil and then emit a redstone signal.
-The redstone signal can be used to trigger an automatic breaking of the anvil
-and any automated pickup of items.
+* Place an "anvil-drop" turtle facing a wall 1 space away.
+* Place a chest directly below, also with a space.
+* Place a "break" turtle facing the wall 1 space away.
+* Place the anvil and recipe items in the turtle or chest.
+* Press enter in the turtle's ui to start.
 
-Profile of setup:
-```
-     
- T_X 
- I_X 
-  X  
-```
-* X is any solid block
-* T is the turtle facing to the right
-* I is the chest or inventory
-* _ is empty space
+The turtle will then:
+* Eject the recipe items.
+* Place the anvil so it drops on top.
+* Emit a redstone signal when complete.
 
 Example:
 > anvil-drop
+
+## break.lua
+
+Break automates breaking blocks above, in front, and below the turtle.
+It will desposit items into any chests above, in front, and below it.
+It will optionally wait for a redstone signal.
+
+Example:
+> break
+
+*Breaks any blocks it detects and deposits items into inventories*
+
+Example:
+> break front true
+
+*Waits for a redstone signal to break only blocks in front of it*
+
+## place.lua
+
+Place automates placing blocks above, in front, and below the turtle.
+It will draw items from any chests above, in front, and below it.
+It will optionally wait for a redstone signal.
+
+Example:
+> place
+
+*Draws items from inventories and places blocks in the spaces above, in front, and below it.*
+
+Example:
+> place front true
+
+*Waits for a redstone signal to place items only in the space in front of it.*
 

@@ -14,37 +14,46 @@ function instruct()
   term.setCursorPos(1, 1)
   print("** Anvil Drop Instructions **")
   print()
-  print("* Place turtle with inventory below it.")
-  print("* Place wall 1 space in front of both.")
-  print("* Place anvil and items in the inventory.")
-  print("* After completion the turtle emits redstone.")
+  print("* Place inventory below turtle.")
+  print("* Place wall 1 space in front.")
+  print("* Place anvil in the inventory.")
+  print("* Place items in the inventory.")
+  print("* After drop, turtle emits redstone.")
   print()
   print("Press enter to start...")
   waitEnter()
 end
 
-function complain(message)
+function dialog(message)
   term.clear()
   term.setCursorPos(1, 1)
-  print("** Anvil Drop Fixes **")
+  print("** Anvil Drop Message **")
   print()
   print(message)
   print()
   os.sleep(3)
 end
 
+function inventory()
+  local _,type = peripheral.getType("bottom")
+  if (type ~= 'inventory') then return false end
+  local items = {}
+  for _, item in pairs(peripheral.call("bottom", "list")) do 
+    table.insert(items, item) 
+  end
+  return items
+end
+
 function inspect()
   if (turtle.detect()) then
-    complain("There should be 1 empty space in front.")
+    dialog("There should be 1 empty space in front.")
     return false
   end
-  local _, bottom = peripheral.getType("bottom")
-  if (not bottom or bottom ~= "inventory") then
-    complain("The inventory should be below the turtle.")
+  local items = inventory()
+  if (not items) then
+    dialog("Missing chest below.")
     return false
   end
-  local inventory = peripheral.wrap("bottom")
-  local items = inventory.list()
   local hasAnvil = false
   local hasItems = false
   for _, item in pairs(items) do
@@ -55,21 +64,22 @@ function inspect()
     end
   end
   if (not hasAnvil) then
-    complain("The anvil should be in the inventory.")
+    dialog("Missing anvil in chest.")
     return false;
   end
   if (not hasItems) then
-    complain("The items should be in the inventory.")
+    dialog("Missing items in chest.")
     return false;
   end
   return true
 end
 
 function suck()
-  local inventory = peripheral.wrap("bottom")
-  while (#inventory.list() > 0 and turtle.suckDown()) do end
-  if (#inventory.list() > 0) then
-    complain("Failed to load items from the inventory.")
+  while (#inventory() > 0 and turtle.suckDown()) do 
+    os.sleep(0.1)
+  end
+  if (#inventory() > 0) then
+    dialog("Empty chest failed.")
     return false
   end
   return true
@@ -91,7 +101,7 @@ function drop()
       return true
     end
   end
-  complain("Failed to complete the anvil drop.")
+  dialog("Drop anvil failed.")
   return false
 end
 

@@ -16,8 +16,8 @@ end
 
 function isRestricted(side)
   if (RESTRICT == side) then return false end
-  if (RESTRICT ~= "up" and RESTRICT ~= "down" and RESTRICT ~= "front") then return false end
-  return true
+  if (RESTRICT == "up" or RESTRICT == "down" or RESTRICT == "front") then return true end
+  return false
 end
 
 function isSignal()
@@ -63,7 +63,7 @@ function collect()
   end
 end
 
-display()
+display("")
 while (true) do
   wait()
   dig()

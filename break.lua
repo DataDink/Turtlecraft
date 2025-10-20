@@ -43,6 +43,7 @@ function wait()
 end
 
 function suck()
+  os.sleep(1)
   for _, side in pairs({
     {isRestricted("up"), isInventory("top"), turtle.suckUp},
     {isRestricted("down"), isInventory("bottom"), turtle.suckDown},

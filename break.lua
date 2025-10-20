@@ -43,9 +43,9 @@ function wait()
 end
 
 function dig()
-  if (not isRestricted("up") and not isInventory("top") and turtle.detectUp()) then return turtle.digUp end
-  if (not isRestricted("down") and not isInventory("bottom") and turtle.detectDown()) then return turtle.digDown end
-  if (not isRestricted("front") and not isInventory("front") and turtle.detect()) then return turtle.dig end
+  if (not isRestricted("up") and not isInventory("top") and turtle.detectUp()) then turtle.digUp() end
+  if (not isRestricted("down") and not isInventory("bottom") and turtle.detectDown()) then turtle.digDown() end
+  if (not isRestricted("front") and not isInventory("front") and turtle.detect()) then turtle.dig() end
 end
 
 function collect()

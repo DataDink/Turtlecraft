@@ -36,9 +36,9 @@ function wait()
   while (true) do
     if (REDSTONE) then os.pullEvent("redstone") else os.sleep(0.5) end
     while (REDSTONE and not isSignal()) do os.pullEvent("redstone") end
-    if (not isRestricted("up") and not turtle.detectUp()) then return end
-    if (not isRestricted("down") and not turtle.detectDown()) then return end
-    if (not isRestricted("front") and not turtle.detect()) then return end
+    if (not isRestricted("up") and not isInventory("top") and turtle.detectUp()) then return end
+    if (not isRestricted("down") and not isInventory("bottom") and turtle.detectDown()) then return end
+    if (not isRestricted("front") and not isInventory("front") and turtle.detect()) then return end
   end
 end
 

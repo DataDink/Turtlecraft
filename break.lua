@@ -42,17 +42,20 @@ function wait()
   end
 end
 
+function suck()
+  if (isInventory("top")) then turtle.suckUp() end
+  if (isInventory("bottom")) then turtle.suckDown() end
+  if (isInventory("front")) then turtle.suck() end
+end
+
 function dig()
   if (not isRestricted("up") and not isInventory("top") and turtle.detectUp()) then turtle.digUp() end
   if (not isRestricted("down") and not isInventory("bottom") and turtle.detectDown()) then turtle.digDown() end
   if (not isRestricted("front") and not isInventory("front") and turtle.detect()) then turtle.dig() end
 end
 
-function collect()
+function distribute()
   os.sleep(1)
-  if (not turtle.detectUp()) then turtle.suckUp() end
-  if (not turtle.detectDown()) then turtle.suckDown() end
-  if (not turtle.detect()) then turtle.suck() end
   for i = 1, 16 do
     if (turtle.getItemCount(i) > 0) then
       turtle.select(i)
@@ -66,7 +69,9 @@ end
 display("")
 while (true) do
   wait()
+  suck()
   dig()
-  collect()
+  suck()
+  distribute()
 end
 

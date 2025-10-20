@@ -39,7 +39,7 @@ end
 
 function suck()
   os.sleep(1)
-  for side in pairs({
+  for _, side in pairs({
     {isRestricted("up"), isInventory("top"), turtle.suckUp},
     {isRestricted("down"), isInventory("bottom"), turtle.suckDown},
     {isRestricted("front"), isInventory("front"), turtle.suck}

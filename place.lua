@@ -43,11 +43,11 @@ function wait()
 end
 
 function refill()
-  for (side in pairs({
+  for _, side in pairs({
     {isInventory("top"), turtle.suckUp}, 
     {isInventory("bottom"), turtle.suckDown}, 
     {isInventory("front"), turtle.suck}
-  })) do
+  }) do
     if (side[0]) then
       while (side[1]()) do os.sleep(0.1) end
     end
@@ -55,11 +55,11 @@ function refill()
 end
 
 function place()
-  for (side in pairs({
+  for _, side in pairs({
     {isRestricted("up"), turtle.detectUp(), turtle.placeUp},
     {isRestricted("down"), turtle.detectDown(), turtle.placeDown},
     {isRestricted("front"), turtle.detect(), turtle.place}
-  })) do
+  }) do
     if (side[0] and not side[1]) then
       refill()
       for i = 1, 16 do

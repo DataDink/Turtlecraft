@@ -15,7 +15,7 @@ function instruct()
   print("** Anvil Drop Instructions **")
   print()
   print("* Place chest below turtle.")
-  print("* Place 'break.lua' turtle below chest."
+  print("* Place 'break.lua' turtle below chest.")
   print("* Place a wall 1 space in front.")
   print("* Place anvil in the chest/inventory.")
   print("* Place items in the chest/inventory.")
@@ -81,7 +81,7 @@ function drop()
   refill()
   for i = 1, 16 do
     local info = turtle.getItemDetail(i)
-    if (info and info.name ~= "minecraft:anvil" and info.name ~= "minecraft:chipped_anvil" and info.name ~= "minecraft:damaged_anvil") then
+    if (info and not isAnvil(info.name)) then
       turtle.select(i)
       turtle.drop()
     end
@@ -89,7 +89,7 @@ function drop()
   os.sleep(1)
   for i = 1, 16 do
     local info = turtle.getItemDetail(i)
-    if (info and (info.name == "minecraft:anvil" or info.name == "minecraft:chipped_anvil" or info.name == "minecraft:damaged_anvil")) then
+    if (info and isAnvil(info.name)) then
       turtle.select(i)
       turtle.place()
       return true

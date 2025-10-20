@@ -48,8 +48,8 @@ function refill()
     {isInventory("bottom"), turtle.suckDown}, 
     {isInventory("front"), turtle.suck}
   }) do
-    if (side[0]) then
-      while (side[1]()) do os.sleep(0.1) end
+    if (side[1]) then
+      while (side[2]()) do os.sleep(0.1) end
     end
   end
 end
@@ -60,12 +60,12 @@ function place()
     {isRestricted("down"), turtle.detectDown(), turtle.placeDown},
     {isRestricted("front"), turtle.detect(), turtle.place}
   }) do
-    if (side[0] and not side[1]) then
+    if (side[1] and not side[2]) then
       refill()
       for i = 1, 16 do
         if (turtle.getItemCount(i) > 0) then
           turtle.select(i)
-          if (side[2]()) then break end
+          if (side[3]()) then break end
         end
       end
     end

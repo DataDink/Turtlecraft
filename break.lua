@@ -48,8 +48,8 @@ function suck()
     {isRestricted("down"), isInventory("bottom"), turtle.suckDown},
     {isRestricted("front"), isInventory("front"), turtle.suck}
   }) do
-    if (not side[0] and not side[1]) then 
-      while (side[2]()) do os.sleep(0.1) end
+    if (not side[1] and not side[2]) then 
+      while (side[3]()) do os.sleep(0.1) end
     end
   end
 end

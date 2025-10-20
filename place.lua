@@ -72,7 +72,7 @@ function place()
   end
 end
 
-display()
+display("")
 while (true) do
   wait()
   place()

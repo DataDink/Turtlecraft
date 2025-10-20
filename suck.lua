@@ -57,7 +57,7 @@ function distribute()
   end
 end
 
-display()
+display("")
 while (true) do
   wait()
   suck()

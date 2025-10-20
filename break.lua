@@ -43,7 +43,6 @@ function wait()
 end
 
 function suck()
-  os.sleep(1)
   if (not isInventory("top")) then turtle.suckUp() end
   if (not isInventory("bottom")) then turtle.suckDown() end
   if (not isInventory("front")) then turtle.suck() end

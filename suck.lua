@@ -41,9 +41,15 @@ end
 
 function suck()
   os.sleep(1)
-  if (not isRestricted("up") and not isInventory("top")) then turtle.suckUp() end
-  if (not isRestricted("down") and not isInventory("bottom")) then turtle.suckDown() end
-  if (not isRestricted("front") and not isInventory("front")) then turtle.suck() end
+  for side in pairs({
+    {isRestricted("up"), isInventory("top"), turtle.suckUp},
+    {isRestricted("down"), isInventory("bottom"), turtle.suckDown},
+    {isRestricted("front"), isInventory("front"), turtle.suck}
+  }) do
+    if (not side[0] and not side[1]) then 
+      while (side[2]()) do os.sleep(0.1) end
+    end
+  end
 end
 
 function distribute()

@@ -43,9 +43,15 @@ function wait()
 end
 
 function suck()
-  if (not isInventory("top")) then turtle.suckUp() end
-  if (not isInventory("bottom")) then turtle.suckDown() end
-  if (not isInventory("front")) then turtle.suck() end
+  for side in pairs({
+    {isRestricted("up"), isInventory("top"), turtle.suckUp},
+    {isRestricted("down"), isInventory("bottom"), turtle.suckDown},
+    {isRestricted("front"), isInventory("front"), turtle.suck}
+  }) do
+    if (not side[0] and not side[1]) then 
+      while (side[2]()) do os.sleep(0.1) end
+    end
+  end
 end
 
 function dig()

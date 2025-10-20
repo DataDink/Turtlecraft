@@ -69,7 +69,6 @@ end
 display("")
 while (true) do
   wait()
-  suck()
   dig()
   suck()
   distribute()

@@ -43,9 +43,9 @@ function wait()
 end
 
 function suck()
-  if (isInventory("top")) then turtle.suckUp() end
-  if (isInventory("bottom")) then turtle.suckDown() end
-  if (isInventory("front")) then turtle.suck() end
+  if (not isInventory("top")) then turtle.suckUp() end
+  if (not isInventory("bottom")) then turtle.suckDown() end
+  if (not isInventory("front")) then turtle.suck() end
 end
 
 function dig()

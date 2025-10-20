@@ -43,6 +43,7 @@ function wait()
 end
 
 function suck()
+  os.sleep(1)
   if (not isInventory("top")) then turtle.suckUp() end
   if (not isInventory("bottom")) then turtle.suckDown() end
   if (not isInventory("front")) then turtle.suck() end
@@ -55,7 +56,6 @@ function dig()
 end
 
 function distribute()
-  os.sleep(1)
   for i = 1, 16 do
     if (turtle.getItemCount(i) > 0) then
       turtle.select(i)

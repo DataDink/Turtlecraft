@@ -33,10 +33,8 @@ function isSignal()
 end
 
 function wait()
-  while (true) do
-    if (REDSTONE) then os.pullEvent("redstone") else os.sleep(0.5) end
-    while (REDSTONE and not isSignal()) do os.pullEvent("redstone") end
-  end
+  if (REDSTONE) then os.pullEvent("redstone") else os.sleep(0.5) end
+  while (REDSTONE and not isSignal()) do os.pullEvent("redstone") end
 end
 
 function suck()

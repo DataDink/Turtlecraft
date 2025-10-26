@@ -120,15 +120,15 @@ end
 
 while (true) do
   cleanup()
+  rest()
   while (isFull()) do
     display("Additional space required")
-    os.sleep(10)
+    os.sleep(3)
   end
   while (isRedstone()) do
     display("Redstone signal detected, waiting...")
     os.sleep(0.1)
   end
-  rest()
   local _, inspection = turtle.inspect()
   local name = inspection and inspection.name
   local mature, reason = turtle.crop.mature()

@@ -13,7 +13,7 @@ os.loadAPI('turtle.crop.api')
 
 local recover = 'farm.time'
 local timer = arg and tonumber(arg[1]) or 10
-local replant = not arg or arg[3] ~= "no"
+local replant = not arg or arg[2] ~= "no"
 
 function display(message)
   term.clear()

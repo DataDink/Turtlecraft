@@ -13,7 +13,7 @@ os.loadAPI('turtle.crop.api')
 
 local recover = 'farm.time'
 local timer = arg and tonumber(arg[1]) or 10
-local replant = not arg or arg[2] ~= "no"
+local doplant = not arg or arg[2] ~= "no"
 
 function display(message)
   term.clear()
@@ -105,7 +105,7 @@ function harvest()
 end
 
 function replant(name)
-  if (not replant) then return true end
+  if (not doplant) then return true end
   for _, search in pairs({name,""}) do
     for i = 1,16 do
       local detail = turtle.getItemDetail(i)

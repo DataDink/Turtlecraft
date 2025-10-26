@@ -1,3 +1,13 @@
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] dig")
+  print("Alternative excavation script that")
+  print("digs to a rectangular boundary and")
+  print("attempts to recover after being unloaded.")
+  print("Instruction: Place a mining turtle on")
+  print("a flat surface limited by a boundary.")
+  return
+end
+
 if (not turtle) then error("dig requires a turtle") end
 
 os.loadAPI('turtle.track.api')

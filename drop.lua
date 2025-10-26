@@ -1,3 +1,12 @@
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] drop [<interval> [<count> [<direction> [<randomize>]]]]]")
+  print("* interval: number")
+  print("* count: number")
+  print("* direction: up/down/forward/auto")
+  print("* random: true/false")
+  return
+end
+
 if (not turtle) then error("Error: Drop requires a turtle") end
 
 local time = arg and tonumber(arg[1]) or 10
@@ -10,7 +19,7 @@ function display(message)
   term.setCursorPos(1,1)
   print("Drop keeps dropped items refreshed so they don't get deleted.")
   print('Items are picked up and re-ejected at a regular interval.')
-  print('drop [<interval:number> [<count:number> [<direction:up/down/forward/auto> [<randomize:true/false>]]]]')
+  print('(see `drop help` for usage)')
   print('')
   print(message)
 end

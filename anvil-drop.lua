@@ -1,3 +1,13 @@
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] anvil-drop")
+  print("Setup:")
+  print("1. Place a `anvil-drop` turtle on top.")
+  print("2. Place a chest/inventory below.")
+  print("3. Place a `break.lua` turtle on bottom.")
+  print("4. Leave a space in front to drop items.")
+  return
+end
+
 if (not turtle) then error("Error: anvil-drop requires a turtle") end
 
 function waitKey()
@@ -14,11 +24,9 @@ function instruct()
   term.setCursorPos(1, 1)
   print("** Anvil Drop Instructions **")
   print()
-  print("* Place chest below turtle.")
-  print("* Place 'break.lua' turtle below chest.")
-  print("* Place a wall 1 space in front.")
-  print("* Place anvil in the chest/inventory.")
-  print("* Place items in the chest/inventory.")
+  print("* Place anvil in inventory.")
+  print("* Place recipe items in inventory.")
+  print("(see `break help` for setup)")
   print()
   print("Press enter to start...")
   waitEnter()

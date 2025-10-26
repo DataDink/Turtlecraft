@@ -1,4 +1,11 @@
-if (not turtle) then error("farm requires a turtle") end
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] treefarm [<interval>]")
+  print("* interval: number")
+  print("    How often to check for a tree.")
+  return
+end
+
+if (not turtle) then error("treefarm requires a turtle") end
 
 local timer = arg and tonumber(arg[1]) or 10
 
@@ -8,8 +15,8 @@ function display(message)
   term.setCursorPos(1,1)
   print("TreeFarm checks for logs in the spaces around it and plants saplings.")
   print("Reserve slots with saplings and logs.")
-  print("For small, straight trees only.")
-  print("treefarm [<interval:number>]")
+  print("Best for small, straight trees only.")
+  print("(see `treefarm help` for usage)")
   print("")
   print(message)
 end

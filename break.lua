@@ -1,3 +1,12 @@
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] break [<restrict> [<redstone>]]")
+  print("* restrict: up/down/front")
+  print("    restricts breaking to the specified side.")
+  print("* redstone: true/false")
+  print("    whether to wait for a redstone pulse.")
+  return
+end
+
 if (not turtle) then error("Error: Drop requires a turtle") end
 
 local RESTRICT = arg and string.lower(tostring(arg[1]))
@@ -9,7 +18,7 @@ function display(message)
   print("Break will break blocks above, below or in front of it.")
   print("It will push items into chests above, below or in front of it.")
   print("It will optionally wait for a redstone signal.")
-  print("break [<restrict:up/down/front> [<redstone:true/false>]]")
+  print("(see `break help` for usage)")
   print('')
   print(message)
 end

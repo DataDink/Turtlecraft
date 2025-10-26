@@ -1,3 +1,9 @@
+if (arg and arg[1] == "help") then
+  print("Usage: drive")
+  print("Control the turtle with the keyboard.")
+  return
+end
+
 if (not turtle) then error("drive requires a turtle") end
 
 function display(message)

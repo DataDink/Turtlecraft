@@ -1,3 +1,12 @@
+if (arg and arg[1] == "help") then
+  print("Usage: [recover] place [<restrict> [<redstone>]]")
+  print("* restrict: up/down/front")
+  print("    restricts placing to the specified side.")
+  print("* redstone: true/false")
+  print("    whether to wait for a redstone pulse.")
+  return
+end
+
 if (not turtle) then error("Error: Drop requires a turtle") end
 
 local RESTRICT = arg and string.lower(tostring(arg[1]))
@@ -9,7 +18,7 @@ function display(message)
   print("Place will place blocks above, in front, and below.")
   print("It will pull items from chests above, in front, and below it.")
   print("It will optionally wait for a redstone signal.")
-  print("place [<restrict:up/down/front> [<redstone:true/false>]]")
+  print("(see `place help` for usage)")
   print('')
   print(message)
 end

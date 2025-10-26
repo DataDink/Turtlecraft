@@ -1,3 +1,9 @@
+if (arg and arg[1] == "help") then
+  print("Usage: tunnel")
+  print("Control the turtle with the keyboard.")
+  return
+end
+
 if (not turtle) then error("tunnel requires a turtle") end
 local width, height = term.getSize()
 

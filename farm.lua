@@ -106,10 +106,15 @@ end
 
 function replant(name)
   if (not doplant) then return true end
-  for _, search in pairs({name,""}) do
+  local search = {name}
+  for word in string.gmatch(name, "%w+") do
+    table.insert(search, word)
+  end
+  table.insert(search, "")
+  for _, value in pairs(search) do
     for i = 1,16 do
       local detail = turtle.getItemDetail(i)
-      if (detail and string.find(detail.name, search) 
+      if (detail and string.find(detail.name, value) 
           and turtle.select(i) 
           and turtle.place()
         ) then return true end
